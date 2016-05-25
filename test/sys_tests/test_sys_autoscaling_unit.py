@@ -60,7 +60,7 @@ runcmd:
 
     jump.DependsOn = internet_gateway.title
 
-    service_role_arn = 'arn:aws:iam::658691668407:role/CodeDeployServiceRole'
+    service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
     unit1 = AutoscalingUnit(
         unit_title='app1',

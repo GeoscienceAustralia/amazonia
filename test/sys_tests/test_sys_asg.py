@@ -60,10 +60,9 @@ runcmd:
         userdata=userdata,
         health_check_grace_period=300,
         health_check_type='ELB',
-        cd_service_role_arn='arn:aws:iam::658691668407:role/CodeDeployServiceRole',
-        iam_instance_profile_arn=
-        'arn:aws:iam::658691668407:instance-profile/natmap-iam-instance-profile-InstanceProfile-1XCAISNTXMEHG',
-        sns_topic_arn='arn:aws:sns:ap-southeast-2:074615718262:natmap_service_status',
+        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
+        iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
+        sns_topic_arn='arn:aws:sns:ap-southeast-2:123456789:test_sns_arn',
         sns_notification_types=['autoscaling:EC2_INSTANCE_LAUNCH',
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',

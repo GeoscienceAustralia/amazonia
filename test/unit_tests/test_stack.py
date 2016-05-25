@@ -34,7 +34,7 @@ runcmd:
     jump_image_id = 'ami-05446966'
     unit_image_id = 'ami-05446966'
     instance_type = 't2.nano'
-    code_deploy_service_role = 'arn:aws:iam::658691668407:role/CodeDeployServiceRole'
+    code_deploy_service_role = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
     vpc_cidr = '10.0.0.0/16'
     home_cidrs = [{'name': 'GA', 'cidr': '123.123.12.34/32'}, {'name': 'home', 'cidr': '192.168.0.1/16'}]
     instanceports = ['80']
