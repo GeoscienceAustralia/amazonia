@@ -1,0 +1,51 @@
+unit_title: 'defaulttitle'
+image_id: 'ami-0c95b86f'
+instance_type: 't2.micro'
+stack_title: 'myStack'
+keypair: 'INSERT_YOUR_KEYPAIR_HERE'
+availability_zones:
+  - 'ap-southeast-2a'
+  - 'ap-southeast-2b'
+  - 'ap-southeast-2c'
+vpc_cidr: '10.0.0.0/16'
+public_cidr:
+  name: 'PublicIp'
+  cidr: '0.0.0.0/0'
+jump_image_id: 'ami-0c95b86f'
+jump_instance_type: 't2.micro'
+nat_image_id: 'ami-0c95b86f'
+nat_instance_type: 't2.micro'
+home_cidrs:
+  - name: 'home'
+    cidr: '127.0.0.1/32'
+  - name: 'office'
+    cidr: '123.45.12.34/16'
+protocols:
+  - 'HTTP'
+  - 'HTTPS'
+instanceports:
+  - '80'
+  - '8080'
+loadbalancerports:
+  - '80'
+  - '8080'
+path2ping: '/index.html'
+minsize: '1'
+maxsize: '1'
+health_check_grace_period: '300'
+health_check_type: 'ELB'
+dependencies:
+autoscaling_units:
+database_units:
+code_deploy_service_role:
+iam_instance_profile_arn:
+sns_topic_arn:
+sns_notification_types:
+elb_log_bucket:
+hosted_zone_name:
+userdata: ''
+
+## YAML TIPS:
+#   Lists: are denoted by indented hypens
+#   Strings: do not need to be enclosed in quotes or double quotes
+#   Multi line strings: can be used by establishing a literal block '|'

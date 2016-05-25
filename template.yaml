@@ -1,0 +1,85 @@
+#
+# A guide yaml file to show which variables can be configured and the expected data types and yaml syntax.
+#
+# Note that some things follow a nested structure and some are in a flat structure.
+#
+# In an applications specific yaml you would want to define variables in a nested fashion (see below example)
+#
+# autoscaling_units:
+#   -
+#     unit_title: 'app1'
+#     image_id: 'ami-some1234'
+#     instance_type: 't2.micro'
+#
+# This will create an autoscaling unit with the title app1 based on the ami ami-some1234 and of the instance type t2.micro.
+#
+# If image_id was not specified, amazonia will look at the provided defaults to find an image_id field to use.
+# In the default the yaml can have a flat structure like below:
+#
+# unit_title: 'app2'
+# image_id: 'ami-1234some'
+# instance_type: 't2.nano'
+#
+# If the application specific yaml did not specify a unit title, image id, or instance type, amazonia would fill those
+# fields with either app2, ami-1234some, or t2.nano from the defaults depending on what was missing from the application yaml.
+#
+
+userdata: '' # A string containing userdata to run on autoscaling groups.
+image_id: 'ami-some1234' # A string specifying which ami to use for autoscaling groups by its id
+instance_type: 't2.micro' # A string containing the instance type to use for autoscaling groups.
+stack_title: 'myStack' # A string containing the name of the cloud formation stack.
+code_deploy_service_role: # A string specifying a code deploy IAM role by its ARN
+iam_instance_profile_arn: # A string specifying an instance IAM role by its ARN
+keypair: 'mykey' # A string containing the Key Pair to use for ssh access to your instances.
+availability_zones: # A list of strings, specifying each availability zone to use when creating resources.
+  - 'ap-southeast-2a'
+  - 'ap-southeast-2b'
+  - 'ap-southeast-2c'
+vpc_cidr: '#.#.#.#/#' # A cidr block to delegate to your VPC.
+public_cidr: # A dictionary containing the name and cidr block to be considered 'public' by your stack.
+  name: 'PublicIp'
+  cidr: '0.0.0.0/0'
+jump_image_id: 'ami-some1234' # A string specifying which ami to use for your jump box by its id
+jump_instance_type: 't2.micro' # A string containing the instance type to use for autoscaling groups.
+nat_image_id: 'ami-some1234'# A string specifying which ami to use for your NAT box by its id
+nat_instance_type: 't2.micro' # A string containing the instance type to use for autoscaling groups.
+home_cidrs: # A list of dictionaries with each list element containing the name and cidr blocks to be considered 'safe' for ssh access to your stack.
+  - name: 'home'
+    cidr: '#.#.#.#/#'
+  - name: 'office'
+    cidr: '#.#.#.#/#'
+protocols: # a list of strings specifying the protocols to allow access through load balancers into your autoscaling groups.
+  - 'HTTP'
+  - 'HTTPS'
+instanceports: # a list of strings specifying the ports to send traffic to from your load balancers into your autoscaling groups.
+  - '80'
+  - '8080'
+loadbalancerports: # a list of strings specifying the ports to receive traffic on your load balancers.
+  - '80'
+  - '8080'
+path2ping: '/index.html' # A string containing the path for your load balancers to check to confirm that your instances are healthy.
+minsize: '1' # a string containing the minimum amount of instances for your autoscaling groups to run
+maxsize: '1' # a string containing the maximum amount of instances for your autoscaling groups to run
+health_check_grace_period: '300' # a string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
+health_check_type: 'ELB' # A string containing the type of health check to use for your autoscaling groups. This should 90% of the time be 'ELB'
+autoscaling_units: # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these 'units'
+  -
+    unit_title: 'app1' # A string containing the title of this autoscaling unit.
+    dependencies:
+     - 'app2'
+     - 'db1'
+database_units: # A list of RDS instances to create.
+  -
+    unit_title: 'db1' # A string containing the title for this particular RDS instance
+    db_instance_type: 'db.m1.small' # A string containing the db type to use for this RDS instance
+    db_engine: 'postgres' # A string containing the engine to use. Find the available types here: https://aws.amazon.com/rds/
+    db_port: '5432' # A string containing the port to use for communication into the RDS instance
+sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
+sns_notification_types: # a string containing the notification types for SNS topics
+elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
+hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
+
+## YAML TIPS:
+#   Lists: are denoted by indented hypens
+#   Strings: do not need to be enclosed in quotes or double quotes
+#   Multi line strings: can be used by establishing a literal block '|'
