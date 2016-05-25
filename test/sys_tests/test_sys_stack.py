@@ -47,7 +47,7 @@ runcmd:
     instance_type = 't2.nano'
     stack = Stack(
         stack_title='test',
-        code_deploy_service_role='arn:aws:iam::658691668407:role/CodeDeployServiceRole',
+        code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
         keypair='pipeline',
         availability_zones=['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'],
         vpc_cidr='10.0.0.0/16',
