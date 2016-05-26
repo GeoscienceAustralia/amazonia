@@ -1,3 +1,4 @@
+keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 autoscaling_units:
   -
     unit_title: 'app1'
