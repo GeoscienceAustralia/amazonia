@@ -1,0 +1,232 @@
+#
+# A guide yaml file to show which variables can be configured and the expected data types and yaml syntax.
+# For a working example, see the defaults.yaml file in the amazonia folder.
+#
+# Note that some things follow a nested structure and some are in a flat structure.
+#
+# In an applications specific yaml you would want to define variables in a nested fashion (see below example)
+#
+# autoscaling_units:
+#   -
+#     unit_title: 'app1'
+#     image_id: 'ami-some1234'
+#     instance_type: 't2.micro'
+#
+# This will create an autoscaling unit with the title app1 based on the ami ami-some1234 and of the instance type t2.micro.
+#
+# If image_id was not specified, amazonia will look at the provided defaults to find an image_id field to use.
+# In the default the yaml should have a flat structure like below (unless you always want an autoscaling unit or a
+# database unit to be created:
+#
+# unit_title: 'app2'
+# image_id: 'ami-1234some'
+# instance_type: 't2.nano'
+#
+# If the application specific yaml did not specify a unit title, image id, or instance type, amazonia would fill those
+# fields with either app2, ami-1234some, or t2.nano from the defaults depending on what was missing from the application yaml.
+#
+
+unit_title:
+  type: 'string' # If unit title is not provided here, it must be provided as an embeded key in any autoscaling
+  nullable: True # or database units (if they are not also empty).
+image_id: # A string specifying which ami to use for autoscaling groups by its id
+  type: 'string'
+  empty: False
+instance_type: # A string containing the instance type to use for autoscaling groups.
+  type: 'string'
+  empty: False
+stack_title: # A string containing the name of the cloud formation stack.
+  type: 'string'
+  empty: False
+keypair: # A string containing the Key Pair to use for ssh access to your instances.
+  type: 'string'
+  empty: False
+availability_zones: # A list of strings, specifying each availability zone to use when creating resources.
+  type: 'list'
+  empty: False
+  schema:
+    type: 'string'
+    empty: False
+vpc_cidr: # A cidr block to delegate to your VPC.
+  type: 'string'
+  empty: False
+public_cidr: # A dictionary containing the name and cidr block to be considered 'public' by your stack.
+  type: 'dict'
+  empty: False
+  schema:
+    name:
+      type: 'string'
+      empty: False
+    cidr:
+      type: 'string'
+      empty: False
+jump_image_id: # A string specifying which ami to use for your jump box by its id
+  type: 'string'
+  empty: False
+jump_instance_type: # A string specifying which instance type to use for your jump box.
+  type: 'string'
+  empty: False
+nat_image_id: # A string specifying which ami to use for your NAT by its id
+  type: 'string'
+  empty: False
+nat_instance_type: # A string specifying which instance type to use for your NAT.
+  type: 'string'
+  empty: False
+home_cidrs:
+  type: 'list'
+  empty: False
+  schema:
+    type: 'dict'
+    schema:
+      name:
+        type: 'string'
+        empty: False
+      cidr:
+        type: 'string'
+        empty: False
+protocols:
+  type: 'list'
+  empty: False
+  schema:
+    type: 'string'
+    empty: False
+instanceports:
+  type: 'list'
+  empty: False
+  schema:
+    type: 'string'
+    empty: False
+loadbalancerports:
+  type: 'list'
+  empty: False
+  schema:
+    type: 'string'
+    empty: False
+path2ping:
+  type: 'string'
+  empty: False
+minsize:
+  type: 'string'
+  empty: False
+maxsize:
+  type: 'string'
+  empty: False
+health_check_grace_period:
+  type: 'string'
+  empty: False
+health_check_type:
+  type: 'string'
+  empty: False
+dependencies:
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'string'
+autoscaling_units:
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:
+        type: 'string'
+        nullable: True  # For all values in an autoscaling unit. If they are null, a matching value must be
+      hosted_zone_name: # provided at the lowest level of the yaml structure (if autoscaling units are not also empty).
+        type: 'string'
+        nullable: True
+      image_id: # A string specifying which ami to use for this specific autoscaling group by its id
+        type: 'string'
+        nullable: True
+      instance_type: # A string containing the instance type to use for this specific autoscaling group.
+        type: 'string'
+        nullable: True
+      protocols:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+      loadbalancerports:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+      instanceports:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+      path2ping:
+        type: 'string'
+        nullable: True
+      minsize:
+        type: 'string'
+        nullable: True
+      maxsize:
+        type: 'string'
+        nullable: True
+      health_check_grace_period:
+        type: 'string'
+        nullable: True
+      iam_instance_profile_arn:  # A string specifying an instance IAM role for this specific autoscaling group by its ARN
+        type: 'string'
+        nullable: True
+      sns_topic_arn:
+        type: 'string'
+        nullable: True
+      sns_notification_types:
+        type: 'string'
+        nullable: True
+      elb_log_bucket:
+        type: 'string'
+        nullable: True
+      health_check_type:
+        type: 'string'
+        nullable: True
+      dependencies:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+          nullable: True
+      userdata: # A string containing userdata to run on this specific autoscaling group.
+        type: 'string'
+        nullable: True
+database_units:
+  nullable: True
+  type: 'list'
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:
+        type: 'string'
+        nullable: True  # For all values in a database unit. If they are null, a matching value must be provided at
+      db_instance_type: # the lowest level of the yaml structure (if database units are not also empty).
+        type: 'string'
+        nullable: True
+      db_engine:
+        type: 'string'
+        nullable: True
+      db_port:
+        type: 'string'
+        nullable: True
+code_deploy_service_role: # A string specifying a code deploy IAM role by its ARN
+  type: 'string'
+  nullable: True
+iam_instance_profile_arn:  # A string specifying an instance IAM role by its ARN
+  type: 'string'
+  nullable: True
+sns_topic_arn:
+  type: 'string'
+  nullable: True
+sns_notification_types:
+  type: 'string'
+  nullable: True
+elb_log_bucket:
+  type: 'string'
+  nullable: True
+hosted_zone_name:
+  type: 'string'
+  nullable: True
+userdata: # A string containing userdata to run on autoscaling groups.
+  type: 'string'
+  nullable: True
