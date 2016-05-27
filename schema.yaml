@@ -26,7 +26,7 @@
 # fields with either app2, ami-1234some, or t2.nano from the defaults depending on what was missing from the application yaml.
 #
 
-unit_title:
+unit_title: # A string containing the title to use for autoscaling or database units in your stack
   type: 'string' # If unit title is not provided here, it must be provided as an embeded key in any autoscaling
   nullable: True # or database units (if they are not also empty).
 image_id: # A string specifying which ami to use for autoscaling groups by its id
@@ -72,7 +72,7 @@ nat_image_id: # A string specifying which ami to use for your NAT by its id
 nat_instance_type: # A string specifying which instance type to use for your NAT.
   type: 'string'
   empty: False
-home_cidrs:
+home_cidrs: # A list of dictionaries with each list element containing the name and cidr blocks to be considered 'safe' for ssh access to your stack.
   type: 'list'
   empty: False
   schema:
@@ -84,51 +84,51 @@ home_cidrs:
       cidr:
         type: 'string'
         empty: False
-protocols:
+protocols: # a list of strings specifying the protocols to allow access through load balancers into your autoscaling groups.
   type: 'list'
   empty: False
   schema:
     type: 'string'
     empty: False
-instanceports:
+instanceports: # a list of strings specifying the ports to send traffic from your load balancers into your autoscaling groups.
   type: 'list'
   empty: False
   schema:
     type: 'string'
     empty: False
-loadbalancerports:
+loadbalancerports: # a list of strings specifying the ports to receive traffic on your load balancers.
   type: 'list'
   empty: False
   schema:
     type: 'string'
     empty: False
-path2ping:
+path2ping: # A string containing the path for your load balancers to check to confirm that your instances are healthy.
   type: 'string'
   empty: False
-minsize:
+minsize: # a string containing the minimum amount of instances for your autoscaling groups to run
   type: 'string'
   empty: False
-maxsize:
+maxsize: # a string containing the maximum amount of instances for your autoscaling groups to run
   type: 'string'
   empty: False
-health_check_grace_period:
+health_check_grace_period: # a string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
   type: 'string'
   empty: False
-health_check_type:
+health_check_type: # A string containing the type of health check to use for your autoscaling groups. This should 90% of the time be 'ELB'
   type: 'string'
   empty: False
-dependencies:
+dependencies: # A list of strings with the titles of objects that your autoscaling units depend on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
   type: 'list'
   nullable: True
   schema:
     type: 'string'
-autoscaling_units:
+autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'
   nullable: True
   schema:
     type: 'dict'
     schema:
-      unit_title:
+      unit_title:  # A string containing the title of this autoscaling unit.
         type: 'string'
         nullable: True  # For all values in an autoscaling unit. If they are null, a matching value must be
       hosted_zone_name: # provided at the lowest level of the yaml structure (if autoscaling units are not also empty).
@@ -140,49 +140,49 @@ autoscaling_units:
       instance_type: # A string containing the instance type to use for this specific autoscaling group.
         type: 'string'
         nullable: True
-      protocols:
+      protocols: # a list of strings specifying the protocols to allow access through load balancers into this specific autoscaling group.
         type: 'list'
         nullable: True
         schema:
           type: 'string'
-      loadbalancerports:
+      loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
         type: 'list'
         nullable: True
         schema:
           type: 'string'
-      instanceports:
+      instanceports: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
         type: 'list'
         nullable: True
         schema:
           type: 'string'
-      path2ping:
+      path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
         type: 'string'
         nullable: True
-      minsize:
+      minsize: # a string containing the minimum amount of instances for this specific autoscaling group to run
         type: 'string'
         nullable: True
-      maxsize:
+      maxsize: # a string containing the maximum amount of instances for this specific autoscaling group to run
         type: 'string'
         nullable: True
-      health_check_grace_period:
+      health_check_grace_period:  # A string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
         type: 'string'
         nullable: True
       iam_instance_profile_arn:  # A string specifying an instance IAM role for this specific autoscaling group by its ARN
         type: 'string'
         nullable: True
-      sns_topic_arn:
+      sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
         type: 'string'
         nullable: True
-      sns_notification_types:
+      sns_notification_types: # A string containing the notification types for SNS topics
         type: 'string'
         nullable: True
-      elb_log_bucket:
+      elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
         type: 'string'
         nullable: True
-      health_check_type:
+      health_check_type: # A string containing the type of health check to use for your autoscaling groups. This should 90% of the time be 'ELB'
         type: 'string'
         nullable: True
-      dependencies:
+      dependencies: # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
         type: 'list'
         nullable: True
         schema:
@@ -191,22 +191,22 @@ autoscaling_units:
       userdata: # A string containing userdata to run on this specific autoscaling group.
         type: 'string'
         nullable: True
-database_units:
+database_units: # A list of database units to create. Security groups, Database Subnet Groups, and RDS instances will be created for each of these units
   nullable: True
   type: 'list'
   schema:
     type: 'dict'
     schema:
-      unit_title:
-        type: 'string'
-        nullable: True  # For all values in a database unit. If they are null, a matching value must be provided at
-      db_instance_type: # the lowest level of the yaml structure (if database units are not also empty).
-        type: 'string'
-        nullable: True
-      db_engine:
+      unit_title: # A string containing the title of this database unit.
+        type: 'string'  # For all values in a database unit. If they are null, a matching value must be provided at
+        nullable: True  # the lowest level of the yaml structure (if database units are not also empty).
+      db_instance_type: # A string containing the db type to use for this RDS instance
         type: 'string'
         nullable: True
-      db_port:
+      db_engine: # A string containing the engine to use. Find the available types here: https://aws.amazon.com/rds/
+        type: 'string'
+        nullable: True
+      db_port: # A string containing the port to use for communication into the RDS instance
         type: 'string'
         nullable: True
 code_deploy_service_role: # A string specifying a code deploy IAM role by its ARN
@@ -215,16 +215,16 @@ code_deploy_service_role: # A string specifying a code deploy IAM role by its AR
 iam_instance_profile_arn:  # A string specifying an instance IAM role by its ARN
   type: 'string'
   nullable: True
-sns_topic_arn:
+sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
   type: 'string'
   nullable: True
-sns_notification_types:
+sns_notification_types: # A string containing the notification types for SNS topics
   type: 'string'
   nullable: True
-elb_log_bucket:
+elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
   type: 'string'
   nullable: True
-hosted_zone_name:
+hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
   type: 'string'
   nullable: True
 userdata: # A string containing userdata to run on autoscaling groups.
