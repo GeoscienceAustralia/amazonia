@@ -16,6 +16,7 @@ setup(
         'nose',
         'iptools',
         'boto3',
-        'pyyaml'
+        'pyyaml',
+        'cerberus'
     ]
 )
