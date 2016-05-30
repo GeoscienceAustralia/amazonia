@@ -47,6 +47,9 @@ def main():
     parser.add_argument('-d', '--default',
                         default='./defaults.yaml',
                         help="Path to the environmental defaults yaml file")
+    parser.add_argument('-s', '--schema',
+                        default='./schema.yaml',
+                        help="Path to the schema to validate the provided yaml values against")
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help="Path for amazonia to place template file")
@@ -56,7 +59,8 @@ def main():
     """
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
-    yaml_return = Yaml(user_stack_data, default_data)
+    schema = read_yaml(args.schema)
+    yaml_return = Yaml(user_stack_data, default_data, schema)
     stack_input = yaml_return.united_data
 
     """ Create stack and create stack template file
