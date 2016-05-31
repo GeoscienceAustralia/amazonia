@@ -43,18 +43,18 @@ def test_complete_valid_values():
 
     stack_input = amz_yaml.united_data
 
-    """ Assert stack values are of type dict"""
+    # Assert stack values are of type dict
     assert_equals(type(stack_input), dict)
 
-    ''' Assert that there are no invalid stack keys'''
+    # Assert that there are no invalid stack keys
     stack_input_set = set(stack_input)
     expected_stack_set = set(Yaml.stack_key_list)
     assert_equals(len(stack_input_set.difference(expected_stack_set)), 0)
 
-    ''' Assert that there are no stack keys we missed'''
+    # Assert that there are no stack keys we missed
     assert_equals(len(expected_stack_set.difference(stack_input_set)), 0)
 
-    '''Assert correct values'''
+    # Assert correct values
     assert_equals(stack_input['stack_title'], 'testStack')
     assert_equals(stack_input['code_deploy_service_role'], 'arn:aws:iam::1234567890124:role/CodeDeployServiceRole')
     assert_equals(stack_input['keypair'], 'key')
@@ -74,15 +74,15 @@ def test_complete_valid_values():
 
     autoscaling_unit_input = stack_input['autoscaling_units'][0]
 
-    """ Assert autoscaling unit values are of type dict"""
+    # Assert autoscaling unit values are of type dict
     assert_equals(type(autoscaling_unit_input), dict)
 
-    '''Assert that there are no invalid autoscaling unit keys'''
+    # Assert that there are no invalid autoscaling unit keys
     autoscaling_unit_input_set = set(autoscaling_unit_input.keys())
     expected_autoscaling_unit_set = set(Yaml.unit_key_list['autoscaling_units'])
     assert_equals(len(autoscaling_unit_input_set.difference(expected_autoscaling_unit_set)), 0)
 
-    ''' Assert that there are no autoscaling unit keys we missed'''
+    # Assert that there are no autoscaling unit keys we missed
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
@@ -105,15 +105,15 @@ def test_complete_valid_values():
 
     database_unit_input = stack_input['database_units'][0]
 
-    """ Assert database unit values are of type dict"""
+    # Assert database unit values are of type dict
     assert_equals(type(database_unit_input), dict)
 
-    '''Assert that there are no invalid database unit keys'''
+    # Assert that there are no invalid database unit keys
     database_unit_input_set = set(database_unit_input)
     expected_database_unit_set = set(Yaml.unit_key_list['database_units'])
     assert_equals(len(database_unit_input_set.difference(expected_database_unit_set)), 0)
 
-    ''' Assert that there are no database unit keys we missed'''
+    # Assert that there are no database unit keys we missed
     assert_equals(len(expected_database_unit_set.difference(database_unit_input_set)), 0)
 
     assert_equals(database_unit_input['unit_title'], 'db1')

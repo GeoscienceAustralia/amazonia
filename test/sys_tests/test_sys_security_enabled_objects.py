@@ -11,11 +11,11 @@ def main():
                   {'name': 'GA2', 'cidr': '231.231.231.231/32'}]
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
 
-    seo0_jump = SecurityEnabledObject(title="StackJump", vpc=myvpc, template=template)
-    seo1_nat = SecurityEnabledObject(title="StackNAT", vpc=myvpc, template=template)
-    seo2_web = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
-    seo3_api = SecurityEnabledObject(title="Unit01Api", vpc=myvpc, template=template)
-    seo4_elb = SecurityEnabledObject(title="Unit01Elb", vpc=myvpc, template=template)
+    seo0_jump = SecurityEnabledObject(title='StackJump', vpc=myvpc, template=template)
+    seo1_nat = SecurityEnabledObject(title='StackNAT', vpc=myvpc, template=template)
+    seo2_web = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    seo3_api = SecurityEnabledObject(title='Unit01Api', vpc=myvpc, template=template)
+    seo4_elb = SecurityEnabledObject(title='Unit01Elb', vpc=myvpc, template=template)
 
     # Add inbound SSH traffic to jump box
     for cidr in home_cidrs:
@@ -51,5 +51,5 @@ def main():
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

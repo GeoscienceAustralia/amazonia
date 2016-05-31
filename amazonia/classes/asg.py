@@ -32,7 +32,7 @@ class Asg(SecurityEnabledObject):
         """
         super(Asg, self).__init__(vpc=vpc, title=title, template=template)
         if maxsize < minsize:
-            raise MinMaxError("Error: minsize must be lower than maxsize.")
+            raise MinMaxError('Error: minsize must be lower than maxsize.')
 
         self.template = template
         self.title = title + 'Asg'
@@ -106,7 +106,7 @@ class Asg(SecurityEnabledObject):
                 self.sns_notification_configurations = self.trop_asg.NotificationConfigurations = \
                     [NotificationConfigurations(TopicARN=sns_topic_arn, NotificationTypes=sns_notification_types)]
             else:
-                raise MalformedSNSError("Error: sns_notification_types must be a non null list.")
+                raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
@@ -114,7 +114,7 @@ class Asg(SecurityEnabledObject):
             image_id=image_id,
             instance_type=instance_type,
             iam_instance_profile_arn=iam_instance_profile_arn,
-            userdata=userdata if userdata is not None else ""
+            userdata=userdata if userdata is not None else ''
         ))
         return title
 
@@ -174,8 +174,7 @@ class Asg(SecurityEnabledObject):
                                        ServiceRoleArn=cd_service_role_arn))
         self.cd_deploygroup.DependsOn = [self.cd_app.title, self.trop_asg.title]
 
-        """ Outputs
-        """
+        # Outputs
         self.template.add_output(
             Output(
                 self.cd_deploygroup.title,
