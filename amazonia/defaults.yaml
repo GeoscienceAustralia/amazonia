@@ -13,7 +13,7 @@ public_cidr:
   cidr: '0.0.0.0/0'
 jump_image_id: 'ami-0c95b86f'
 jump_instance_type: 't2.micro'
-nat_image_id: 'ami-0c95b86f'
+nat_image_id: 'ami-162c0c75'
 nat_instance_type: 't2.micro'
 home_cidrs:
   - name: 'home'
@@ -22,13 +22,10 @@ home_cidrs:
     cidr: '123.45.12.34/16'
 protocols:
   - 'HTTP'
-  - 'HTTPS'
 instanceports:
   - '80'
-  - '8080'
 loadbalancerports:
   - '80'
-  - '8080'
 path2ping: '/index.html'
 minsize: '1'
 maxsize: '1'
@@ -43,7 +40,24 @@ sns_topic_arn:
 sns_notification_types:
 elb_log_bucket:
 hosted_zone_name:
-userdata: ''
+userdata: |
+      #cloud-config
+      repo_update: true
+      repo_upgrade: all
+      packages:
+       - httpd
+      write_files:
+       - content: |
+          <html>
+          <body>
+          <h1>Amazonia created this stack!</h1>
+          </body>
+          </html>
+         path: /var/www/html/index.html
+         permissions: '0644'
+         owner: root:root
+      runcmd:
+       - service httpd start
 
 ## YAML TIPS:
 #   Lists: are denoted by indented hypens
