@@ -54,7 +54,6 @@ def main():
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help="Path for amazonia to place template file")
-
     parser.add_argument('-o', '--out',
                         action='store_true',
                         help="Output template to stdout rather than a file.")
