@@ -40,7 +40,6 @@ class Asg(SecurityEnabledObject):
         self.lc = None
         self.cd_app = None
         self.cd_deploygroup = None
-        self.sns_notification_configurations = None
         self.create_asg(
             title=self.title,
             minsize=minsize,
@@ -103,8 +102,8 @@ class Asg(SecurityEnabledObject):
 
         if sns_topic_arn is not None:
             if sns_notification_types is not None and isinstance(sns_notification_types, list):
-                self.sns_notification_configurations = self.trop_asg.NotificationConfigurations = \
-                    [NotificationConfigurations(TopicARN=sns_topic_arn, NotificationTypes=sns_notification_types)]
+                self.trop_asg.NotificationConfigurations = [NotificationConfigurations(TopicARN=sns_topic_arn,
+                                                                                       NotificationTypes=sns_notification_types)]
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
