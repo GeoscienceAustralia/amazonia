@@ -51,6 +51,9 @@ def main():
     parser.add_argument('-d', '--default',
                         default=os.path.join(__location__, './defaults.yaml'),
                         help='Path to the environmental defaults yaml file')
+    parser.add_argument('-s', os.path.join(__location__, '--schema'),
+                        default='./schema.yaml',
+                        help="Path to the schema to validate the provided yaml values against")
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help='Path for amazonia to place template file')
