@@ -6,6 +6,7 @@ Ingest User YAML and defaults YAML and send to yaml class to return as one unifi
 """
 import yaml
 import argparse
+import sys
 from amazonia.classes.yaml import Yaml
 from amazonia.classes.stack import Stack
 
@@ -53,6 +54,9 @@ def main():
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help="Path for amazonia to place template file")
+    parser.add_argument('-o', '--out',
+                        action='store_true',
+                        help="Output template to stdout rather than a file.")
     args = parser.parse_args()
 
     """ YAML ingestion
@@ -67,11 +71,15 @@ def main():
     """
     template_file_path = args.template
     template_trop = create_stack(stack_input)
+    send_to_output = args.out
     template_data = template_trop.template.to_json(indent=2, separators=(',', ': '))
-    with open(template_file_path, 'w') as template_file:
-        template_file.write(template_data)
-        template_file.close()
 
-    print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
+    if send_to_output is True:
+        sys.stdout.write(template_data)
+    else:
+        with open(template_file_path, 'w') as template_file:
+            template_file.write(template_data)
+            template_file.close()
+        print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
 if __name__ == "__main__":
     main()
