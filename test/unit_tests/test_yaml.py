@@ -5,7 +5,8 @@ import os
 import yaml
 from nose.tools import *
 
-from amazonia.classes.yaml import Yaml, InvalidKeyError, InsecureVariableError, InvalidTitleError, InvalidCidrError
+from cerberus import ValidationError
+from amazonia.classes.yaml import Yaml, InsecureVariableError
 
 default_data = None
 
@@ -15,8 +16,10 @@ def setup_resources():
     Create default data yaml
     """
     global default_data
+    global schema
 
     default_data = open_yaml_file('amazonia_ga_defaults.yaml')
+    schema = open_yaml_file('../../amazonia/schema.yaml')
 
 
 def open_yaml_file(file_path):
@@ -39,7 +42,7 @@ def test_complete_valid_values():
     """
     global default_data
     valid_stack_data = open_yaml_file('complete_valid.yaml')
-    amz_yaml = Yaml(valid_stack_data, default_data)
+    amz_yaml = Yaml(valid_stack_data, default_data, schema)
 
     stack_input = amz_yaml.united_data
 
@@ -132,12 +135,15 @@ def test_validate_cidr_yaml():
     invalid_vpc_cidr_data = open_yaml_file('invalid_vpc_cidr.yaml')
     invalid_home_cidrs_data = open_yaml_file('invalid_home_cidrs.yaml')
     invalid_home_cidr_title_data = open_yaml_file('invalid_home_cidr_title.yaml')
-    assert_raises(InvalidCidrError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
-                                             'default_data': default_data})
-    assert_raises(InvalidCidrError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
-                                             'default_data': default_data})
-    assert_raises(InvalidTitleError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
-                                              'default_data': default_data})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
 
 
 @with_setup(setup_resources())
@@ -150,12 +156,15 @@ def test_get_invalid_values_yaml():
     invalid_stack_data = open_yaml_file('invalid_key_stack.yaml')
     invalid_autoscaling_unit_data = open_yaml_file('invalid_key_autoscaling_unit.yaml')
     invalid_database_unit_data = open_yaml_file('invalid_key_database_unit.yaml')
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_stack_data,
-                                            'default_data': default_data})
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
-                                            'default_data': default_data})
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_database_unit_data,
-                                            'default_data': default_data})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_database_unit_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
 
 
 @with_setup(setup_resources())
@@ -168,27 +177,11 @@ def test_insecure_variables_yaml():
     insecure_access_id = open_yaml_file('insecure_access_id.yaml')
     insecure_secret_key = open_yaml_file('insecure_secret_key.yaml')
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_access_id,
-                                                  'default_data': default_data})
+                                                  'default_data': default_data,
+                                                  'schema': schema})
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_secret_key,
-                                                  'default_data': default_data})
-
-
-def test_get_invalid_values():
-    """
-    Test the detection of unrecognized or invalid keys
-    """
-    invalid_stack_values = {'invalid_key': 'what',
-                            'mistake': 'this is a mistake',
-                            'not_even_a_value': 'not_in_yaml'}
-    invalid_unit_values = {'first_test_prop': 'tester',
-                           'test_prop': '34',
-                           'another_test_prop': 'wer'}
-
-    assert_raises(InvalidKeyError, Yaml.get_invalid_values, **{'user_key': invalid_stack_values,
-                                                               'key_list': Yaml.stack_key_list})
-    for unit_type in Yaml.unit_key_list:
-        assert_raises(InvalidKeyError, Yaml.get_invalid_values, **{'user_key': invalid_unit_values,
-                                                                   'key_list': Yaml.unit_key_list[unit_type]})
+                                                  'default_data': default_data,
+                                                  'schema': schema})
 
 
 def test_detect_unencrypted_access_keys():
@@ -200,13 +193,3 @@ def test_detect_unencrypted_access_keys():
 
     assert_raises(InsecureVariableError, Yaml.detect_unencrypted_access_keys,
                   **{'userdata': 'AKI3ISW6DFTLGVWEDYMQ'})
-
-
-def test_validate_title():
-    """
-    Tests validate_title function that returns string without any non alphanumeric data
-    """
-
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test_Title'})
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test*Title'})
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test-title_'})
