@@ -94,12 +94,11 @@ class Yaml(object):
                     self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
                 # Validate that minsize is less than maxsize
                 if unit_value == 'minsize':
+                    minsize = self.united_data[unit_type][unit][unit_value]
                     maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
-                    if self.united_data[unit_type][unit][unit_value] > maxsize:
-                        print('Autoscaling unit minsize cannot be larger than the maxsize')
-                        print('minsize: {0}'.format(self.united_data[unit_type][unit][unit_value]))
-                        print('maxsize: {0}'.format(maxsize))
-                        raise cerberus.ValidationError
+                    if minsize > maxsize:
+                        raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be \
+                        larger than maxsize ({1})'.format(minsize, maxsize))
 
 
     @staticmethod
@@ -108,9 +107,8 @@ class Yaml(object):
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):
-            print("Errors were found in the supplied YAML values. See below errors: ")
-            print(validator.errors)
-            raise cerberus.ValidationError
+            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \
+                                            {0}'.format(validator.errors))
 
     @staticmethod
     def detect_unencrypted_access_keys(userdata):
