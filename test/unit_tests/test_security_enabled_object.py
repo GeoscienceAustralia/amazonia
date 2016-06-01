@@ -11,10 +11,10 @@ def test_security_enabled_object():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
 
-    assert_equals(myobj.title, "Unit01Web")
-    assert_equals(myobj.security_group.title, "Unit01WebSg")
+    assert_equals(myobj.title, 'Unit01Web')
+    assert_equals(myobj.security_group.title, 'Unit01WebSg')
     assert_equals(myobj.template, template)
 
 
@@ -24,10 +24,10 @@ def test_create_sg():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
 
-    assert_equals(myobj.security_group.title, "Unit01WebSg")
-    assert_equals(myobj.security_group.GroupDescription, "Security group")
+    assert_equals(myobj.security_group.title, 'Unit01WebSg')
+    assert_equals(myobj.security_group.GroupDescription, 'Security group')
     assert_is(type(myobj.security_group.VpcId), Ref)
 
 
@@ -37,20 +37,20 @@ def test_add_flow():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title="Unit02Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
 
     myobj.add_flow(otherobj, '80')
 
-    assert_equals(otherobj.ingress[0].title, "Unit02Web80FromUnit01Web80")
-    assert_equals(otherobj.ingress[0].IpProtocol, "tcp")
-    assert_equals(otherobj.ingress[0].FromPort, "80")
-    assert_equals(otherobj.ingress[0].ToPort, "80")
+    assert_equals(otherobj.ingress[0].title, 'Unit02Web80FromUnit01Web80')
+    assert_equals(otherobj.ingress[0].IpProtocol, 'tcp')
+    assert_equals(otherobj.ingress[0].FromPort, '80')
+    assert_equals(otherobj.ingress[0].ToPort, '80')
 
-    assert_equals(myobj.egress[0].title, "Unit01Web80ToUnit02Web80")
-    assert_equals(myobj.egress[0].IpProtocol, "tcp")
-    assert_equals(myobj.egress[0].FromPort, "80")
-    assert_equals(myobj.egress[0].ToPort, "80")
+    assert_equals(myobj.egress[0].title, 'Unit01Web80ToUnit02Web80')
+    assert_equals(myobj.egress[0].IpProtocol, 'tcp')
+    assert_equals(myobj.egress[0].FromPort, '80')
+    assert_equals(myobj.egress[0].ToPort, '80')
 
 
 def test_add_ingress():
@@ -59,15 +59,15 @@ def test_add_ingress():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title="Unit02Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
 
     myobj.add_ingress(otherobj, '80')
 
-    assert_equals(myobj.ingress[0].title, "Unit01Web80FromUnit02Web80")
-    assert_equals(myobj.ingress[0].IpProtocol, "tcp")
-    assert_equals(myobj.ingress[0].FromPort, "80")
-    assert_equals(myobj.ingress[0].ToPort, "80")
+    assert_equals(myobj.ingress[0].title, 'Unit01Web80FromUnit02Web80')
+    assert_equals(myobj.ingress[0].IpProtocol, 'tcp')
+    assert_equals(myobj.ingress[0].FromPort, '80')
+    assert_equals(myobj.ingress[0].ToPort, '80')
 
 
 def test_add_ip_ingress():
@@ -76,7 +76,7 @@ def test_add_ip_ingress():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
 
     cidrs = [{'name': 'GA1', 'cidr': '123.123.132.123/24'},
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},
@@ -96,7 +96,7 @@ def test_add_ip_egress():
     """
     template = Template()
     myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title="Unit01Web", vpc=myvpc, template=template)
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
 
     cidrs = [{'name': 'GA1', 'cidr': '123.123.132.123/24'},
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},

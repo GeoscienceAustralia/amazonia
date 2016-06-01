@@ -126,4 +126,4 @@ def test_elb_log_bucket():
     Test elb log bucked is associated when when elb_log_bucket is supplied
     """
     helper_elb = create_elb(elb_log_bucket='my_elb_log_bucket')
-    assert helper_elb.access_logging_policy
+    assert helper_elb.trop_elb.AccessLoggingPolicy

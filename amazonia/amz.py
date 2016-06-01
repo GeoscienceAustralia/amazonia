@@ -27,8 +27,6 @@ def create_stack(united_data):
 
     stack = Stack(**united_data)
 
-    """ Print Cloud Formation Template
-    """
     return stack
 
 
@@ -44,31 +42,29 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--yaml',
                         default='./application.yaml',
-                        help="Path to the applications amazonia yaml file")
+                        help='Path to the applications amazonia yaml file')
     parser.add_argument('-d', '--default',
                         default='./defaults.yaml',
-                        help="Path to the environmental defaults yaml file")
+                        help='Path to the environmental defaults yaml file')
     parser.add_argument('-s', '--schema',
                         default='./schema.yaml',
                         help="Path to the schema to validate the provided yaml values against")
     parser.add_argument('-t', '--template',
                         default='stack.template',
-                        help="Path for amazonia to place template file")
+                        help='Path for amazonia to place template file')
     parser.add_argument('-o', '--out',
                         action='store_true',
-                        help="Output template to stdout rather than a file.")
+                        help='Output template to stdout rather than a file.')
     args = parser.parse_args()
 
-    """ YAML ingestion
-    """
+    # YAML ingestion
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
     schema = read_yaml(args.schema)
     yaml_return = Yaml(user_stack_data, default_data, schema)
     stack_input = yaml_return.united_data
 
-    """ Create stack and create stack template file
-    """
+    # Create stack and create stack template file
     template_file_path = args.template
     template_trop = create_stack(stack_input)
     send_to_output = args.out
@@ -81,5 +77,6 @@ def main():
             template_file.write(template_data)
             template_file.close()
         print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

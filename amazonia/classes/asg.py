@@ -32,7 +32,7 @@ class Asg(SecurityEnabledObject):
         """
         super(Asg, self).__init__(vpc=vpc, title=title, template=template)
         if maxsize < minsize:
-            raise MinMaxError("Error: minsize must be lower than maxsize.")
+            raise MinMaxError('Error: minsize must be lower than maxsize.')
 
         self.template = template
         self.title = title + 'Asg'
@@ -40,7 +40,6 @@ class Asg(SecurityEnabledObject):
         self.lc = None
         self.cd_app = None
         self.cd_deploygroup = None
-        self.sns_notification_configurations = None
         self.create_asg(
             title=self.title,
             minsize=minsize,
@@ -103,10 +102,10 @@ class Asg(SecurityEnabledObject):
 
         if sns_topic_arn is not None:
             if sns_notification_types is not None and isinstance(sns_notification_types, list):
-                self.sns_notification_configurations = self.trop_asg.NotificationConfigurations = \
-                    [NotificationConfigurations(TopicARN=sns_topic_arn, NotificationTypes=sns_notification_types)]
+                self.trop_asg.NotificationConfigurations = [NotificationConfigurations(TopicARN=sns_topic_arn,
+                                                                                       NotificationTypes=sns_notification_types)]
             else:
-                raise MalformedSNSError("Error: sns_notification_types must be a non null list.")
+                raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
@@ -114,8 +113,10 @@ class Asg(SecurityEnabledObject):
             image_id=image_id,
             instance_type=instance_type,
             iam_instance_profile_arn=iam_instance_profile_arn,
-            userdata=userdata if userdata is not None else ""
+            userdata=userdata
         ))
+        if userdata is None:
+            self.trop_asg.LaunchConfigurationName.userdata = ''
         return title
 
     def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata):
@@ -174,8 +175,7 @@ class Asg(SecurityEnabledObject):
                                        ServiceRoleArn=cd_service_role_arn))
         self.cd_deploygroup.DependsOn = [self.cd_app.title, self.trop_asg.title]
 
-        """ Outputs
-        """
+        # Outputs
         self.template.add_output(
             Output(
                 self.cd_deploygroup.title,

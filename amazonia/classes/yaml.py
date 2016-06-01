@@ -8,8 +8,10 @@ import cerberus
 
 
 class Yaml(object):
-    """Setting these as class variables rather than instance variables so that they can be resolved and referred to
-     statically"""
+    """
+    Setting these as class variables rather than instance variables so that they can be resolved and referred to
+    statically
+    """
     stack_key_list = ['stack_title',
                       'code_deploy_service_role',
                       'keypair',
@@ -71,7 +73,7 @@ class Yaml(object):
         Validating values such as vpc cidr, home cidrs, aws access ids and secret keys and reassigning if required
         """
         for stack_key in Yaml.stack_key_list:
-            """ Add stack key value pairs to united data"""
+            # Add stack key value pairs to united data
             self.united_data[stack_key] = self.user_stack_data.get(stack_key, self.default_data[stack_key])
 
         for unit_type in Yaml.unit_key_list:
@@ -87,7 +89,7 @@ class Yaml(object):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 self.united_data[unit_type][unit][unit_value] = \
                     self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
-                """ Validate for unecrypted aws access ids and aws secret keys"""
+                # Validate for unecrypted aws access ids and aws secret keys
                 if unit_value == 'userdata':
                     self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
 
