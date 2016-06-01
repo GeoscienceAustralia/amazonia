@@ -75,7 +75,7 @@ unit_title: # A string containing the title to use for autoscaling or database u
 image_id: # A string specifying which ami to use for autoscaling groups by its id
   type: 'string'
   empty: False
-  regex: '^([a][m][i][\-][a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
+  regex: '^(ami-[a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
 instance_type: # A string containing the instance type to use for autoscaling groups.
   type: 'string'
   empty: False
@@ -111,14 +111,14 @@ public_cidr: # A dictionary containing the name and cidr block to be considered 
 jump_image_id: # A string specifying which ami to use for your jump box by its id
   type: 'string'
   empty: False
-  regex: '^([a][m][i][\-][a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
+  regex: '^(ami-[a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
 jump_instance_type: # A string specifying which instance type to use for your jump box.
   type: 'string'
   empty: False
 nat_image_id: # A string specifying which ami to use for your NAT by its id
   type: 'string'
   empty: False
-  regex: '^([a][m][i][\-][a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
+  regex: '^(ami-[a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
 nat_instance_type: # A string specifying which instance type to use for your NAT.
   type: 'string'
   empty: False
@@ -190,7 +190,7 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
       image_id: # A string specifying which ami to use for this specific autoscaling group by its id
         type: 'string'
         nullable: True
-        regex: '^([a][m][i][\-][a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
+        regex: '^(ami-[a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
       instance_type: # A string containing the instance type to use for this specific autoscaling group.
         type: 'string'
         nullable: True
