@@ -2,7 +2,7 @@ import troposphere.elasticloadbalancing as elb
 from nose.tools import *
 from troposphere import ec2, Ref, Template, Join
 
-from amazonia.classes.asg import Asg, MinMaxError, MalformedSNSError
+from amazonia.classes.asg import Asg, MalformedSNSError
 
 userdata = vpc = subnet = template = load_balancer = health_check_grace_period = health_check_type = \
     cd_service_role_arn = instance_type = image_id = keypair = iam_instance_profile_arn = sns_topic_arn = None
@@ -99,34 +99,6 @@ def test_asg():
         assert_is(type(asg.cd_deploygroup.DeploymentGroupName), Join)
         [assert_is(type(cdasg), Ref) for cdasg in asg.cd_deploygroup.AutoScalingGroups]
         assert_equals(asg.cd_deploygroup.ServiceRoleArn, 'arn:aws:iam::12345678987654321:role/CodeDeployServiceRole')
-
-
-@with_setup(setup_resources())
-def test_min_gtr_max_error():
-    """
-    Tests that a higher minsize than maxsize is detected and raises an error.
-    """
-    global userdata, vpc, subnet, template, load_balancer, health_check_grace_period, health_check_type, \
-        cd_service_role_arn, image_id, instance_type, keypair
-
-    assert_raises(MinMaxError, Asg, **{'title': 'testminmax',
-                                       'vpc': vpc,
-                                       'template': template,
-                                       'minsize': 2,
-                                       'maxsize': 1,
-                                       'subnets': [subnet],
-                                       'load_balancer': load_balancer,
-                                       'keypair': keypair,
-                                       'image_id': image_id,
-                                       'instance_type': instance_type,
-                                       'health_check_grace_period': health_check_grace_period,
-                                       'health_check_type': health_check_type,
-                                       'userdata': userdata,
-                                       'cd_service_role_arn': None,
-                                       'iam_instance_profile_arn': None,
-                                       'sns_topic_arn': None,
-                                       'sns_notification_types': None
-                                       })
 
 
 @with_setup(setup_resources())
