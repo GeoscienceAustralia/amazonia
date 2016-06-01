@@ -81,9 +81,9 @@ def test_asg():
         assert_equals(asg.trop_asg.HealthCheckType, 'ELB')
         assert_equals(asg.trop_asg.HealthCheckGracePeriod, 300)
         assert_not_equal(asg.trop_asg.NotificationConfigurations, None)
-        assert_equals(asg.sns_notification_configurations[0].TopicARN,
+        assert_equals(asg.trop_asg.NotificationConfigurations[0].TopicARN,
                       'arn:aws:sns:ap-southeast-2:1234567890:test_service_status')
-        assert_list_equal(asg.sns_notification_configurations[0].NotificationTypes,
+        assert_list_equal(asg.trop_asg.NotificationConfigurations[0].NotificationTypes,
                           ['autoscaling:EC2_INSTANCE_LAUNCH', 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                            'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
         assert_equals(asg.lc.title, title + 'Asg' + 'Lc')
@@ -157,7 +157,6 @@ def test_no_cd_group_and_no_sns():
     )
     assert_is_none(asg.cd_app)
     assert_is_none(asg.cd_deploygroup)
-    assert_is_none(asg.sns_notification_configurations)
 
 
 def create_asg(title):

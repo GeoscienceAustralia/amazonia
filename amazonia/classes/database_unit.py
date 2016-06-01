@@ -6,7 +6,8 @@ from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter
 
 class DatabaseUnit(SecurityEnabledObject):
     def __init__(self, unit_title, vpc, template, subnets, db_instance_type, db_engine, db_port):
-        """ Class to create an RDS and DB subnet group in a vpc
+        """
+        Class to create an RDS and DB subnet group in a vpc
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/rds.py
         :param unit_title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
@@ -19,7 +20,7 @@ class DatabaseUnit(SecurityEnabledObject):
         """
         self.title = unit_title + 'Rds'
         self.dependencies = []
-        self.db_subnet_group_title = unit_title + "Dsg"
+        self.db_subnet_group_title = unit_title + 'Dsg'
         self.port = db_port
         super(DatabaseUnit, self).__init__(vpc=vpc, title=self.title, template=template)
 
@@ -85,7 +86,7 @@ class DatabaseUnit(SecurityEnabledObject):
         Create security group flow from this Amazonia unit's ASG to another unit's ELB
         :param receiver: Other Amazonia Unit
         """
-        raise InvalidFlowError("Error: database_unit {0} may only be the destination of flow, not the originator."
+        raise InvalidFlowError('Error: database_unit {0} may only be the destination of flow, not the originator.'
                                .format(self.title))
 
 
