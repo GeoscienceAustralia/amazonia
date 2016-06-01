@@ -14,9 +14,9 @@ To generate cloud formation using amazonia, you need to provide two yaml documen
 
 Amazonia will read the two yaml documets and give priority to the application specific yaml, meaning that the defaults can be overridden in the application specific yaml if required. Because of this, it is best to set as many defaults as possible to ensure the best functionality out of this library.
 
-See template.yaml for a guide showing all possible yaml variables and the expected types of contents.
+See the yaml files in the amazonia folder for a guide showing all possible yaml variables and the expected types of contents. Schema is used to validate the combined application and defaults yaml before execution.
 
-if no yaml files are provided, amazonia will read from amazonia/application.yaml and amazonia/defaults.yaml.
+If no custom yaml files are provided, amazonia will read from amazonia/application.yaml and amazonia/defaults.yaml.
 
 Once you have both of your yaml documents, you can run amazonia using the below command
 
