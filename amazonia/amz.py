@@ -70,8 +70,6 @@ def main():
     send_to_output = args.out
     template_data = template_trop.template.to_json(indent=2, separators=(',', ': '))
 
-    print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
-
     if send_to_output is True:
         sys.stdout.write(template_data)
     else:
