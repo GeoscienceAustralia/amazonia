@@ -85,6 +85,8 @@ class AutoscalingUnit(object):
         self.asg.add_flow(receiver=nat, port='443')
         jump.add_flow(receiver=self.asg, port='22')
 
+        self.asg.trop_asg.DependsOn = nat.single.title
+
     def get_dependencies(self):
         """
         :return: list of other unit's this unit is dependant upon
