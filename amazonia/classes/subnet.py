@@ -24,20 +24,18 @@ class Subnet(object):
         self.stack_title = stack_title
         self.pub_or_pri = 'Public' if is_public else 'Private'
 
-        """ Create Subnet
-        """
+        # Create Subnet
         subnet_title = self.stack_title + self.pub_or_pri + 'Subnet' + az[-1:].upper()
         self.trop_subnet = self.template.add_resource(ec2.Subnet(subnet_title,
                                                                  AvailabilityZone=az,
                                                                  VpcId=Ref(self.vpc),
                                                                  CidrBlock=self.cidr,
-                                                                 Tags=Tags(Name=Join("",
+                                                                 Tags=Tags(Name=Join('',
                                                                                      [Ref('AWS::StackName'),
                                                                                       '-',
                                                                                       subnet_title]))))
 
-        """ Create Route Table Associations
-        """
+        # Create Route Table Associations
         self.rt_association = self.create_associate_route_table(route_table)
 
     def create_associate_route_table(self, route_table):

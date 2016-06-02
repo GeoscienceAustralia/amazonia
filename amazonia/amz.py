@@ -28,8 +28,6 @@ def create_stack(united_data):
 
     stack = Stack(**united_data)
 
-    """ Print Cloud Formation Template
-    """
     return stack
 
 
@@ -63,16 +61,14 @@ def main():
                         help='Output template to stdout rather than a file.')
     args = parser.parse_args()
 
-    """ YAML ingestion
-    """
+    # YAML ingestion
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
     schema = read_yaml(args.schema)
     yaml_return = Yaml(user_stack_data, default_data, schema)
     stack_input = yaml_return.united_data
 
-    """ Create stack and create stack template file
-    """
+    # Create stack and create stack template file
     template_file_path = args.template
     template_trop = create_stack(stack_input)
     send_to_output = args.out
@@ -85,5 +81,6 @@ def main():
             template_file.write(template_data)
             template_file.close()
         print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
+
 if __name__ == '__main__':
     main()

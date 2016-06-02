@@ -31,7 +31,7 @@ class SingleInstance(SecurityEnabledObject):
                                NetworkInterfaces=[ec2.NetworkInterfaceProperty(
                                    GroupSet=[Ref(self.security_group)],
                                    AssociatePublicIpAddress=True,
-                                   DeviceIndex="0",
+                                   DeviceIndex='0',
                                    DeleteOnTermination=True,
                                    SubnetId=Ref(subnet),
                                )],
@@ -40,7 +40,7 @@ class SingleInstance(SecurityEnabledObject):
                                # true otherwise. For more info check the below:
                                # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
                                SourceDestCheck=False if is_nat else True,
-                               Tags=Tags(Name=Join("", [Ref('AWS::StackName'), '-', title]))
+                               Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title]))
                            ))
 
         if self.single.SourceDestCheck == 'true':
@@ -57,17 +57,17 @@ class SingleInstance(SecurityEnabledObject):
         """
 
         if nat is True:
-            net_interface = "PrivateIp"
+            net_interface = 'PrivateIp'
         else:
-            net_interface = "PublicIp"
+            net_interface = 'PublicIp'
 
         self.template.add_output(
              Output(
                  self.single.title,
                  Description='{0} address of {1} single instance'.format(net_interface, self.single.title),
-                 Value=Join(" ", ["{0} {1} address".format(self.single.title, net_interface),
+                 Value=Join(' ', ['{0} {1} address'.format(self.single.title, net_interface),
                                   GetAtt(self.single, net_interface),
-                                  "on subnet",
+                                  'on subnet',
                                   Ref(subnet)
                                   ]
                             )

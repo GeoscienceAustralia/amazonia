@@ -48,7 +48,7 @@ class Elb(SecurityEnabledObject):
         self.trop_elb.DependsOn = gateway_attachment.title
 
         if elb_log_bucket:
-            self.access_logging_policy = self.trop_elb.AccessLoggingPolicy = elb.AccessLoggingPolicy(
+            self.trop_elb.AccessLoggingPolicy = elb.AccessLoggingPolicy(
                 EmitInterval='60',
                 Enabled=True,
                 S3BucketName=elb_log_bucket,
