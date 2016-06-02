@@ -4,6 +4,7 @@
 Ingest User YAML and defaults YAML and send to yaml class to return as one unified data dictionary for stack input
 
 """
+import os
 import yaml
 import argparse
 import sys
@@ -39,16 +40,19 @@ def main():
     Create Stack template from stack output
     """
 
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--yaml',
-                        default='./application.yaml',
-                        help='Path to the applications amazonia yaml file')
+                        default=os.path.join(__location__, 'application.yaml'),
+                        help="Path to the applications amazonia yaml file")
     parser.add_argument('-d', '--default',
-                        default='./defaults.yaml',
+                        default=os.path.join(__location__, './defaults.yaml'),
                         help='Path to the environmental defaults yaml file')
     parser.add_argument('-s', '--schema',
-                        default='./schema.yaml',
-                        help="Path to the schema to validate the provided yaml values against")
+                        default=os.path.join(__location__, './schema.yaml'),
+                        help='Path to the schema to validate the provided yaml values against')
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help='Path for amazonia to place template file')
