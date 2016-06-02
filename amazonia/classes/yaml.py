@@ -92,6 +92,14 @@ class Yaml(object):
                 # Validate for unecrypted aws access ids and aws secret keys
                 if unit_value == 'userdata':
                     self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
+                # Validate that minsize is less than maxsize
+                if unit_value == 'minsize':
+                    minsize = self.united_data[unit_type][unit][unit_value]
+                    maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
+                    if minsize > maxsize:
+                        raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
+                                                       'larger than maxsize ({1})'.format(minsize, maxsize))
+
 
     @staticmethod
     def validate_yaml(data, schema):
@@ -99,9 +107,8 @@ class Yaml(object):
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):
-            print("Errors were found in the supplied YAML values. See below errors: ")
-            print(validator.errors)
-            raise cerberus.ValidationError
+            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \n'\
+                                           '{0}'.format(validator.errors))
 
     @staticmethod
     def detect_unencrypted_access_keys(userdata):
@@ -123,3 +130,4 @@ class Yaml(object):
 class InsecureVariableError(Exception):
     def __init__(self, value):
         self.value = value
+

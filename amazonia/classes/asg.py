@@ -31,8 +31,6 @@ class Asg(SecurityEnabledObject):
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
         """
         super(Asg, self).__init__(vpc=vpc, title=title, template=template)
-        if maxsize < minsize:
-            raise MinMaxError('Error: minsize must be lower than maxsize.')
 
         self.template = template
         self.title = title + 'Asg'
@@ -196,11 +194,6 @@ class Asg(SecurityEnabledObject):
             ))
 
         return cd_app_title, cd_deploygroup_title
-
-
-class MinMaxError(Exception):
-    def __init__(self, value):
-        self.value = value
 
 
 class MalformedSNSError(Exception):
