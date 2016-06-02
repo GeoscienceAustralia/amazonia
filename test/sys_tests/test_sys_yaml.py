@@ -26,5 +26,5 @@ def main():
     print('\nstack_input=\n{0}\n'.format(stack_input))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
