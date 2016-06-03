@@ -22,6 +22,30 @@ Once you have both of your yaml documents, you can run amazonia using the below 
 
 `python3 amazonia/amz.py -y APPLICATION_YAML_LOCATION -d ENVIRONMENTAL_DEFAULT_YAML_LOCATION`
 
+#### amz.py options
+
+
+    usage: amz.py [-h] [-y YAML] [-d DEFAULT] [-s SCHEMA] [-t TEMPLATE] [-o]
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -y YAML, --yaml       Path to the applications amazonia yaml file
+      -d DEFAULT, --default
+                            Path to the environmental defaults yaml file
+      -s SCHEMA, --schema
+                            Path to the schema to validate the provided yaml
+                            values against
+      -t TEMPLATE, --template
+                            Path for amazonia to place template file
+      -o, --out             Output template to stdout rather than a file.
+
+
+## Contributions
+
+For any contributions, please feel free to fork, or branch this repo from the integration branch.
+All Pull requests should also be aimed at the integration branch. 
+This is because the integration branch is where our tests run before we merge to master so this is super helpful to us :)
+
 ##Examples
 
 #### Quick Start
