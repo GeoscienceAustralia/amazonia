@@ -183,6 +183,18 @@ def test_insecure_variables_yaml():
                                                   'default_data': default_data,
                                                   'schema': schema})
 
+@with_setup(setup_resources())
+def test_invalid_min_max_asg():
+    """
+    Test the detection of a larger minimum that the provided maximum for an auto scaling unit
+    """
+    global default_data
+    invalid_min_max_stack_data = open_yaml_file('invalid_min_max_asg.yaml')
+
+    assert_raises(ValidationError, Yaml, **{'user_stack_data':invalid_min_max_stack_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+
 
 def test_detect_unencrypted_access_keys():
     """

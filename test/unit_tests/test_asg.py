@@ -1,6 +1,6 @@
 import troposphere.elasticloadbalancing as elb
 from nose.tools import *
-from troposphere import ec2, Ref, Template, Join
+from troposphere import ec2, Ref, Template, Join, Base64
 
 from amazonia.classes.asg import Asg, MalformedSNSError
 
@@ -67,6 +67,7 @@ def test_asg():
     """
     Tests correct structure of autoscaling group objects.
     """
+    global userdata
     asg_titles = ['simple', 'hard', 'harder', 'easy']
 
     for title in asg_titles:
@@ -91,6 +92,7 @@ def test_asg():
         assert_equals(asg.lc.InstanceType, 't2.micro')
         assert_equals(asg.lc.KeyName, 'pipeline')
         assert_equals(asg.lc.IamInstanceProfile, 'arn:aws:iam::12345678987654321:role/InstanceProfileRole')
+        assert_is(type(asg.lc.UserData), Base64)
         [assert_is(type(sg), Ref) for sg in asg.lc.SecurityGroups]
         assert_equals(asg.cd_app.title, title + 'Asg' + 'Cda')
         assert_is(type(asg.cd_app.ApplicationName), Join)
@@ -157,6 +159,19 @@ def test_no_cd_group_and_no_sns():
     )
     assert_is_none(asg.cd_app)
     assert_is_none(asg.cd_deploygroup)
+
+@with_setup(setup_resources())
+def test_no_userdata():
+    """
+    Tests that an empty userdata is correctly handled
+    """
+
+    global userdata
+    userdata = None
+
+    asg = create_asg('nouserdata')
+
+    assert_equals(asg.lc.UserData, '')
 
 
 def create_asg(title):

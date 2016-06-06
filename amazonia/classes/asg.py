@@ -114,7 +114,7 @@ class Asg(SecurityEnabledObject):
             userdata=userdata
         ))
         if userdata is None:
-            self.trop_asg.LaunchConfigurationName.userdata = ''
+            self.lc.UserData = ''
         return title
 
     def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata):
