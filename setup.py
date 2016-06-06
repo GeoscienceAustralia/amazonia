@@ -14,8 +14,8 @@ setup(
     install_requires=[
         'troposphere',
         'nose',
-        'iptools',
         'boto3',
-        'pyyaml'
+        'pyyaml',
+        'cerberus'
     ]
 )

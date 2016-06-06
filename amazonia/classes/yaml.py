@@ -4,13 +4,14 @@ Ingest User YAML and defaults YAML
 Overwrite defaults YAML with User YAML
 """
 import re
-
-from iptools.ipv4 import validate_cidr
+import cerberus
 
 
 class Yaml(object):
-    """Setting these as class variables rather than instance variables so that they can be resolved and referred to
-     statically"""
+    """
+    Setting these as class variables rather than instance variables so that they can be resolved and referred to
+    statically
+    """
     stack_key_list = ['stack_title',
                       'code_deploy_service_role',
                       'keypair',
@@ -48,7 +49,7 @@ class Yaml(object):
                                         'db_port']
                      }
 
-    def __init__(self, user_stack_data, default_data):
+    def __init__(self, user_stack_data, default_data, schema):
         """
         Initializes united, user and default data dictionaries
         :param user_stack_data: User yaml document used to read stack values
@@ -58,19 +59,13 @@ class Yaml(object):
         self.default_data = default_data
         self.united_data = dict()
 
-        self.get_invalid_keys()
+        # Validate user and default yaml against the provided schema before attempting to combine them.
+        self.validate_yaml(self.user_stack_data, schema)
+        self.validate_yaml(self.default_data, schema)
+
         self.set_values()
-
-    def get_invalid_keys(self):
-        """
-        Detect Invalid keys in stack and unit yaml and raise error if any exist
-        """
-        self.get_invalid_values(self.user_stack_data, Yaml.stack_key_list)
-
-        for unit_type in Yaml.unit_key_list:
-            if unit_type in self.user_stack_data:
-                for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
-                    self.get_invalid_values(unit_values, Yaml.unit_key_list[unit_type])
+        # Validate the combined yaml against the provided schema
+        self.validate_yaml(self.united_data, schema)
 
     def set_values(self):
         """
@@ -78,25 +73,8 @@ class Yaml(object):
         Validating values such as vpc cidr, home cidrs, aws access ids and secret keys and reassigning if required
         """
         for stack_key in Yaml.stack_key_list:
-            """ Add stack key value pairs to united data"""
+            # Add stack key value pairs to united data
             self.united_data[stack_key] = self.user_stack_data.get(stack_key, self.default_data[stack_key])
-
-        """ Validate Stack Title
-        """
-        self.validate_title(self.united_data['stack_title'])
-
-        """ Validate VPC CIDR
-        """
-        if not validate_cidr(self.united_data['vpc_cidr']):
-            raise InvalidCidrError('Error: An invalid CIDR {0} was found.'.format('vpc_cidr'))
-
-        """ Validate title and CIDRs of Home CIDRs list
-        """
-
-        for cidr in self.united_data['home_cidrs']:
-            self.validate_title(cidr['name'])
-            if not validate_cidr(cidr['cidr']):
-                raise InvalidCidrError('Error: An invalid CIDR {0} was found.'.format(cidr['cidr']))
 
         for unit_type in Yaml.unit_key_list:
             if unit_type in self.user_stack_data:
@@ -111,24 +89,26 @@ class Yaml(object):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 self.united_data[unit_type][unit][unit_value] = \
                     self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
-                """ Validate for unit title"""
-                if unit_value == 'unit_title':
-                    self.validate_title(self.united_data[unit_type][unit]['unit_title'])
-                """ Validate for unecrypted aws access ids and aws secret keys"""
+                # Validate for unecrypted aws access ids and aws secret keys
                 if unit_value == 'userdata':
                     self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
+                # Validate that minsize is less than maxsize
+                if unit_value == 'minsize':
+                    minsize = self.united_data[unit_type][unit][unit_value]
+                    maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
+                    if minsize > maxsize:
+                        raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
+                                                       'larger than maxsize ({1})'.format(minsize, maxsize))
+
 
     @staticmethod
-    def validate_title(title):
-        """
-        Validate that the string passed in returns the same string stripped of non alphanumeric characters
-        :param title: Title from the united_data yaml containing hte stack or unit title
-        """
-        pattern = re.compile('[^a-zA-Z0-9]+')  # pattern is one or more non work characters
+    def validate_yaml(data, schema):
 
-        if pattern.search(title):
-            raise InvalidTitleError('Error: invalid characters used in stack or unit title: {0}'
-                                    .format(title))
+        validator = cerberus.Validator()
+
+        if not validator.validate(data, schema):
+            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \n'\
+                                           '{0}'.format(validator.errors))
 
     @staticmethod
     def detect_unencrypted_access_keys(userdata):
@@ -146,36 +126,8 @@ class Yaml(object):
             raise InsecureVariableError('Error: unencrypted {0} was found in your userdata, please remove or encrypt.'
                                         .format('AWS secret Key'))
 
-    @staticmethod
-    def get_invalid_values(user_key, key_list):
-        """
-        Uses set operations to detect invalid keys and throw an error when one is found
-        :param user_key:
-        :param key_list:
-        """
-        user_set = set(user_key)
-        expected_set = set(key_list)
-        invalid_set = user_set.difference(expected_set)
-        if len(invalid_set) > 0:
-            raise InvalidKeyError('Error: invalid keys {0} were found in your yaml, please remove or adjust.'
-                                  .format(invalid_set))
-
 
 class InsecureVariableError(Exception):
     def __init__(self, value):
         self.value = value
 
-
-class InvalidCidrError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class InvalidKeyError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class InvalidTitleError(Exception):
-    def __init__(self, value):
-        self.value = value
