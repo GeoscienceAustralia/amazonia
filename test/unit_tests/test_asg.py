@@ -163,7 +163,7 @@ def test_no_cd_group_and_no_sns():
 @with_setup(setup_resources())
 def test_no_userdata():
     """
-    Tests that a minimum auto scaling value cannot be larger than the maximum that is provided.
+    Tests that an empty userdata is correctly handled
     """
 
     global userdata
