@@ -32,10 +32,7 @@ def create_stack(united_data):
 
 
 def generate_template(yaml_data, default_data, schema_data):
-    user_stack_data = read_yaml(yaml_data)
-    default_data = read_yaml(default_data)
-    schema = read_yaml(schema_data)
-    yaml_return = Yaml(user_stack_data, default_data, schema)
+    yaml_return = Yaml(yaml_data, default_data, schema_data)
     stack_input = yaml_return.united_data
 
     """ Create stack and create stack template file
