@@ -18,7 +18,7 @@ def setup_resources():
     global default_data
     global schema
 
-    default_data = open_yaml_file('amazonia_ga_defaults.yaml')
+    default_data = open_yaml_file('../../amazonia/defaults.yaml')
     schema = open_yaml_file('../../amazonia/schema.yaml')
 
 
@@ -41,7 +41,7 @@ def test_complete_valid_values():
     Validate that stack value exists in expected list of stack values
     """
     global default_data
-    valid_stack_data = open_yaml_file('complete_valid.yaml')
+    valid_stack_data = open_yaml_file('test_yaml_complete_valid.yaml')
     amz_yaml = Yaml(valid_stack_data, default_data, schema)
 
     stack_input = amz_yaml.united_data
@@ -132,9 +132,9 @@ def test_validate_cidr_yaml():
     """
     global default_data
 
-    invalid_vpc_cidr_data = open_yaml_file('invalid_vpc_cidr.yaml')
-    invalid_home_cidrs_data = open_yaml_file('invalid_home_cidrs.yaml')
-    invalid_home_cidr_title_data = open_yaml_file('invalid_home_cidr_title.yaml')
+    invalid_vpc_cidr_data = open_yaml_file('test_yaml_invalid_vpc_cidr.yaml')
+    invalid_home_cidrs_data = open_yaml_file('test_yaml_invalid_home_cidrs.yaml')
+    invalid_home_cidr_title_data = open_yaml_file('test_yaml_invalid_home_cidr_title.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
                                             'default_data': default_data,
                                             'schema': schema})
@@ -153,9 +153,9 @@ def test_get_invalid_values_yaml():
     """
     global default_data
 
-    invalid_stack_data = open_yaml_file('invalid_key_stack.yaml')
-    invalid_autoscaling_unit_data = open_yaml_file('invalid_key_autoscaling_unit.yaml')
-    invalid_database_unit_data = open_yaml_file('invalid_key_database_unit.yaml')
+    invalid_stack_data = open_yaml_file('test_yaml_invalid_key_stack.yaml')
+    invalid_autoscaling_unit_data = open_yaml_file('test_yaml_invalid_key_autoscaling_unit.yaml')
+    invalid_database_unit_data = open_yaml_file('test_yaml_invalid_key_database_unit.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
                                             'default_data': default_data,
                                             'schema': schema})
@@ -174,8 +174,8 @@ def test_insecure_variables_yaml():
     """
     global default_data
 
-    insecure_access_id = open_yaml_file('insecure_access_id.yaml')
-    insecure_secret_key = open_yaml_file('insecure_secret_key.yaml')
+    insecure_access_id = open_yaml_file('test_yaml_insecure_access_id.yaml')
+    insecure_secret_key = open_yaml_file('test_yaml_insecure_secret_key.yaml')
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_access_id,
                                                   'default_data': default_data,
                                                   'schema': schema})
@@ -189,7 +189,7 @@ def test_invalid_min_max_asg():
     Test the detection of a larger minimum that the provided maximum for an auto scaling unit
     """
     global default_data
-    invalid_min_max_stack_data = open_yaml_file('invalid_min_max_asg.yaml')
+    invalid_min_max_stack_data = open_yaml_file('test_yaml_invalid_min_max_asg.yaml')
 
     assert_raises(ValidationError, Yaml, **{'user_stack_data':invalid_min_max_stack_data,
                                             'default_data': default_data,

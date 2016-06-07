@@ -1,0 +1,17 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+stack_title: 'testStack'
+blah: 'should not be here'
+code_deploy_service_role: 'arn:aws:iam::1234567890124:role/CodeDeployServiceRole'
+keypair: 'key'
+availability_zones:
+  - 'ap-southeast-2a'
+  - 'ap-southeast-2b'
+  - 'ap-southeast-2c'
+vpc_cidr: '10.0.0.0/16'
+jump_image_id: 'ami-05446966'
+jump_instance_type: 't2.micro'
+nat_image_id: 'ami-162c0c75'
+nat_instance_type: 't2.micro'
