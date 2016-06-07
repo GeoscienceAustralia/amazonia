@@ -5,7 +5,8 @@ import os
 import yaml
 from nose.tools import *
 
-from amazonia.classes.yaml import Yaml, InvalidKeyError, InsecureVariableError, InvalidTitleError, InvalidCidrError
+from cerberus import ValidationError
+from amazonia.classes.yaml import Yaml, InsecureVariableError
 
 default_data = None
 
@@ -15,8 +16,10 @@ def setup_resources():
     Create default data yaml
     """
     global default_data
+    global schema
 
     default_data = open_yaml_file('amazonia_ga_defaults.yaml')
+    schema = open_yaml_file('../../amazonia/schema.yaml')
 
 
 def open_yaml_file(file_path):
@@ -39,22 +42,22 @@ def test_complete_valid_values():
     """
     global default_data
     valid_stack_data = open_yaml_file('complete_valid.yaml')
-    amz_yaml = Yaml(valid_stack_data, default_data)
+    amz_yaml = Yaml(valid_stack_data, default_data, schema)
 
     stack_input = amz_yaml.united_data
 
-    """ Assert stack values are of type dict"""
+    # Assert stack values are of type dict
     assert_equals(type(stack_input), dict)
 
-    ''' Assert that there are no invalid stack keys'''
+    # Assert that there are no invalid stack keys
     stack_input_set = set(stack_input)
     expected_stack_set = set(Yaml.stack_key_list)
     assert_equals(len(stack_input_set.difference(expected_stack_set)), 0)
 
-    ''' Assert that there are no stack keys we missed'''
+    # Assert that there are no stack keys we missed
     assert_equals(len(expected_stack_set.difference(stack_input_set)), 0)
 
-    '''Assert correct values'''
+    # Assert correct values
     assert_equals(stack_input['stack_title'], 'testStack')
     assert_equals(stack_input['code_deploy_service_role'], 'arn:aws:iam::1234567890124:role/CodeDeployServiceRole')
     assert_equals(stack_input['keypair'], 'key')
@@ -74,15 +77,15 @@ def test_complete_valid_values():
 
     autoscaling_unit_input = stack_input['autoscaling_units'][0]
 
-    """ Assert autoscaling unit values are of type dict"""
+    # Assert autoscaling unit values are of type dict
     assert_equals(type(autoscaling_unit_input), dict)
 
-    '''Assert that there are no invalid autoscaling unit keys'''
+    # Assert that there are no invalid autoscaling unit keys
     autoscaling_unit_input_set = set(autoscaling_unit_input.keys())
     expected_autoscaling_unit_set = set(Yaml.unit_key_list['autoscaling_units'])
     assert_equals(len(autoscaling_unit_input_set.difference(expected_autoscaling_unit_set)), 0)
 
-    ''' Assert that there are no autoscaling unit keys we missed'''
+    # Assert that there are no autoscaling unit keys we missed
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
@@ -105,15 +108,15 @@ def test_complete_valid_values():
 
     database_unit_input = stack_input['database_units'][0]
 
-    """ Assert database unit values are of type dict"""
+    # Assert database unit values are of type dict
     assert_equals(type(database_unit_input), dict)
 
-    '''Assert that there are no invalid database unit keys'''
+    # Assert that there are no invalid database unit keys
     database_unit_input_set = set(database_unit_input)
     expected_database_unit_set = set(Yaml.unit_key_list['database_units'])
     assert_equals(len(database_unit_input_set.difference(expected_database_unit_set)), 0)
 
-    ''' Assert that there are no database unit keys we missed'''
+    # Assert that there are no database unit keys we missed
     assert_equals(len(expected_database_unit_set.difference(database_unit_input_set)), 0)
 
     assert_equals(database_unit_input['unit_title'], 'db1')
@@ -132,12 +135,15 @@ def test_validate_cidr_yaml():
     invalid_vpc_cidr_data = open_yaml_file('invalid_vpc_cidr.yaml')
     invalid_home_cidrs_data = open_yaml_file('invalid_home_cidrs.yaml')
     invalid_home_cidr_title_data = open_yaml_file('invalid_home_cidr_title.yaml')
-    assert_raises(InvalidCidrError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
-                                             'default_data': default_data})
-    assert_raises(InvalidCidrError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
-                                             'default_data': default_data})
-    assert_raises(InvalidTitleError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
-                                              'default_data': default_data})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
 
 
 @with_setup(setup_resources())
@@ -150,12 +156,15 @@ def test_get_invalid_values_yaml():
     invalid_stack_data = open_yaml_file('invalid_key_stack.yaml')
     invalid_autoscaling_unit_data = open_yaml_file('invalid_key_autoscaling_unit.yaml')
     invalid_database_unit_data = open_yaml_file('invalid_key_database_unit.yaml')
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_stack_data,
-                                            'default_data': default_data})
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
-                                            'default_data': default_data})
-    assert_raises(InvalidKeyError, Yaml, **{'user_stack_data': invalid_database_unit_data,
-                                            'default_data': default_data})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_database_unit_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
 
 
 @with_setup(setup_resources())
@@ -168,27 +177,23 @@ def test_insecure_variables_yaml():
     insecure_access_id = open_yaml_file('insecure_access_id.yaml')
     insecure_secret_key = open_yaml_file('insecure_secret_key.yaml')
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_access_id,
-                                                  'default_data': default_data})
+                                                  'default_data': default_data,
+                                                  'schema': schema})
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_secret_key,
-                                                  'default_data': default_data})
+                                                  'default_data': default_data,
+                                                  'schema': schema})
 
-
-def test_get_invalid_values():
+@with_setup(setup_resources())
+def test_invalid_min_max_asg():
     """
-    Test the detection of unrecognized or invalid keys
+    Test the detection of a larger minimum that the provided maximum for an auto scaling unit
     """
-    invalid_stack_values = {'invalid_key': 'what',
-                            'mistake': 'this is a mistake',
-                            'not_even_a_value': 'not_in_yaml'}
-    invalid_unit_values = {'first_test_prop': 'tester',
-                           'test_prop': '34',
-                           'another_test_prop': 'wer'}
+    global default_data
+    invalid_min_max_stack_data = open_yaml_file('invalid_min_max_asg.yaml')
 
-    assert_raises(InvalidKeyError, Yaml.get_invalid_values, **{'user_key': invalid_stack_values,
-                                                               'key_list': Yaml.stack_key_list})
-    for unit_type in Yaml.unit_key_list:
-        assert_raises(InvalidKeyError, Yaml.get_invalid_values, **{'user_key': invalid_unit_values,
-                                                                   'key_list': Yaml.unit_key_list[unit_type]})
+    assert_raises(ValidationError, Yaml, **{'user_stack_data':invalid_min_max_stack_data,
+                                            'default_data': default_data,
+                                            'schema': schema})
 
 
 def test_detect_unencrypted_access_keys():
@@ -200,13 +205,3 @@ def test_detect_unencrypted_access_keys():
 
     assert_raises(InsecureVariableError, Yaml.detect_unencrypted_access_keys,
                   **{'userdata': 'AKI3ISW6DFTLGVWEDYMQ'})
-
-
-def test_validate_title():
-    """
-    Tests validate_title function that returns string without any non alphanumeric data
-    """
-
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test_Title'})
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test*Title'})
-    assert_raises(InvalidTitleError, Yaml.validate_title, **{'title': 'test-title_'})

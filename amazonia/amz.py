@@ -4,6 +4,7 @@
 Ingest User YAML and defaults YAML and send to yaml class to return as one unified data dictionary for stack input
 
 """
+import os
 import yaml
 import argparse
 import sys
@@ -27,8 +28,6 @@ def create_stack(united_data):
 
     stack = Stack(**united_data)
 
-    """ Print Cloud Formation Template
-    """
     return stack
 
 
@@ -41,31 +40,35 @@ def main():
     Create Stack template from stack output
     """
 
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--yaml',
-                        default='./application.yaml',
+                        default=os.path.join(__location__, 'application.yaml'),
                         help="Path to the applications amazonia yaml file")
     parser.add_argument('-d', '--default',
-                        default='./defaults.yaml',
-                        help="Path to the environmental defaults yaml file")
+                        default=os.path.join(__location__, './defaults.yaml'),
+                        help='Path to the environmental defaults yaml file')
+    parser.add_argument('-s', '--schema',
+                        default=os.path.join(__location__, './schema.yaml'),
+                        help='Path to the schema to validate the provided yaml values against')
     parser.add_argument('-t', '--template',
                         default='stack.template',
-                        help="Path for amazonia to place template file")
-
+                        help='Path for amazonia to place template file')
     parser.add_argument('-o', '--out',
                         action='store_true',
-                        help="Output template to stdout rather than a file.")
+                        help='Output template to stdout rather than a file.')
     args = parser.parse_args()
 
-    """ YAML ingestion
-    """
+    # YAML ingestion
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
-    yaml_return = Yaml(user_stack_data, default_data)
+    schema = read_yaml(args.schema)
+    yaml_return = Yaml(user_stack_data, default_data, schema)
     stack_input = yaml_return.united_data
 
-    """ Create stack and create stack template file
-    """
+    # Create stack and create stack template file
     template_file_path = args.template
     template_trop = create_stack(stack_input)
     send_to_output = args.out
@@ -78,5 +81,6 @@ def main():
             template_file.write(template_data)
             template_file.close()
         print('Amazonia has successfully created stack template at location: {0}'.format(template_file_path))
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

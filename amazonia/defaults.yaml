@@ -58,7 +58,9 @@ userdata: |
          owner: root:root
       runcmd:
        - service httpd start
-
+db_instance_type:
+db_engine:
+db_port:
 ## YAML TIPS:
 #   Lists: are denoted by indented hypens
 #   Strings: do not need to be enclosed in quotes or double quotes

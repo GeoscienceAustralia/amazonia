@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from troposphere import Ref, Template, ec2, Tags, Join
-
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
@@ -49,8 +48,7 @@ class Stack(object):
         self.private_subnets = []
         self.public_subnets = []
 
-        """ Add VPC and Internet Gateway with Attachment
-        """
+        # Add VPC and Internet Gateway with Attachment
         vpc_name = self.title + 'Vpc'
         self.vpc = self.template.add_resource(
             ec2.VPC(
@@ -67,8 +65,7 @@ class Stack(object):
                                      InternetGatewayId=Ref(self.internet_gateway)))
         self.gateway_attachment.DependsOn = self.internet_gateway.title
 
-        """ Add Public and Private Route Tables
-        """
+        # Add Public and Private Route Tables
         public_rt_name = self.title + 'PubRt'
         self.public_route_table = self.template.add_resource(
             ec2.RouteTable(public_rt_name, VpcId=Ref(self.vpc),
@@ -79,8 +76,7 @@ class Stack(object):
             ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
 
-        """ Add Public and Private Subnets
-        """
+        # Add Public and Private Subnets
         for az in self.availability_zones:
             self.private_subnets.append(Subnet(template=self.template,
                                                stack_title=self.title,
@@ -98,8 +94,7 @@ class Stack(object):
                                               cidr=self.generate_subnet_cidr(is_public=True)
                                               ).trop_subnet)
 
-        """ Add Jumpbox and NAT and associated security group ingress and egress rules
-        """
+        # Add Jumpbox and NAT and associated security group ingress and egress rules
         self.jump = SingleInstance(
             title=self.title + 'Jump',
             keypair=self.keypair,
@@ -125,9 +120,7 @@ class Stack(object):
         )
         self.nat.single.DependsOn = self.gateway_attachment.title
 
-        """ Add Routes
-        """
-
+        # Add Routes
         self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
                                                                  RouteTableId=Ref(self.public_route_table),
@@ -140,15 +133,13 @@ class Stack(object):
                                                                   DestinationCidrBlock=self.public_cidr['cidr']))
         self.private_route.DependsOn = self.gateway_attachment.title
 
-        """ Add Autoscaling Units
-        """
+        # Add Autoscaling Units
         for unit in self.autoscaling_units:
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: autoscaling unit name '{0}' has already been specified, "
-                                             "it must be unique.".format(orig_unit_title))
-            """ Update unit title with stackname prefix
-            """
+                                             'it must be unique.'.format(orig_unit_title))
+            # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
             self.units[orig_unit_title] = AutoscalingUnit(
                 vpc=self.vpc,
@@ -163,13 +154,12 @@ class Stack(object):
                 public_cidr=self.public_cidr,
                 **unit
             )
-        """ Add Database Units
-        """
+        # Add Database Units
         for unit in self.database_units:
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
-                                             "it must be unique.".format(orig_unit_title))
+                                             'it must be unique.'.format(orig_unit_title))
             unit['unit_title'] = self.title + orig_unit_title
             self.units[orig_unit_title] = DatabaseUnit(
                 vpc=self.vpc,
@@ -177,8 +167,7 @@ class Stack(object):
                 subnets=self.private_subnets,
                 **unit
             )
-        """ Add Unit flow
-        """
+        # Add Unit flow
         for unit_name in self.units:
             dependencies = self.units[unit_name].get_dependencies()
             for dependency in dependencies:
