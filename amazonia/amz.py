@@ -31,6 +31,17 @@ def create_stack(united_data):
     return stack
 
 
+def generate_template(yaml_data, default_data, schema_data):
+    yaml_return = Yaml(yaml_data, default_data, schema_data)
+    stack_input = yaml_return.united_data
+
+    """ Create stack and create stack template file
+    """
+    template_trop = create_stack(stack_input)
+    template_data = template_trop.template.to_json(indent=2, separators=(',', ': '))
+    return template_data
+
+
 def main():
     """
     Ingest User YAML as user_stack_data
@@ -65,14 +76,12 @@ def main():
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
     schema = read_yaml(args.schema)
-    yaml_return = Yaml(user_stack_data, default_data, schema)
-    stack_input = yaml_return.united_data
 
     # Create stack and create stack template file
     template_file_path = args.template
-    template_trop = create_stack(stack_input)
     send_to_output = args.out
-    template_data = template_trop.template.to_json(indent=2, separators=(',', ': '))
+
+    template_data = generate_template(user_stack_data, default_data, schema)
 
     if send_to_output is True:
         sys.stdout.write(template_data)
