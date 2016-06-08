@@ -17,7 +17,7 @@ s3_response = s3_client.upload_file('stack.template', 'smallest-bucket-in-histor
 
 print('File Successfully Uploaded to S3')
 
-stack_name = 'teststack'
+stack_name = 'systemteststack'
 template_url = \
     'https://s3-ap-southeast-2.amazonaws.com/smallest-bucket-in-history/smallest_app_in_history/stack.template'
 environment = 'test'
