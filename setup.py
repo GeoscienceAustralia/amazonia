@@ -16,6 +16,7 @@ setup(
         'nose',
         'boto3',
         'pyyaml',
-        'cerberus'
+        'cerberus',
+        'flask'
     ]
 )
