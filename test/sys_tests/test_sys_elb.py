@@ -49,7 +49,7 @@ def main():
         template=template,
         gateway_attachment=gateway_attachment,
         elb_log_bucket='my-s3-bucket',
-        elb_public=False)
+        public_unit=False)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

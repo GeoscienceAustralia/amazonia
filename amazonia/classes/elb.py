@@ -7,7 +7,7 @@ import troposphere.elasticloadbalancing as elb
 
 class Elb(SecurityEnabledObject):
     def __init__(self, title, vpc, template, protocols, loadbalancerports, instanceports, path2ping, subnets,
-                 gateway_attachment, hosted_zone_name, elb_log_bucket, elb_public):
+                 gateway_attachment, hosted_zone_name, elb_log_bucket, public_unit):
         """
         Public Class to create an Elastic Loadbalancer in the unit stack environment
         AWS Cloud Formation: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-elb.html
@@ -23,7 +23,7 @@ class Elb(SecurityEnabledObject):
         :param hosted_zone_name: Route53 hosted zone ID
         :param gateway_attachment: Stack's gateway attachment troposphere object
         :param elb_log_bucket: S3 bucket to log access log to
-        :param elb_public: Boolean to determine if the elb scheme will be internet-facing or private
+        :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
         """
         self.title = title + 'Elb'
         super(Elb, self).__init__(vpc=vpc, title=self.title, template=template)
@@ -42,7 +42,7 @@ class Elb(SecurityEnabledObject):
                                                      InstancePort=network_tuple[1],
                                                      InstanceProtocol=network_tuple[2]) for network_tuple
                                         in network_tuples],
-                             Scheme='internet-facing' if elb_public is True else 'private',
+                             Scheme='internet-facing' if public_unit is True else 'private',
                              SecurityGroups=[Ref(self.security_group)],
                              Subnets=[Ref(x) for x in subnets],
                              Tags=Tags(Name=self.title)))

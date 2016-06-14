@@ -8,7 +8,7 @@ from amazonia.classes.elb import Elb
 
 
 def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, path2ping='index.html',
-               elb_log_bucket=None, elb_public=True):
+               elb_log_bucket=None, public_unit=True):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
@@ -17,7 +17,7 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
     :param path2ping: path to test page
     :param elb_log_bucket: S3 bucket to log access log to
     :param hosted_zone_name: Route53 hosted zone ID
-    :param elb_public: Boolean to determine if the elb scheme will be internet-facing or private
+    :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
     :return: Troposphere object for Elb,
     """
     vpc = 'vpc-12345'
@@ -33,7 +33,7 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
               template=Template(),
               elb_log_bucket=elb_log_bucket,
               gateway_attachment='testIgAtch',
-              elb_public=elb_public)
+              public_unit=public_unit)
     return elb
 
 
@@ -131,11 +131,11 @@ def test_elb_log_bucket():
     assert helper_elb.trop_elb.AccessLoggingPolicy
 
 
-def test_elb_public():
+def test_public_unit():
     """
-    Test to determine that elb scheme is private if elb_public is set to False
+    Test to determine that elb scheme is private if public_unit is set to False
     """
-    helper_elb = create_elb(elb_public=False)
+    helper_elb = create_elb(public_unit=False)
     assert_equals(helper_elb.trop_elb.Scheme, 'private')
-    helper_elb = create_elb(elb_public=True)
+    helper_elb = create_elb(public_unit=True)
     assert_equals(helper_elb.trop_elb.Scheme, 'internet-facing')
