@@ -89,9 +89,9 @@ runcmd:
         sns_topic_arn=None,
         sns_notification_types=None,
         elb_log_bucket=None,
+        public_unit=True,
         gateway_attachment=gateway_attachment,
-        dependencies='app2',
-        public_unit=True
+        dependencies='app2'
     )
 
     unit2 = AutoscalingUnit(
@@ -121,9 +121,9 @@ runcmd:
         sns_topic_arn=None,
         sns_notification_types=None,
         elb_log_bucket=None,
+        public_unit=False,
         gateway_attachment=gateway_attachment,
-        dependencies='app1',
-        public_unit=False
+        dependencies='app1'
     )
 
     unit1.add_unit_flow(unit2)

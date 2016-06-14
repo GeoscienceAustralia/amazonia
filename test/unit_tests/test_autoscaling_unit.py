@@ -118,6 +118,7 @@ def create_autoscaling_unit(unit_title):
         hosted_zone_name=None,
         gateway_attachment='testIgAtch',
         elb_log_bucket=None,
+        public_unit=True,
         sns_topic_arn=None,
         sns_notification_types=None,
         dependencies=None
