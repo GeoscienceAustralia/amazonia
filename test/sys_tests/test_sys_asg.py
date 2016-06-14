@@ -67,7 +67,8 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        template=template)
+        template=template,
+        public_unit=True)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
