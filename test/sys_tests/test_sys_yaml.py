@@ -8,7 +8,7 @@ from amazonia.classes.yaml import Yaml
 def main():
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    with open(os.path.join(__location__, 'amazonia.yaml'), 'r') as stack_yaml:
+    with open(os.path.join(__location__, '../../amazonia/application.yaml'), 'r') as stack_yaml:
         user_stack_data = yaml.safe_load(stack_yaml)
         print('\nuser_stack_data=\n{0}\n'.format(user_stack_data))
 

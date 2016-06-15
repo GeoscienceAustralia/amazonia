@@ -48,7 +48,8 @@ def main():
         path2ping='/index.html',
         template=template,
         gateway_attachment=gateway_attachment,
-        elb_log_bucket='my-s3-bucket')
+        elb_log_bucket='my-s3-bucket',
+        public_unit=False)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
