@@ -1,0 +1,12 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+stack_title: 'testStack'
+database_units:
+  -
+    blah: 'should not be here'
+    unit_title: 'db1'
+    db_instance_type: 'db.m1.small'
+    db_engine: 'postgres'
+    db_port: '5432'

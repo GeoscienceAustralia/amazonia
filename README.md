@@ -14,13 +14,37 @@ To generate cloud formation using amazonia, you need to provide two yaml documen
 
 Amazonia will read the two yaml documets and give priority to the application specific yaml, meaning that the defaults can be overridden in the application specific yaml if required. Because of this, it is best to set as many defaults as possible to ensure the best functionality out of this library.
 
-See template.yaml for a guide showing all possible yaml variables and the expected types of contents.
+See the yaml files in the amazonia folder for a guide showing all possible yaml variables and the expected types of contents. Schema is used to validate the combined application and defaults yaml before execution.
 
-if no yaml files are provided, amazonia will read from amazonia/application.yaml and amazonia/defaults.yaml.
+If no custom yaml files are provided, amazonia will read from amazonia/application.yaml and amazonia/defaults.yaml.
 
 Once you have both of your yaml documents, you can run amazonia using the below command
 
 `python3 amazonia/amz.py -y APPLICATION_YAML_LOCATION -d ENVIRONMENTAL_DEFAULT_YAML_LOCATION`
+
+#### amz.py options
+
+
+    usage: amz.py [-h] [-y YAML] [-d DEFAULT] [-s SCHEMA] [-t TEMPLATE] [-o]
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -y YAML, --yaml       Path to the applications amazonia yaml file
+      -d DEFAULT, --default
+                            Path to the environmental defaults yaml file
+      -s SCHEMA, --schema
+                            Path to the schema to validate the provided yaml
+                            values against
+      -t TEMPLATE, --template
+                            Path for amazonia to place template file
+      -o, --out             Output template to stdout rather than a file.
+
+
+## Contributions
+
+For any contributions, please feel free to fork, or branch this repo from the integration branch.
+All Pull requests should also be aimed at the integration branch. 
+This is because the integration branch is where our tests run before we merge to master so this is super helpful to us :)
 
 ##Examples
 

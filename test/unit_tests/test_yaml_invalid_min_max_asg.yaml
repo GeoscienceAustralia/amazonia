@@ -1,0 +1,9 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+stack_title: 'testStack'
+autoscaling_units:
+  -
+    minsize: '2'
+    maxsize: '1'

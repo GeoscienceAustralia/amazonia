@@ -1,0 +1,40 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+stack_title: 'testStack'
+autoscaling_units:
+  -
+    blah: 'should not be here'
+    unit_title: 'app1'
+    hosted_zone_name: '.test.lan'
+    image_id: 'ami-05446966'
+    instance_type: 't2.micro'
+    protocols:
+     - 'HTTP'
+    loadbalancerports:
+     - '80'
+    instanceports:
+     - '80'
+    path2ping: '/index.html'
+    minsize: '1'
+    maxsize: '1'
+    health_check_grace_period: '300'
+    iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
+    sns_topic_arn: 'sns_topic_arn'
+    sns_notification_types: 'sns_notification_types'
+    elb_log_bucket: 'elb_log_bucket'
+    health_check_type: 'ELB'
+    dependencies:
+     - 'app2'
+     - 'db1'
+    userdata: |
+      #cloud-config
+      repo_update: true
+      repo_upgrade: all
+
+      packages:
+       - httpd
+
+      runcmd:
+       - service httpd start

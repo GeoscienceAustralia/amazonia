@@ -23,5 +23,5 @@ def main():
     print(template.to_json(indent=2, separators=(',', ': ')))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -7,8 +7,7 @@ from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
 
 
 def test_database():
-    """
-    Tests correct structure of Database unit.
+    """ Tests correct structure of Database unit.
     """
     template = Template()
     vpc = template.add_resource(ec2.VPC('MyVPC',

@@ -1,0 +1,10 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+stack_title: 'testStack'
+home_cidrs:
+  - name: 'GA_1'
+    cidr: '124.47.132.132/32'
+  - name: 'GA2'
+    cidr: '192.104.44.10.0/22'
