@@ -10,7 +10,7 @@ class AutoscalingUnit(object):
                  public_subnets, private_subnets, minsize, maxsize, keypair, image_id, instance_type, userdata,
                  cd_service_role_arn, nat, jump, hosted_zone_name, gateway_attachment, iam_instance_profile_arn,
                  sns_topic_arn, sns_notification_types, health_check_grace_period, health_check_type, elb_log_bucket,
-                 public_unit, dependencies, ):
+                 public_unit, dependencies):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',
