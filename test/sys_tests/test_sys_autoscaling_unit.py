@@ -89,6 +89,7 @@ runcmd:
         sns_topic_arn=None,
         sns_notification_types=None,
         elb_log_bucket=None,
+        public_unit=True,
         gateway_attachment=gateway_attachment,
         dependencies='app2'
     )
@@ -120,6 +121,7 @@ runcmd:
         sns_topic_arn=None,
         sns_notification_types=None,
         elb_log_bucket=None,
+        public_unit=False,
         gateway_attachment=gateway_attachment,
         dependencies='app1'
     )

@@ -74,6 +74,7 @@ runcmd:
                             'sns_notification_types': None,
                             'elb_log_bucket': None,
                             'userdata': userdata1,
+                            'public_unit': True,
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
                             'protocols': ['HTTP'],
@@ -92,6 +93,7 @@ runcmd:
                             'sns_notification_types': None,
                             'elb_log_bucket': None,
                             'userdata': userdata2,
+                            'public_unit': True,
                             'dependencies': []}
                            ],
         database_units=[{'unit_title': 'db1',

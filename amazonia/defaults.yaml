@@ -39,6 +39,7 @@ iam_instance_profile_arn:
 sns_topic_arn:
 sns_notification_types:
 elb_log_bucket:
+public_unit: true
 hosted_zone_name:
 userdata: |
       #cloud-config
