@@ -236,8 +236,8 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
         nullable: True
       sns_notification_types: # A string containing the notification types for SNS topics
         type:
-         - list
-         - string
+         - 'list'
+         - 'string'
         nullable: True
       elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
         type: 'string'
@@ -295,8 +295,8 @@ sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
   empty: False
 sns_notification_types: # A string containing the notification types for SNS topics
   type:
-   - list
-   - string
+   - 'list'
+   - 'string'
   nullable: True
   empty: False
 elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
