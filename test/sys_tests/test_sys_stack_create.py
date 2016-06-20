@@ -168,7 +168,7 @@ def main():
     default_data = read_yaml(args.default)
     schema_data = read_yaml(args.schema)
     template_path = os.path.join(__location__, args.template)
-    s3_key = 'smallest_app_in_history/' + args.template
+    s3_key = 'amazonia/' + args.template
     s3_bucket = args.s3_bucket
     stack_name = args.stack_name
 
