@@ -15,8 +15,8 @@ http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#Cl
 def read_yaml(user_yaml):
     """
     Ingest user YAML
-    :param user_yaml:
-    :return:
+    :param user_yaml: yaml file location
+    :return: Json serialised version of Yaml
     """
     with open(user_yaml, 'r') as stack_yaml:
         return yaml.safe_load(stack_yaml)
@@ -40,11 +40,10 @@ def create_template(yaml_data, default_data, schema_data, template_path):
 def upload_s3(s3_client, template_path, s3_bucket, s3_key):
     """
     Upload to s3
-    :param s3_client:
-    :param template_path:
-    :param s3_bucket:
-    :param s3_key:
-    :return:
+    :param s3_client: Boto S3 client API
+    :param template_path: Path where output template file was saved to
+    :param s3_bucket: S3 bucket where to upload template to
+    :param s3_key: Folder and file path key where to upload template to
     """
     s3_client.upload_file(template_path, s3_bucket, s3_key)
 
@@ -55,11 +54,10 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
     """
     his Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
     http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#CloudFormation.Client.create_stack
-    :param cf_client:
-    :param stack_name:
-    :param s3_bucket:
-    :param s3_key:
-    :return:
+    :param cf_client: Boto Cloudformation client API
+    :param stack_name: name of stack to create and delete
+    :param s3_bucket: S3 bucket where to read template from
+    :param s3_key: Folder and file path key where to read template from
     """
     template_url = \
         'https://s3-ap-southeast-2.amazonaws.com/' + s3_bucket + '/' + s3_key
@@ -131,7 +129,11 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
 
 def main():
     """
-
+    Accepts arguments
+    Reads data
+    Creates template
+    Uploads template to S3
+    Creates and delets stack
     """
     cf_client = boto3.client('cloudformation')
     s3_client = boto3.resource('s3').meta.client
