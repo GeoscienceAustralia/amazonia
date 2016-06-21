@@ -52,7 +52,7 @@ def upload_s3(s3_client, template_path, s3_bucket, s3_key):
 
 def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
     """
-    his Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
+    This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
     http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#CloudFormation.Client.create_stack
     :param cf_client: Boto Cloudformation client API
     :param stack_name: name of stack to create and delete
