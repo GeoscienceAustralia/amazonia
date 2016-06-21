@@ -41,6 +41,7 @@ class Yaml(object):
                                            'sns_topic_arn',
                                            'sns_notification_types',
                                            'elb_log_bucket',
+                                           'public_unit',
                                            'health_check_type',
                                            'dependencies'],
                      'database_units': ['unit_title',
@@ -108,7 +109,7 @@ class Yaml(object):
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):
-            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \n'\
+            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \n'
                                            '{0}'.format(validator.errors))
 
     @staticmethod
