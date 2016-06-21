@@ -19,8 +19,8 @@ def get_cloud_formation():
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
     text_content = request.get_data(as_text=True)
     json_content = yaml.safe_load(text_content)
-    default_yaml = amz.read_yaml(os.path.join(__location__, './amazonia/defaults.yaml'))
-    schema = amz.read_yaml(os.path.join(__location__, './amazonia/schema.yaml'))
+    default_yaml = amz.read_yaml(os.path.join(__location__, '../amazonia/defaults.yaml'))
+    schema = amz.read_yaml(os.path.join(__location__, '../amazonia/schema.yaml'))
 
     try:
         result = amz.generate_template(json_content, default_yaml, schema)
