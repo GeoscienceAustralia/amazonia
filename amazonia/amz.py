@@ -13,7 +13,10 @@ from amazonia.classes.stack import Stack
 
 
 def read_yaml(user_yaml):
-    """ Ingest user YAML
+    """
+    Ingest user YAML
+    :param user_yaml: yaml file location
+    :return: Json serialised version of Yaml
     """
     with open(user_yaml, 'r') as stack_yaml:
         return yaml.safe_load(stack_yaml)
@@ -35,8 +38,7 @@ def generate_template(yaml_data, default_data, schema_data):
     yaml_return = Yaml(yaml_data, default_data, schema_data)
     stack_input = yaml_return.united_data
 
-    """ Create stack and create stack template file
-    """
+    # Create stack and create stack template file
     template_trop = create_stack(stack_input)
     template_data = template_trop.template.to_json(indent=2, separators=(',', ': '))
     return template_data
