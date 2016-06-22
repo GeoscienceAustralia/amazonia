@@ -16,7 +16,14 @@ class S3(object):
                     BucketOwnerRead,
                     BucketOwnerFullControl,
                     LogDeliveryWrite]
+        :param unit_title: Title of the s3 bucket unit
+        :param template: The troposphere template to add the Elastic Loadbalancer to.
+        :param s3_access: A canned access control list (ACL) that grants predefined permissions to the bucket.
+        For more information about canned ACLs http://docs.aws.amazon.com/AmazonS3/latest/dev/CannedACL.html
+        Valid values: AuthenticatedRead | AwsExecRead | BucketOwnerRead | BucketOwnerFullControl |
+            LogDeliveryWrite | Private | PublicRead | PublicReadWrite
         """
+
         title = unit_title + 's3'
         self.s3_b = template.add_resource(Bucket(title,
                                                  AccessControl=s3_access))

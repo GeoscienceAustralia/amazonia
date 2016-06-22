@@ -1,6 +1,9 @@
 from nose.tools import *
 from amazonia.classes.s3 import S3
 from troposphere import Template
+"""
+Tests the functions of the s3 bucket class
+"""
 
 
 def test_s3_access():
