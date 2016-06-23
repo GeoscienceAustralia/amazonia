@@ -40,7 +40,8 @@ autoscaling_units:
     health_check_grace_period: '300'
     iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
     sns_topic_arn: 'sns_topic_arn'
-    sns_notification_types: 'sns_notification_types'
+    sns_notification_types:
+     - 'sns_notification_types'
     elb_log_bucket: 'elb_log_bucket'
     health_check_type: 'ELB'
     dependencies:
