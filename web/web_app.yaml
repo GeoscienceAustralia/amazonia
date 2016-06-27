@@ -8,6 +8,7 @@ autoscaling_units:
       - '80'
     loadbalancerports:
       - '80'
+    path2ping: '/amazonia/web/index.html'
     hosted_zone_name: 'gadevs.ga.'
     userdata: |
       #cloud-config
@@ -29,5 +30,5 @@ autoscaling_units:
        - echo "    ProxyPassReverse /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
        - echo "</VirtualHost>" >> /etc/httpd/conf/httpd.conf
        - service httpd reload
-       - service httpd restart
+       - service httpd start
        - python3 -m flask run --host=0.0.0.0
