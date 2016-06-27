@@ -26,7 +26,7 @@ Once you have both of your yaml documents, you can run amazonia using the below 
 
 We have created an experimental front end which allows a user to build an application yaml file in their web browser and see the result Amazonia would generate using the basic defaults.yaml for now.
 
-The site can be found [here](http://TOBEUPDATED)
+The site can be found [here](http://amazonia.gadevs.ga/amazonia/web/index.html)
 
 #### amz.py options
 
