@@ -22,7 +22,6 @@ autoscaling_units:
        - cd /var/www/html
        - git clone https://github.com/GeoscienceAustralia/amazonia.git
        - cd amazonia
-       - git checkout dev-snayler0-AUTO-580-web
        - pip-3.4 install -e . --user
        - export FLASK_APP=/var/www/html/amazonia/web/api.py
        - echo "<VirtualHost *:80>" >> /etc/httpd/conf/httpd.conf
