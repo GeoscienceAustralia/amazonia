@@ -86,6 +86,8 @@ class Yaml(object):
         Process unit input values for given unit type, validate specific fields such as title and userdata
         :param unit_type: unit type (autoscaling, database, etc)
         """
+        minsize = 0
+        maxsize = 0
         for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 self.united_data[unit_type][unit][unit_value] = \
@@ -97,7 +99,7 @@ class Yaml(object):
                 if unit_value == 'minsize':
                     minsize = self.united_data[unit_type][unit][unit_value]
                     maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
-                if minsize and maxsize and minsize > maxsize:
+                if minsize > maxsize:
                     raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
                                                    'larger than maxsize ({1})'.format(minsize, maxsize))
 
