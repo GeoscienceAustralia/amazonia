@@ -17,6 +17,7 @@ setup(
         'boto3',
         'pyyaml',
         'cerberus',
-        'flask'
+        'flask',
+        'flask_cors'
     ]
 )

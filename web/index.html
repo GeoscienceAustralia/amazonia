@@ -47,7 +47,8 @@
     </div>
     <script type="text/javascript">
     function sendData() {
-        var url = encodeURI("http://127.0.0.1:5000/yaml");
+        var local = 'http://' + window.location.host + '/yaml';
+        var url = encodeURI(local);
         $.ajax({
             dataType: "json",
             contentType: "plain/text; charset=utf-8",
