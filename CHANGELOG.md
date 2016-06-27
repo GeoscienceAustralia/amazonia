@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
--
+- Fixed some code linting issued in yaml class.
 
 ## [1.0.5] - 27/06/2016
 - Added /web folder and a web front end + api
