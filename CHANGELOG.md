@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 -
 
+## [1.0.5] - 27/06/2016
+- Added /web folder and a web front end + api
+
 ## [1.0.4] - 23/06/2016
 - Updated cerberus schema: minsize, maxsize can be numbers or strings
 - Updated cerberus schema: sns notification types must be list of strings

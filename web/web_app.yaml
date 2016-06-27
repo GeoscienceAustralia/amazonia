@@ -1,0 +1,33 @@
+autoscaling_units:
+  -
+    unit_title: 'api'
+    image_id: 'ami-d9d7f9ba'
+    protocols:
+      - 'HTTP'
+    instanceports:
+      - '80'
+    loadbalancerports:
+      - '80'
+    path2ping: '/amazonia/web/index.html'
+    hosted_zone_name: 'gadevs.ga.'
+    userdata: |
+      #cloud-config
+      repo_update: true
+      repo_upgrade: all
+      packages:
+       - httpd
+       - git
+       - python34-pip
+      runcmd:
+       - cd /var/www/html
+       - git clone https://github.com/GeoscienceAustralia/amazonia.git
+       - cd amazonia
+       - pip-3.4 install -e . --user
+       - export FLASK_APP=/var/www/html/amazonia/web/api.py
+       - echo "<VirtualHost *:80>" >> /etc/httpd/conf/httpd.conf
+       - echo "    ProxyPass /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
+       - echo "    ProxyPassReverse /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
+       - echo "</VirtualHost>" >> /etc/httpd/conf/httpd.conf
+       - service httpd reload
+       - service httpd start
+       - python3 -m flask run --host=0.0.0.0

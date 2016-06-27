@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head lang="en"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <link rel="stylesheet" href="./app.min.css">
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <title>Amazonia API Client</title>
+    <style type="text/css">.aurelia-hide { display:none !important; }</style></head>
+<body aurelia-app="src/main"><!--<view>-->
+    <div class="navbar navbar-inverse" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">Amazonia Web Interface</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                <!--<view>--><li class="au-target active">
+                    <a href.bind="row.href" class="au-target" href="./index.html">
+                        Home
+                        <!--anchor-->
+                    </a>
+                </li><!--</view>--><!--anchor-->
+                <li class="au-target inactive">
+                    <a href.bind="row.href" class="au-target" href="https://github.com/GeoscienceAustralia/amazonia">
+                        Github
+                        <!--anchor-->
+                    </a>
+                </li><!--</view>--><!--anchor-->
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+    <div id="main" class="container">
+        <form name="form">
+            <h2>Application Yaml:</h2><br />
+            <textarea class="form-control input-lg au-target" name="Input" rows="15" cols="50" placeholder="Experiment with application yaml here" onchange="sendData()"></textarea>
+            <h2>Output Cloud Formation:</h2><br />
+            <textarea readonly class="form-control input-lg au-target" name="Output" rows="15"></textarea>
+        </form>
+    </div>
+    <script type="text/javascript">
+    function sendData() {
+        var local = 'http://' + window.location.host + '/yaml';
+        var url = encodeURI(local);
+        $.ajax({
+            dataType: "json",
+            contentType: "plain/text; charset=utf-8",
+            url: url,
+            method:"POST",
+            data: document.form.Input.value,
+            success: function(data){
+                document.form.Output.value = JSON.stringify(data, null, 2);
+            },
+            error: function(data){
+                document.form.Output.value = JSON.stringify(data, null, 2);
+            }
+        })
+    };
+    </script>
+</body>
+</html>

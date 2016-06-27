@@ -22,6 +22,12 @@ Once you have both of your yaml documents, you can run amazonia using the below 
 
 `python3 amazonia/amz.py -y APPLICATION_YAML_LOCATION -d ENVIRONMENTAL_DEFAULT_YAML_LOCATION`
 
+## experimental front end
+
+We have created an experimental front end which allows a user to build an application yaml file in their web browser and see the result Amazonia would generate using the basic defaults.yaml for now.
+
+The site can be found [here](http://amazonia.gadevs.ga/amazonia/web/index.html)
+
 #### amz.py options
 
 
