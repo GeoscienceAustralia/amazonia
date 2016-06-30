@@ -41,9 +41,9 @@ runcmd:
  - service httpd start
 """
 
-    nat_image_id = 'ami-162c0c75'
-    jump_image_id = 'ami-05446966'
-    app_image_id = 'ami-05446966'
+    nat_image_id = 'ami-53371f30'
+    jump_image_id = 'ami-dc361ebf'
+    app_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
     stack = Stack(
         stack_title='test',

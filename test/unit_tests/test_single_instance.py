@@ -52,7 +52,7 @@ def create_si(title, is_nat=False):
     template = Template()
     si = SingleInstance(title=title,
                         keypair='pipeline',
-                        si_image_id='ami-162c0c75',
+                        si_image_id='ami-53371f30',
                         si_instance_type='t2.nano',
                         vpc=vpc,
                         subnet=subnet,

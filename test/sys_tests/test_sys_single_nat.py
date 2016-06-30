@@ -14,7 +14,7 @@ def main():
     template = Template()
     SingleInstance(title='nat1',
                    keypair='pipeline',
-                   si_image_id='ami-162c0c75',
+                   si_image_id='ami-53371f30',
                    si_instance_type='t2.micro',
                    vpc=vpc,
                    subnet=subnet,
