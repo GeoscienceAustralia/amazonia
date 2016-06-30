@@ -86,21 +86,22 @@ class Yaml(object):
         Process unit input values for given unit type, validate specific fields such as title and userdata
         :param unit_type: unit type (autoscaling, database, etc)
         """
+        minsize = 0
+        maxsize = 0
         for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 self.united_data[unit_type][unit][unit_value] = \
                     self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
                 # Validate for unecrypted aws access ids and aws secret keys
-                if unit_value == 'userdata':
-                    if self.united_data[unit_type][unit]['userdata'] is not None:
-                        self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
+                if unit_value == 'userdata' and self.united_data[unit_type][unit]['userdata'] is not None:
+                    self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
                 # Validate that minsize is less than maxsize
                 if unit_value == 'minsize':
                     minsize = self.united_data[unit_type][unit][unit_value]
                     maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
-                    if minsize > maxsize:
-                        raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
-                                                       'larger than maxsize ({1})'.format(minsize, maxsize))
+                if minsize > maxsize:
+                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
+                                                   'larger than maxsize ({1})'.format(minsize, maxsize))
 
 
     @staticmethod
