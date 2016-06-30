@@ -5,6 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - Fixed some code linting issued in yaml class.
 
+## [1.0.8] - 29/06/2016
+- Testing for Release Automation
+- 
+## [1.0.7] - 29/06/2016
+- Testing for Release Automation
+
+## [1.0.6] - 29/06/2016
+- Testing for Release Automation
+
 ## [1.0.5] - 27/06/2016
 - Added /web folder and a web front end + api
 
