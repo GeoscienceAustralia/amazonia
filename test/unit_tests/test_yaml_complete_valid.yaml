@@ -13,9 +13,9 @@ vpc_cidr: '10.0.0.0/16'
 public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
-jump_image_id: 'ami-05446966'
+jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
-nat_image_id: 'ami-162c0c75'
+nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
 home_cidrs:
   - name: 'GA1'
@@ -26,7 +26,7 @@ autoscaling_units:
   -
     unit_title: 'app1'
     hosted_zone_name: '.test.lan'
-    image_id: 'ami-05446966'
+    image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:
      - 'HTTP'
@@ -60,7 +60,7 @@ autoscaling_units:
   -
     unit_title: 'app2'
     hosted_zone_name: null
-    image_id: 'ami-05446966'
+    image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:
      - 'HTTPS'

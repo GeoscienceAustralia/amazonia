@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 - Fixed some code linting issued in yaml class.
+- Updated all amis to point to latest Amazon Linux images
 
 ## [1.0.8] - 29/06/2016
 - Testing for Release Automation

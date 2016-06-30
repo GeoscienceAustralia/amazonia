@@ -1,5 +1,5 @@
 unit_title: 'defaulttitle'
-image_id: 'ami-0c95b86f'
+image_id: 'ami-dc361ebf'
 instance_type: 't2.micro'
 stack_title: 'myStack'
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
@@ -11,9 +11,9 @@ vpc_cidr: '10.0.0.0/16'
 public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
-jump_image_id: 'ami-0c95b86f'
+jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
-nat_image_id: 'ami-162c0c75'
+nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
 home_cidrs:
   - name: 'home'
