@@ -11,8 +11,8 @@ def main():
 
     S3(unit_title='MyBucket',
        template=template,
-       s3_access='PublicRead'
-       )
+       s3_access='PublicRead',
+       bucket_policy='')
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

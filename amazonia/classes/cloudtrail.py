@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from troposphere import Output, Join, Ref
 from troposphere.cloudtrail import Trail
 from amazonia.classes.s3 import S3
 
@@ -13,12 +14,52 @@ class Cloudtrail(object):
 
         title = unit_title + 'Trail'
 
-        # S3 Bucket for Cloud Trail Log
+        # S3 Bucket Policy for Cloudtrail S3 bucket
+        # resource = Join('', ["arn:aws:s3:::",
+        #                      'mycloudtrailamzs3',
+        #                      "/AWSLogs/",
+        #                      '658691668407',
+        #                      "/*"])
+        # resource = "arn:aws:s3:::" + 'mycloudtrailamzs3' + "/AWSLogs/" + '658691668407' + "/*"
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "cloudtrail.amazonaws.com"
+                    },
+                    "Action": "s3:GetBucketAcl",
+                    "Resource": 'mycloudtrailamzs3'
+                },
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "cloudtrail.amazonaws.com"
+                    },
+                    "Action": "s3:PutObject",
+                    # "Resource": resource,
+                    "Resource": "arn:aws:s3:::mytrailamzs3/AWSLogs/123456789123/*",
+                    # "Resource": Join('', ["arn:aws:s3:::",
+                    #                       Ref(title.lower() + 'amzs3'),
+                    #                       "/AWSLogs/",
+                    #                       Ref('AWS::AccountId'),
+                    #                       "/*"]),
+                    "Condition": {
+                        "StringEquals": {
+                            "s3:x-amz-acl": "bucket-owner-full-control"
+                        }
+                    }
+                }
+            ]
+        }
+        # Create S3 Bucket for Cloud Trail Log
         self.s3_b_trail = S3(unit_title=title,
                              template=template,
-                             s3_access='LogDeliveryWrite')
+                             s3_access='BucketOwnerFullControl',
+                             bucket_policy=policy)
 
-        # Cloudtrail
+        # Create Cloudtrail Trail
         self.trail = template.add_resource(Trail(title,
                                                  IsLogging=True,
                                                  S3BucketName=self.s3_b_trail.s3_b.title,
@@ -27,5 +68,14 @@ class Cloudtrail(object):
                                                  IncludeGlobalServiceEvents=True,
                                                  IsMultiRegionTrail=True
                                                  ))
+        self.trail.DependsOn = [self.s3_b_trail]
 
+        template.add_output(Output(
+            title,
+            Value=Join('', [Ref(self.trail),
+                            ' is a managed AWS Cloudtrail Trail, created with Amazonia as part of stack name - ',
+                            Ref('AWS::StackName')
+                            ]),
+            Description='Amazonia Cloudtrail'
+        ))
 
