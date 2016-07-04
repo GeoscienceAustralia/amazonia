@@ -2,7 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.0.14] - 04/06/2016
+- Updated amazonia/test/sys_tests/test_sys_stack_create.py to include cases for CREATE_FAILED, DELETE_FAILED, ROLLBACK_FAILED for create_and_delete_stack()
+
+## [1.0.9] - 30/06/2016
 - Fixed some code linting issued in yaml class.
 - Updated all amis to point to latest Amazon Linux images
 
