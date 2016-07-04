@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2
+from troposphere.ec2 import EIP
+from troposphere.route53 import RecordSetType
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class SingleInstance(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, is_nat=False):
+    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, is_nat=False, hosted_zone_name=None):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
@@ -47,6 +49,27 @@ class SingleInstance(SecurityEnabledObject):
             self.si_output(nat=False, subnet=subnet)
         else:
             self.si_output(nat=True, subnet=subnet)
+
+        if hosted_zone_name is not None:
+
+            # Give the instance an Elastic IP Address
+            self.eip_address = self.template.add_resource(EIP(
+                self.single.title + 'EIP',
+                DependsOn='',
+                Domain='vpc',
+                InstanceId=Ref(self.single)
+                ))
+
+            # Create a Route53 Record Set for the instances Elastic IP address.
+
+            self.record_set = self.template.add_resource(RecordSetType(
+                self.single.title + 'Recordset',
+                HostedZoneName=hosted_zone_name,
+                Comment="Recordset for {0}".format(self.single.title),
+                Name=Join("", [Ref(self.single), ".", Ref("AWS::Region"), ".", hosted_zone_name, "."]),
+                Type="A",
+                ResourceRecords=[GetAtt(self.eip_address.title, "AllocationId")]
+            ))
 
     def si_output(self, nat, subnet):
         """

@@ -41,11 +41,11 @@
 #                   'nat_image_id',
 #                   'nat_instance_type',
 #                   'home_cidrs',
+#                   'hosted_zone_name',
 #                   'autoscaling_units',
 #                   'database_units']
 #
 # unit_key_list = {'autoscaling_units': ['unit_title',
-#                                        'hosted_zone_name',
 #                                        'userdata',
 #                                        'image_id',
 #                                        'instance_type',
@@ -190,9 +190,6 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
       unit_title:  # A string containing the title of this autoscaling unit.
         type: 'string'
         regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        nullable: True  # For all values in an autoscaling unit. If they are null, a matching value must be
-      hosted_zone_name: # provided at the lowest level of the yaml structure (if autoscaling units are not also empty).
-        type: 'string'
         nullable: True
       image_id: # A string specifying which ami to use for this specific autoscaling group by its id
         type: 'string'

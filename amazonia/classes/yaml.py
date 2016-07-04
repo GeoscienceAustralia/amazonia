@@ -23,10 +23,10 @@ class Yaml(object):
                       'nat_image_id',
                       'nat_instance_type',
                       'home_cidrs',
+                      'hosted_zone_name',
                       'autoscaling_units',
                       'database_units']
     unit_key_list = {'autoscaling_units': ['unit_title',
-                                           'hosted_zone_name',
                                            'userdata',
                                            'image_id',
                                            'instance_type',
