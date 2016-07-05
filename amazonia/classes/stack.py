@@ -32,7 +32,7 @@ class Stack(object):
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
-        :paran hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
+        :param hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
         """
         super(Stack, self).__init__()
         self.title = stack_title
@@ -104,9 +104,11 @@ class Stack(object):
             si_instance_type=jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template
+            template=self.template,
+            hosted_zone_name=hosted_zone_name,
+            dependencies=self.gateway_attachment.title
         )
-        self.jump.single.DependsOn = self.gateway_attachment.title
+        #self.jump.single.DependsOn = self.gateway_attachment.title
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
 
@@ -118,9 +120,10 @@ class Stack(object):
             subnet=self.public_subnets[0],
             vpc=self.vpc,
             template=self.template,
-            is_nat=True
+            is_nat=True,
+            dependencies=self.gateway_attachment.title
         )
-        self.nat.single.DependsOn = self.gateway_attachment.title
+        #self.nat.single.DependsOn = self.gateway_attachment.title
 
         # Add Routes
         self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
@@ -154,6 +157,7 @@ class Stack(object):
                 jump=self.jump,
                 gateway_attachment=self.gateway_attachment,
                 public_cidr=self.public_cidr,
+                hosted_zone_name=hosted_zone_name if hosted_zone_name is not None else None,
                 **unit
             )
         # Add Database Units
