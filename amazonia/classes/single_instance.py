@@ -79,7 +79,7 @@ class SingleInstance(SecurityEnabledObject):
 
             self.template.add_output(Output(
                  self.single.title + 'EIP',
-                 Description='URL of the jump host: {0}'.format(self.single.title),
+                 Description='URL of the jump host {0}'.format(self.single.title),
                  Value=self.si_r53.Name
             ))
 
