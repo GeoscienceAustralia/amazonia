@@ -41,7 +41,7 @@
 #                   'nat_image_id',
 #                   'nat_instance_type',
 #                   'home_cidrs',
-#                   'hosted_zone_name',
+#                   'stack_hosted_zone_name',
 #                   'autoscaling_units',
 #                   'database_units']
 #
@@ -203,6 +203,10 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
         nullable: True
         schema:
           type: 'string'
+      unit_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for this unit
+        type: 'string'
+        nullable: True
+        empty: False
       loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
         type: 'list'
         nullable: True
@@ -304,7 +308,7 @@ elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traff
   type: 'string'
   nullable: True
   empty: False
-hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
+stack_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
   type: 'string'
   nullable: True
   empty: False

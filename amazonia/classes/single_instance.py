@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53
-from troposphere.ec2 import EIP
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
@@ -20,6 +19,7 @@ class SingleInstance(SecurityEnabledObject):
         :param si_instance_type: Instance type for single instance e.g. 't2.micro' or 't2.nano'
         :param subnet: Troposhere object for subnet created e.g. 'sub_pub1'
         :param is_nat: a boolean that is used to determine if the instance will be a NAT or not. Default: False
+        :param hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
         :param dependencies: a list of dependencies to wait for before creating the single instance.
         """
 
@@ -52,10 +52,10 @@ class SingleInstance(SecurityEnabledObject):
         else:
             self.si_output(nat=True, subnet=subnet)
 
-        if hosted_zone_name is not None:
+        if hosted_zone_name:
 
             # Give the instance an Elastic IP Address
-            self.eip_address = self.template.add_resource(EIP(
+            self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
                 DependsOn=dependencies,
                 Domain='vpc',

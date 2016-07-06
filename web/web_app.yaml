@@ -1,4 +1,4 @@
-hosted_zone_name: 'gadevs.ga.'
+stack_hosted_zone_name: 'gadevs.ga.'
 autoscaling_units:
   -
     unit_title: 'api'

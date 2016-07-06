@@ -23,7 +23,7 @@ class Yaml(object):
                       'nat_image_id',
                       'nat_instance_type',
                       'home_cidrs',
-                      'hosted_zone_name',
+                      'stack_hosted_zone_name',
                       'autoscaling_units',
                       'database_units']
     unit_key_list = {'autoscaling_units': ['unit_title',
@@ -32,6 +32,7 @@ class Yaml(object):
                                            'instance_type',
                                            'path2ping',
                                            'protocols',
+                                           'unit_hosted_zone_name',
                                            'loadbalancerports',
                                            'instanceports',
                                            'minsize',
@@ -90,8 +91,12 @@ class Yaml(object):
         maxsize = 0
         for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
             for unit_value in Yaml.unit_key_list[unit_type]:
-                self.united_data[unit_type][unit][unit_value] = \
-                    self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
+                if unit_value == 'unit_hosted_zone_name':
+                    self.united_data[unit_type][unit][unit_value] = \
+                    self.user_stack_data[unit_type][unit].get(unit_value, self.united_data['stack_hosted_zone_name'])
+                else:
+                    self.united_data[unit_type][unit][unit_value] = \
+                        self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
                 # Validate for unecrypted aws access ids and aws secret keys
                 if unit_value == 'userdata' and self.united_data[unit_type][unit]['userdata'] is not None:
                     self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])

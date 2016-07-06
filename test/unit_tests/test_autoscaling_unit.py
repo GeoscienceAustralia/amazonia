@@ -115,7 +115,7 @@ def create_autoscaling_unit(unit_title):
         iam_instance_profile_arn=None,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         gateway_attachment='testIgAtch',
         elb_log_bucket=None,
         public_unit=True,

@@ -10,7 +10,7 @@ from amazonia.classes.database_unit import DatabaseUnit
 class Stack(object):
     def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, autoscaling_units,
-                 database_units, hosted_zone_name=None):
+                 database_units, stack_hosted_zone_name):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -32,7 +32,7 @@ class Stack(object):
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
-        :param hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
+        :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
         """
         super(Stack, self).__init__()
         self.title = stack_title
@@ -43,7 +43,7 @@ class Stack(object):
         self.vpc_cidr = vpc_cidr
         self.home_cidrs = home_cidrs
         self.public_cidr = public_cidr
-        self.hosted_zone_name = hosted_zone_name
+        self.hosted_zone_name = stack_hosted_zone_name
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
         self.units = {}
@@ -105,7 +105,7 @@ class Stack(object):
             subnet=self.public_subnets[0],
             vpc=self.vpc,
             template=self.template,
-            hosted_zone_name=hosted_zone_name,
+            hosted_zone_name=self.hosted_zone_name,
             dependencies=self.gateway_attachment.title
         )
 
@@ -155,7 +155,6 @@ class Stack(object):
                 jump=self.jump,
                 gateway_attachment=self.gateway_attachment,
                 public_cidr=self.public_cidr,
-                hosted_zone_name=hosted_zone_name,
                 **unit
             )
         # Add Database Units
