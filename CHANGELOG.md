@@ -3,8 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.15] - 06/07/2016
-- Updated Hosted_zone_name to be passed at stack level in yaml
-- Updated single_instance to create an elastic IP and a route 53 record set for jump hosts if hosted_zone_name is provided
+- Updated Hosted_zone_name to be passed at stack level or unit level in yaml as stack_hosted_zone_name or unit_hosted_zone_name
+- Updated single_instance to create an elastic IP and a route 53 record set for jump hosts if stack_hosted_zone_name is provided
 
 ## [1.0.14] - 04/07/2016
 - Updated amazonia/test/sys_tests/test_sys_stack_create.py to include cases for CREATE_FAILED, DELETE_FAILED, ROLLBACK_FAILED for create_and_delete_stack()
