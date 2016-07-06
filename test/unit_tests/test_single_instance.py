@@ -40,6 +40,23 @@ def test_not_nat_single_instance():
         print(sio)
         assert_in('PublicIp', sio)
 
+def test_jump_with_hostedzone_creates_r53_record():
+    """
+    Tests that creating a jump host and supplying a hostedzone creates an elastic IP, r53 recordset and output for
+    the jump host
+    :return: Pass
+    """
+    jump_titles = ['jump1', 'jump2']
+
+    for title in jump_titles:
+        si = create_si(title)
+
+        assert_equals(si.eip_address.Domain, 'vpc')
+        assert_equals(si.si_r53.HostedZoneName, 'my.hostedzone.')
+
+        sio = si.template.outputs[title + 'EIP'].Value
+        assert_equals(sio, si.si_r53.Name)
+
 
 def create_si(title, is_nat=False):
     """
@@ -49,6 +66,8 @@ def create_si(title, is_nat=False):
     """
     vpc = 'vpc-12345'
     subnet = 'subnet-123456'
+    dependencies = 'igw-12345'
+    hosted_zone_name = None if is_nat else 'my.hostedzone.'
     template = Template()
     si = SingleInstance(title=title,
                         keypair='pipeline',
@@ -56,6 +75,8 @@ def create_si(title, is_nat=False):
                         si_instance_type='t2.nano',
                         vpc=vpc,
                         subnet=subnet,
+                        hosted_zone_name=hosted_zone_name,
+                        dependencies=dependencies,
                         template=template,
                         is_nat=is_nat)
     return si
