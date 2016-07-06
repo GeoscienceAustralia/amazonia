@@ -5,7 +5,7 @@ from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter
 
 
 class DatabaseUnit(SecurityEnabledObject):
-    def __init__(self, unit_title, vpc, template, subnets, db_instance_type, db_engine, db_port):
+    def __init__(self, unit_title, vpc, template, subnets, db_instance_type, db_engine, db_port, db_name):
         """
         Class to create an RDS and DB subnet group in a vpc
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html
@@ -14,6 +14,7 @@ class DatabaseUnit(SecurityEnabledObject):
         :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
         :param template: Troposphere stack to append resources to
         :param subnets: subnets to create autoscaled instances in
+        :param db_name: the specific name of the database to be created
         :param db_instance_type: Size of the RDS instance
         :param db_engine: DB engine type (Postgres, Oracle, MySQL, etc)
         :param db_port: Port of RDS instance
@@ -46,7 +47,7 @@ class DatabaseUnit(SecurityEnabledObject):
                            MultiAZ=True,
                            DBInstanceClass=db_instance_type,
                            DBSubnetGroupName=Ref(self.trop_db_subnet_group),
-                           DBName=unit_title,
+                           DBName=db_name,
                            Engine=db_engine,
                            MasterUsername=Ref(self.username),
                            MasterUserPassword=Ref(self.password),

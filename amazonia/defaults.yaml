@@ -62,6 +62,7 @@ userdata: |
 db_instance_type: 'db.m1.small'
 db_engine: 'postgres'
 db_port: '5432'
+db_name: 'myDb'
 ## YAML TIPS:
 #   Lists: are denoted by indented hypens
 #   Strings: do not need to be enclosed in quotes or double quotes
