@@ -172,11 +172,13 @@ def test_duplicate_unit_names():
         'database_units': [{'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port},
+                            'db_port': db_port,
+                            'db_name': 'MyDb1'},
                            {'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port}]
+                            'db_port': db_port,
+                            'db_name': 'MyDb2'}]
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -213,7 +215,8 @@ def test_duplicate_unit_names():
         'database_units': [{'unit_title': 'app1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port}]
+                            'db_port': db_port,
+                            'db_name': 'MyDb'}]
     })
 
 
@@ -280,6 +283,7 @@ def create_stack(stack_title):
         database_units=[{'unit_title': 'db1',
                          'db_instance_type': db_instance_type,
                          'db_engine': db_engine,
-                         'db_port': db_port}]
+                         'db_port': db_port,
+                         'db_name': 'MyDb'}]
     )
     return stack

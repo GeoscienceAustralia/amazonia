@@ -1,5 +1,4 @@
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
-database_units:
+autoscaling_units:
   -
-    unit_title: 'mydatabase'
-    db_name: 'mydatabase'
+    unit_title: 'app1'
