@@ -46,6 +46,7 @@ class DatabaseUnit(SecurityEnabledObject):
                            MultiAZ=True,
                            DBInstanceClass=db_instance_type,
                            DBSubnetGroupName=Ref(self.trop_db_subnet_group),
+                           DBName=unit_title,
                            Engine=db_engine,
                            MasterUsername=Ref(self.username),
                            MasterUserPassword=Ref(self.password),
