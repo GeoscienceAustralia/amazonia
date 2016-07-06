@@ -93,7 +93,7 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
         if stack_status == 'CREATE_COMPLETE':
             print('\nStack Successfully Created...\nStack Status: {0}'.format(stack_status))
             break
-        elif stack_status in ('ROLLBACK_IN_PROGRESS', 'ROLLBACK_COMPLETE'):
+        elif stack_status in ('CREATE_FAILED', 'ROLLBACK_IN_PROGRESS', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED'):
             print('Error occurred creating AWS CloudFormation stack and returned status code {0}.'.format(stack_status))
             exit(1)
         else:
@@ -119,7 +119,7 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
         if stack_status == 'DELETE_COMPLETE':
             print('\nStack Successfully Deleted...\nStack Status: {0}\n'.format(stack_status))
             break
-        elif stack_status in ('ROLLBACK_IN_PROGRESS', 'ROLLBACK_COMPLETE'):
+        elif stack_status in ('DELETE_FAILED', 'ROLLBACK_IN_PROGRESS', 'ROLLBACK_COMPLETE', 'ROLLBACK_FAILED'):
             print('Error occurred creating AWS CloudFormation stack and returned status code {0}.'.format(stack_status))
             exit(1)
         else:
