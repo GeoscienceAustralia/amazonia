@@ -108,7 +108,6 @@ class Stack(object):
             hosted_zone_name=hosted_zone_name,
             dependencies=self.gateway_attachment.title
         )
-        #self.jump.single.DependsOn = self.gateway_attachment.title
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
 
@@ -123,7 +122,6 @@ class Stack(object):
             is_nat=True,
             dependencies=self.gateway_attachment.title
         )
-        #self.nat.single.DependsOn = self.gateway_attachment.title
 
         # Add Routes
         self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
@@ -157,7 +155,7 @@ class Stack(object):
                 jump=self.jump,
                 gateway_attachment=self.gateway_attachment,
                 public_cidr=self.public_cidr,
-                hosted_zone_name=hosted_zone_name if hosted_zone_name is not None else None,
+                hosted_zone_name=hosted_zone_name,
                 **unit
             )
         # Add Database Units
