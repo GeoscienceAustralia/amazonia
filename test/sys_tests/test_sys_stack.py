@@ -100,7 +100,8 @@ runcmd:
         database_units=[{'unit_title': 'db1',
                          'db_instance_type': 'db.m1.small',
                          'db_engine': 'postgres',
-                         'db_port': '5432'
+                         'db_port': '5432',
+                         'db_name': 'myDb'
                          }]
 
     )
