@@ -7,7 +7,7 @@ autoscaling_units:
   -
     blah: 'should not be here'
     unit_title: 'app1'
-    hosted_zone_name: '.test.lan'
+    unit_hosted_zone_name: '.test.lan'
     image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:

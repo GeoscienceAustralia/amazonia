@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-from troposphere import Ref, Tags, Join, Output, GetAtt, ec2
+from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class SingleInstance(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, is_nat=False):
+    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, instance_dependencies, is_nat=False,
+                 hosted_zone_name=None):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
@@ -18,6 +19,8 @@ class SingleInstance(SecurityEnabledObject):
         :param si_instance_type: Instance type for single instance e.g. 't2.micro' or 't2.nano'
         :param subnet: Troposhere object for subnet created e.g. 'sub_pub1'
         :param is_nat: a boolean that is used to determine if the instance will be a NAT or not. Default: False
+        :param hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
+        :param instance_dependencies: a list of dependencies to wait for before creating the single instance.
         """
 
         super(SingleInstance, self).__init__(vpc=vpc, title=title, template=template)
@@ -40,13 +43,45 @@ class SingleInstance(SecurityEnabledObject):
                                # true otherwise. For more info check the below:
                                # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
                                SourceDestCheck=False if is_nat else True,
-                               Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title]))
+                               Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
+                               DependsOn=instance_dependencies
                            ))
 
         if self.single.SourceDestCheck == 'true':
             self.si_output(nat=False, subnet=subnet)
         else:
             self.si_output(nat=True, subnet=subnet)
+
+        if hosted_zone_name:
+
+            # Give the instance an Elastic IP Address
+            self.eip_address = self.template.add_resource(ec2.EIP(
+                self.single.title + 'EIP',
+                DependsOn=instance_dependencies,
+                Domain='vpc',
+                InstanceId=Ref(self.single)
+                ))
+
+            # Create a Route53 Record Set for the instances Elastic IP address.
+
+            self.si_r53 = self.template.add_resource(route53.RecordSetType(
+                self.single.title + 'R53',
+                HostedZoneName=hosted_zone_name,
+                Comment='DNS Record for {0}'.format(self.single.title),
+                Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.', hosted_zone_name]),
+                ResourceRecords=[Ref(self.eip_address)],
+                Type='A',
+                TTL='300',
+                DependsOn=instance_dependencies
+            ))
+
+            # Create an output for the Record Set that has been created.
+
+            self.template.add_output(Output(
+                 self.single.title + 'EIP',
+                 Description='URL of the jump host {0}'.format(self.single.title),
+                 Value=self.si_r53.Name
+            ))
 
     def si_output(self, nat, subnet):
         """

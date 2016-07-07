@@ -41,14 +41,16 @@ runcmd:
                          si_instance_type='t2.nano',
                          vpc=vpc,
                          subnet=public_subnets[0],
-                         template=template)
+                         template=template,
+                         instance_dependencies=vpc.title)
     jump = SingleInstance(title='Jump',
                           keypair='pipeline',
                           si_image_id='ami-dc361ebf',
                           si_instance_type='t2.nano',
                           vpc=vpc,
                           subnet=public_subnets[0],
-                          template=template)
+                          template=template,
+                          instance_dependencies=vpc.title)
 
     health_check_grace_period = 300
     health_check_type = 'ELB'
@@ -115,7 +117,7 @@ def create_autoscaling_unit(unit_title):
         iam_instance_profile_arn=None,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         gateway_attachment='testIgAtch',
         elb_log_bucket=None,
         public_unit=True,

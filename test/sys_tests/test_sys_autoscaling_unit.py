@@ -47,8 +47,8 @@ runcmd:
                          si_instance_type='t2.nano',
                          vpc=vpc,
                          subnet=public_subnets[0],
-                         template=template)
-    nat.DependsOn = internet_gateway.title
+                         template=template,
+                         instance_dependencies=internet_gateway.title)
 
     jump = SingleInstance(title='jump',
                           keypair='pipeline',
@@ -56,9 +56,8 @@ runcmd:
                           si_instance_type='t2.nano',
                           vpc=vpc,
                           subnet=public_subnets[0],
-                          template=template)
-
-    jump.DependsOn = internet_gateway.title
+                          template=template,
+                          instance_dependencies=internet_gateway.title)
 
     service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
@@ -83,7 +82,7 @@ runcmd:
         cd_service_role_arn=service_role_arn,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
@@ -115,7 +114,7 @@ runcmd:
         cd_service_role_arn=service_role_arn,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
