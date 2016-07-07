@@ -59,9 +59,10 @@ userdata: |
          owner: root:root
       runcmd:
        - service httpd start
-db_instance_type:
-db_engine:
-db_port:
+db_instance_type: 'db.t2.micro'
+db_engine: 'postgres'
+db_port: '5432'
+db_name: 'myDb'
 ## YAML TIPS:
 #   Lists: are denoted by indented hypens
 #   Strings: do not need to be enclosed in quotes or double quotes

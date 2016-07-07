@@ -17,7 +17,7 @@ def main():
                    vpc=vpc,
                    subnet=subnet,
                    template=template,
-                   instance_dependencies=None,
+                   instance_dependencies=vpc.title,
                    hosted_zone_name=None)
 
     template.add_resource(vpc)

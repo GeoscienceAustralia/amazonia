@@ -274,6 +274,11 @@ database_units: # A list of database units to create. Security groups, Database 
         nullable: True  # the lowest level of the yaml structure (if database units are not also empty).
         empty: False
         regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+      db_name: # A string containing the title of this database instance.
+        type: 'string'
+        nullable: True
+        empty: False
+        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
       db_instance_type: # A string containing the db type to use for this RDS instance
         type: 'string'
         nullable: True
@@ -327,3 +332,8 @@ db_port: # A string containing the port to use for communication into RDS instan
   type: 'string'
   nullable: True
   empty: False
+db_name: # A string containing the title of any database instance created in this stack.
+  type: 'string'
+  nullable: True
+  empty: False
+  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
