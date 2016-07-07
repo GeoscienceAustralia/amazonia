@@ -76,7 +76,7 @@ def create_si(title, is_nat=False):
                         vpc=vpc,
                         subnet=subnet,
                         hosted_zone_name=hosted_zone_name,
-                        dependencies=dependencies,
+                        instance_dependencies=dependencies,
                         template=template,
                         is_nat=is_nat)
     return si

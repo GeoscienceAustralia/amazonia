@@ -6,7 +6,7 @@ from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 class SingleInstance(SecurityEnabledObject):
     def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, is_nat=False,
-                 hosted_zone_name=None, dependencies=None):
+                 hosted_zone_name=None, instance_dependencies=None):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
@@ -20,7 +20,7 @@ class SingleInstance(SecurityEnabledObject):
         :param subnet: Troposhere object for subnet created e.g. 'sub_pub1'
         :param is_nat: a boolean that is used to determine if the instance will be a NAT or not. Default: False
         :param hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
-        :param dependencies: a list of dependencies to wait for before creating the single instance.
+        :param instance_dependencies: a list of dependencies to wait for before creating the single instance.
         """
 
         super(SingleInstance, self).__init__(vpc=vpc, title=title, template=template)
@@ -44,7 +44,7 @@ class SingleInstance(SecurityEnabledObject):
                                # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
                                SourceDestCheck=False if is_nat else True,
                                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
-                               DependsOn=dependencies
+                               DependsOn=instance_dependencies
                            ))
 
         if self.single.SourceDestCheck == 'true':
@@ -57,7 +57,7 @@ class SingleInstance(SecurityEnabledObject):
             # Give the instance an Elastic IP Address
             self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
-                DependsOn=dependencies,
+                DependsOn=instance_dependencies,
                 Domain='vpc',
                 InstanceId=Ref(self.single)
                 ))
@@ -72,7 +72,7 @@ class SingleInstance(SecurityEnabledObject):
                 ResourceRecords=[Ref(self.eip_address)],
                 Type='A',
                 TTL='300',
-                DependsOn=dependencies
+                DependsOn=instance_dependencies
             ))
 
             # Create an output for the Record Set that has been created.

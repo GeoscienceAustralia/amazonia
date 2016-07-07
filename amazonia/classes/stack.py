@@ -106,7 +106,7 @@ class Stack(object):
             vpc=self.vpc,
             template=self.template,
             hosted_zone_name=self.hosted_zone_name,
-            dependencies=self.gateway_attachment.title
+            instance_dependencies=self.gateway_attachment.title
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
@@ -120,7 +120,7 @@ class Stack(object):
             vpc=self.vpc,
             template=self.template,
             is_nat=True,
-            dependencies=self.gateway_attachment.title
+            instance_dependencies=self.gateway_attachment.title
         )
 
         # Add Routes
