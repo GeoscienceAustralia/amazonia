@@ -5,8 +5,8 @@ from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class SingleInstance(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, is_nat=False,
-                 hosted_zone_name=None, instance_dependencies=None):
+    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, instance_dependencies, is_nat=False,
+                 hosted_zone_name=None):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py

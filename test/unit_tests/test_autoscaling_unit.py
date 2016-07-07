@@ -41,14 +41,16 @@ runcmd:
                          si_instance_type='t2.nano',
                          vpc=vpc,
                          subnet=public_subnets[0],
-                         template=template)
+                         template=template,
+                         instance_dependencies=vpc.title)
     jump = SingleInstance(title='Jump',
                           keypair='pipeline',
                           si_image_id='ami-dc361ebf',
                           si_instance_type='t2.nano',
                           vpc=vpc,
                           subnet=public_subnets[0],
-                          template=template)
+                          template=template,
+                          instance_dependencies=vpc.title)
 
     health_check_grace_period = 300
     health_check_type = 'ELB'
