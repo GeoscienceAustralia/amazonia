@@ -69,7 +69,7 @@ class Asg(SecurityEnabledObject):
         """
         Creates an autoscaling group object
         AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-group.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         :param title: Title of the autoscaling application
         :param minsize: minimum size of autoscaling group
@@ -125,9 +125,12 @@ class Asg(SecurityEnabledObject):
     def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata, hdd_size):
         """
         Method to add a launch configuration resource to a cloud formation document
-        AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
-        Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
+        AWS Cloud Formation links:
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig-blockdev-mapping.html
+        Troposphere links:
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         :param title: Title of the autoscaling application
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
@@ -170,7 +173,7 @@ class Asg(SecurityEnabledObject):
         """
         Creates a CodeDeploy application and deploy group and associates with autoscaling group
         AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/codedeploy.py
         :param title: Title of the code deploy application
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
