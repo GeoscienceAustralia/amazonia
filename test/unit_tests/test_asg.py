@@ -5,7 +5,8 @@ from troposphere import ec2, Ref, Template, Join, Base64
 from amazonia.classes.asg import Asg, MalformedSNSError
 
 userdata = vpc = subnet = template = load_balancer = health_check_grace_period = health_check_type = \
-    cd_service_role_arn = instance_type = image_id = keypair = iam_instance_profile_arn = sns_topic_arn = None
+    cd_service_role_arn = instance_type = image_id = keypair = iam_instance_profile_arn = sns_topic_arn = \
+    hdd_size = None
 
 sns_notification_types = []
 
@@ -173,6 +174,17 @@ def test_no_userdata():
 
     assert_equals(asg.lc.UserData, '')
 
+@with_setup(setup_resources())
+def test_change_hdd_size():
+    """
+    Tests that the EBS volumesize can be confirgured correctly using hdd_size
+    """
+    global hdd_size
+    hdd_size = '50'
+    asg = create_asg('hddsize')
+
+    assert_equals(asg.lc.BlockDeviceMappings[0].Ebs.VolumeSize, '50')
+
 
 def create_asg(title):
     """
@@ -182,7 +194,7 @@ def create_asg(title):
     """
     global userdata, vpc, subnet, template, load_balancer, health_check_grace_period, health_check_type, \
         cd_service_role_arn, image_id, instance_type, keypair, iam_instance_profile_arn, sns_topic_arn, \
-        sns_notification_types
+        sns_notification_types, hdd_size
     asg = Asg(
         title=title,
         vpc=vpc,
@@ -200,7 +212,8 @@ def create_asg(title):
         cd_service_role_arn=cd_service_role_arn,
         iam_instance_profile_arn=iam_instance_profile_arn,
         sns_topic_arn=sns_topic_arn,
-        sns_notification_types=sns_notification_types
+        sns_notification_types=sns_notification_types,
+        hdd_size=hdd_size
     )
 
     return asg
