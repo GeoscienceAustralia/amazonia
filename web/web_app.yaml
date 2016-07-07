@@ -3,6 +3,7 @@ autoscaling_units:
   -
     unit_title: 'api'
     image_id: 'ami-dc361ebf'
+    hdd_size: '20'
     protocols:
       - 'HTTP'
     instanceports:
