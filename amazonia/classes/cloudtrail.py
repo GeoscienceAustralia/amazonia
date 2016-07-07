@@ -15,7 +15,7 @@ class Cloudtrail(object):
         title = unit_title + 'Trail'
 
         policy = {
-            "Version": "2012-10-17",
+            # "Version": "2012-10-17",
             "Statement": [
                 {
                     "Effect": "Allow",
@@ -27,7 +27,7 @@ class Cloudtrail(object):
                     "Effect": "Allow",
                     "Principal": {"Service": "cloudtrail.amazonaws.com"},
                     "Action": "s3:PutObject",
-                    "Resource": "arn:aws:s3:::mytrailamzs3/AWSLogs/123456789123/*",
+                    "Resource": "arn:aws:s3:::mytrailamzs3/AWSLogs/123456789/*",
                     "Condition": {
                         "StringEquals": {
                             "s3:x-amz-acl": "bucket-owner-full-control"
