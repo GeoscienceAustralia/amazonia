@@ -8,7 +8,7 @@ from amazonia.classes.elb import Elb
 class AutoscalingUnit(object):
     def __init__(self, unit_title, vpc, template, protocols, public_cidr, instanceports, loadbalancerports, path2ping,
                  public_subnets, private_subnets, minsize, maxsize, keypair, image_id, instance_type, userdata,
-                 cd_service_role_arn, nat, jump, hosted_zone_name, gateway_attachment, iam_instance_profile_arn,
+                 cd_service_role_arn, nat, jump, unit_hosted_zone_name, gateway_attachment, iam_instance_profile_arn,
                  sns_topic_arn, sns_notification_types, health_check_grace_period, health_check_type, elb_log_bucket,
                  public_unit, dependencies):
         """
@@ -33,7 +33,7 @@ class AutoscalingUnit(object):
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
         :param nat: nat instance for outbound traffic
         :param jump: jump instance for inbound ssh
-        :param hosted_zone_name: Route53 hosted zone name string for Route53 record sets
+        :param unit_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
         :param gateway_attachment: Stack's gateway attachment troposphere object
         :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
         :param sns_notification_types: list of SNS autoscale notification types
@@ -56,7 +56,7 @@ class AutoscalingUnit(object):
             loadbalancerports=self.loadbalancerports,
             path2ping=path2ping,
             subnets=public_subnets if public_unit is True else private_subnets,
-            hosted_zone_name=hosted_zone_name,
+            hosted_zone_name=unit_hosted_zone_name,
             gateway_attachment=gateway_attachment,
             elb_log_bucket=elb_log_bucket,
             public_unit=public_unit

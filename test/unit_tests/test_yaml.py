@@ -68,6 +68,7 @@ def test_complete_valid_values():
     assert_equals(stack_input['jump_instance_type'], 't2.micro')
     assert_equals(stack_input['nat_image_id'], 'ami-53371f30')
     assert_equals(stack_input['nat_instance_type'], 't2.micro')
+    assert_equals(stack_input['stack_hosted_zone_name'], '.test.lan')
     assert_equals(type(stack_input['home_cidrs']), list)
     assert_equals(len(stack_input['home_cidrs']), 2)
     assert_equals(type(stack_input['autoscaling_units']), list)
@@ -89,7 +90,6 @@ def test_complete_valid_values():
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
-    assert_equals(autoscaling_unit_input['hosted_zone_name'], '.test.lan')
     assert_equals(autoscaling_unit_input['image_id'], 'ami-dc361ebf')
     assert_equals(autoscaling_unit_input['instance_type'], 't2.micro')
     assert_equals(autoscaling_unit_input['path2ping'], '/index.html')
@@ -105,6 +105,12 @@ def test_complete_valid_values():
     assert_equals(autoscaling_unit_input['elb_log_bucket'], 'elb_log_bucket')
     assert_equals(autoscaling_unit_input['health_check_type'], 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])
+    assert_equals(autoscaling_unit_input['unit_hosted_zone_name'], '.dev.lan')
+
+    # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
+    print(stack_input['autoscaling_units'][1]['unit_hosted_zone_name'])
+    print(stack_input['stack_hosted_zone_name'])
+    assert_equals(stack_input['autoscaling_units'][1]['unit_hosted_zone_name'], stack_input['stack_hosted_zone_name'])
 
     database_unit_input = stack_input['database_units'][0]
 

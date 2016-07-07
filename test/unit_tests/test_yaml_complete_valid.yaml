@@ -17,6 +17,7 @@ jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
 nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
+stack_hosted_zone_name: '.test.lan'
 home_cidrs:
   - name: 'GA1'
     cidr: '124.47.132.132/32'
@@ -25,7 +26,7 @@ home_cidrs:
 autoscaling_units:
   -
     unit_title: 'app1'
-    hosted_zone_name: '.test.lan'
+    unit_hosted_zone_name: '.dev.lan'
     image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:
@@ -59,7 +60,6 @@ autoscaling_units:
        - service httpd start
   -
     unit_title: 'app2'
-    hosted_zone_name: null
     image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:

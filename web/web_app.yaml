@@ -1,3 +1,4 @@
+stack_hosted_zone_name: 'gadevs.ga.'
 autoscaling_units:
   -
     unit_title: 'api'
@@ -9,7 +10,6 @@ autoscaling_units:
     loadbalancerports:
       - '80'
     path2ping: '/amazonia/web/index.html'
-    hosted_zone_name: 'gadevs.ga.'
     userdata: |
       #cloud-config
       repo_update: true
