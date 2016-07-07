@@ -42,8 +42,9 @@ class S3(object):
         ))
 
         # Add S3 Bucket Policy
+        s3_b_policy_name = ''.join([title, 'policy'])
         if bucket_policy:
-            self.s3_b_policy = template.add_resource(BucketPolicy(title + 'policy',
+            self.s3_b_policy = template.add_resource(BucketPolicy(s3_b_policy_name,
                                                                   Bucket=title,
                                                                   PolicyDocument=bucket_policy))
             self.s3_b_policy.DependsOn = [self.s3_b.title]

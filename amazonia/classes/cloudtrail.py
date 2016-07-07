@@ -14,37 +14,20 @@ class Cloudtrail(object):
 
         title = unit_title + 'Trail'
 
-        # S3 Bucket Policy for Cloudtrail S3 bucket
-        # resource = Join('', ["arn:aws:s3:::",
-        #                      'mycloudtrailamzs3',
-        #                      "/AWSLogs/",
-        #                      '658691668407',
-        #                      "/*"])
-        # resource = "arn:aws:s3:::" + 'mycloudtrailamzs3' + "/AWSLogs/" + '658691668407' + "/*"
         policy = {
             "Version": "2012-10-17",
             "Statement": [
                 {
                     "Effect": "Allow",
-                    "Principal": {
-                        "Service": "cloudtrail.amazonaws.com"
-                    },
+                    "Principal": {"Service": "cloudtrail.amazonaws.com"},
                     "Action": "s3:GetBucketAcl",
                     "Resource": 'mycloudtrailamzs3'
                 },
                 {
                     "Effect": "Allow",
-                    "Principal": {
-                        "Service": "cloudtrail.amazonaws.com"
-                    },
+                    "Principal": {"Service": "cloudtrail.amazonaws.com"},
                     "Action": "s3:PutObject",
-                    # "Resource": resource,
                     "Resource": "arn:aws:s3:::mytrailamzs3/AWSLogs/123456789123/*",
-                    # "Resource": Join('', ["arn:aws:s3:::",
-                    #                       Ref(title.lower() + 'amzs3'),
-                    #                       "/AWSLogs/",
-                    #                       Ref('AWS::AccountId'),
-                    #                       "/*"]),
                     "Condition": {
                         "StringEquals": {
                             "s3:x-amz-acl": "bucket-owner-full-control"
@@ -53,6 +36,7 @@ class Cloudtrail(object):
                 }
             ]
         }
+
         # Create S3 Bucket for Cloud Trail Log
         self.s3_b_trail = S3(unit_title=title,
                              template=template,
@@ -68,7 +52,7 @@ class Cloudtrail(object):
                                                  IncludeGlobalServiceEvents=True,
                                                  IsMultiRegionTrail=True
                                                  ))
-        self.trail.DependsOn = [self.s3_b_trail]
+        self.trail.DependsOn = [self.s3_b_trail.s3_b.title]
 
         template.add_output(Output(
             title,
