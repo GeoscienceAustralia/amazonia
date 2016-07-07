@@ -30,9 +30,9 @@ runcmd:
 """
     availability_zones = ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c']
     keypair = 'pipeline'
-    nat_image_id = 'ami-162c0c75'
-    jump_image_id = 'ami-05446966'
-    unit_image_id = 'ami-05446966'
+    nat_image_id = 'ami-53371f30'
+    jump_image_id = 'ami-dc361ebf'
+    unit_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
     code_deploy_service_role = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
     vpc_cidr = '10.0.0.0/16'
@@ -115,6 +115,7 @@ def test_duplicate_unit_names():
         'jump_instance_type': instance_type,
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
+        'stack_hosted_zone_name': None,
         'autoscaling_units': [{'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -127,13 +128,13 @@ def test_duplicate_unit_names():
                                'health_check_grace_period': health_check_grace_period,
                                'health_check_type': health_check_type,
                                'userdata': userdata,
-                               'hosted_zone_name': None,
                                'iam_instance_profile_arn': None,
                                'sns_topic_arn': None,
                                'sns_notification_types': None,
                                'elb_log_bucket': None,
                                'public_unit': True,
-                               'dependencies': ['app2', 'db1']},
+                               'dependencies': ['app2', 'db1'],
+                               'unit_hosted_zone_name': None},
                               {'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -146,13 +147,13 @@ def test_duplicate_unit_names():
                                'health_check_grace_period': health_check_grace_period,
                                'health_check_type': health_check_type,
                                'userdata': userdata,
-                               'hosted_zone_name': None,
                                'iam_instance_profile_arn': None,
                                'sns_topic_arn': None,
                                'sns_notification_types': None,
                                'elb_log_bucket': None,
                                'public_unit': True,
-                               'dependencies': []}],
+                               'dependencies': [],
+                               'unit_hosted_zone_name': None}],
         'database_units': []
     })
 
@@ -169,14 +170,17 @@ def test_duplicate_unit_names():
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
         'autoscaling_units': [],
+        'stack_hosted_zone_name': None,
         'database_units': [{'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port},
+                            'db_port': db_port,
+                            'db_name': 'MyDb1'},
                            {'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port}]
+                            'db_port': db_port,
+                            'db_name': 'MyDb2'}]
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -191,6 +195,7 @@ def test_duplicate_unit_names():
         'jump_instance_type': instance_type,
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
+        'stack_hosted_zone_name': None,
         'autoscaling_units': [{'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -203,17 +208,18 @@ def test_duplicate_unit_names():
                                'health_check_grace_period': health_check_grace_period,
                                'health_check_type': health_check_type,
                                'userdata': userdata,
-                               'hosted_zone_name': None,
                                'iam_instance_profile_arn': None,
                                'sns_topic_arn': None,
                                'sns_notification_types': None,
                                'elb_log_bucket': None,
                                'public_unit': True,
-                               'dependencies': ['app2', 'db1']}],
+                               'dependencies': ['app2', 'db1'],
+                               'unit_hosted_zone_name': None}],
         'database_units': [{'unit_title': 'app1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
-                            'db_port': db_port}]
+                            'db_port': db_port,
+                            'db_name': 'MyDb'}]
     })
 
 
@@ -239,6 +245,7 @@ def create_stack(stack_title):
         jump_instance_type=instance_type,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
+        stack_hosted_zone_name=None,
         autoscaling_units=[{'unit_title': 'app1',
                             'protocols': protocols,
                             'instanceports': instanceports,
@@ -251,13 +258,13 @@ def create_stack(stack_title):
                             'health_check_grace_period': health_check_grace_period,
                             'health_check_type': health_check_type,
                             'userdata': userdata,
-                            'hosted_zone_name': None,
                             'iam_instance_profile_arn': None,
                             'sns_topic_arn': None,
                             'sns_notification_types': None,
                             'elb_log_bucket': None,
                             'public_unit': True,
-                            'dependencies': ['app2', 'db1']},
+                            'dependencies': ['app2', 'db1'],
+                            'unit_hosted_zone_name': None},
                            {'unit_title': 'app2',
                             'protocols': protocols,
                             'instanceports': instanceports,
@@ -270,16 +277,17 @@ def create_stack(stack_title):
                             'health_check_grace_period': health_check_grace_period,
                             'health_check_type': health_check_type,
                             'userdata': userdata,
-                            'hosted_zone_name': None,
                             'iam_instance_profile_arn': None,
                             'sns_topic_arn': None,
                             'sns_notification_types': None,
                             'elb_log_bucket': None,
                             'public_unit': True,
-                            'dependencies': []}],
+                            'dependencies': [],
+                            'unit_hosted_zone_name': None}],
         database_units=[{'unit_title': 'db1',
                          'db_instance_type': db_instance_type,
                          'db_engine': db_engine,
-                         'db_port': db_port}]
+                         'db_port': db_port,
+                         'db_name': 'MyDb'}]
     )
     return stack

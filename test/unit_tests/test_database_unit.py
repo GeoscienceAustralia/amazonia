@@ -38,9 +38,11 @@ def test_database():
                       template=template,
                       db_instance_type='db.m1.small',
                       db_engine='postgres',
-                      db_port='5432')
+                      db_port='5432',
+                      db_name='MyDb')
     assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
+    assert_equals(db.trop_db.DBName, 'MyDb')
 
     assert_raises(InvalidFlowError, db.add_unit_flow, **{'receiver': db})

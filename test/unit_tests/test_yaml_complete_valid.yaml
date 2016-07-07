@@ -13,10 +13,11 @@ vpc_cidr: '10.0.0.0/16'
 public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
-jump_image_id: 'ami-05446966'
+jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
-nat_image_id: 'ami-162c0c75'
+nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
+stack_hosted_zone_name: '.test.lan'
 home_cidrs:
   - name: 'GA1'
     cidr: '124.47.132.132/32'
@@ -25,8 +26,8 @@ home_cidrs:
 autoscaling_units:
   -
     unit_title: 'app1'
-    hosted_zone_name: '.test.lan'
-    image_id: 'ami-05446966'
+    unit_hosted_zone_name: '.dev.lan'
+    image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:
      - 'HTTP'
@@ -40,7 +41,8 @@ autoscaling_units:
     health_check_grace_period: '300'
     iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
     sns_topic_arn: 'sns_topic_arn'
-    sns_notification_types: 'sns_notification_types'
+    sns_notification_types:
+     - 'sns_notification_types'
     elb_log_bucket: 'elb_log_bucket'
     health_check_type: 'ELB'
     dependencies:
@@ -58,8 +60,7 @@ autoscaling_units:
        - service httpd start
   -
     unit_title: 'app2'
-    hosted_zone_name: null
-    image_id: 'ami-05446966'
+    image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
     protocols:
      - 'HTTPS'

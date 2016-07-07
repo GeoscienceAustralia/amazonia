@@ -54,7 +54,7 @@ runcmd:
     health_check_type = 'ELB'
     cd_service_role_arn = 'arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     iam_instance_profile_arn = 'arn:aws:iam::12345678987654321:role/InstanceProfileRole'
-    image_id = 'ami-05446966'
+    image_id = 'ami-dc361ebf'
     instance_type = 't2.micro'
     keypair = 'pipeline'
     sns_topic_arn = 'arn:aws:sns:ap-southeast-2:1234567890:test_service_status'
@@ -88,7 +88,7 @@ def test_asg():
                           ['autoscaling:EC2_INSTANCE_LAUNCH', 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                            'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
         assert_equals(asg.lc.title, title + 'Asg' + 'Lc')
-        assert_equals(asg.lc.ImageId, 'ami-05446966')
+        assert_equals(asg.lc.ImageId, 'ami-dc361ebf')
         assert_equals(asg.lc.InstanceType, 't2.micro')
         assert_equals(asg.lc.KeyName, 'pipeline')
         assert_equals(asg.lc.IamInstanceProfile, 'arn:aws:iam::12345678987654321:role/InstanceProfileRole')

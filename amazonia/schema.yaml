@@ -41,11 +41,11 @@
 #                   'nat_image_id',
 #                   'nat_instance_type',
 #                   'home_cidrs',
+#                   'stack_hosted_zone_name',
 #                   'autoscaling_units',
 #                   'database_units']
 #
 # unit_key_list = {'autoscaling_units': ['unit_title',
-#                                        'hosted_zone_name',
 #                                        'userdata',
 #                                        'image_id',
 #                                        'instance_type',
@@ -190,9 +190,6 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
       unit_title:  # A string containing the title of this autoscaling unit.
         type: 'string'
         regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        nullable: True  # For all values in an autoscaling unit. If they are null, a matching value must be
-      hosted_zone_name: # provided at the lowest level of the yaml structure (if autoscaling units are not also empty).
-        type: 'string'
         nullable: True
       image_id: # A string specifying which ami to use for this specific autoscaling group by its id
         type: 'string'
@@ -206,6 +203,10 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
         nullable: True
         schema:
           type: 'string'
+      unit_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for this unit
+        type: 'string'
+        nullable: True
+        empty: False
       loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
         type: 'list'
         nullable: True
@@ -219,11 +220,15 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
       path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
         type: 'string'
         nullable: True
-      minsize: # a string containing the minimum amount of instances for this specific autoscaling group to run
-        type: 'string'
+      minsize: # a number or string containing the minimum amount of instances for this specific autoscaling group to run
+        type:
+         - 'number'
+         - 'string'
         nullable: True
-      maxsize: # a string containing the maximum amount of instances for this specific autoscaling group to run
-        type: 'string'
+      maxsize: # a number or string containing the maximum amount of instances for this specific autoscaling group to run
+        type:
+         - 'number'
+         - 'string'
         nullable: True
       health_check_grace_period:  # A string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
         type: 'string'
@@ -234,11 +239,11 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
       sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
         type: 'string'
         nullable: True
-      sns_notification_types: # A string containing the notification types for SNS topics
-        type:
-         - 'list'
-         - 'string'
+      sns_notification_types: # A list of strings containing the notification types for SNS topics
+        type: 'list'
         nullable: True
+        schema:
+          type: 'string'
       elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
         type: 'string'
         nullable: True
@@ -267,6 +272,11 @@ database_units: # A list of database units to create. Security groups, Database 
       unit_title: # A string containing the title of this database unit.
         type: 'string'  # For all values in a database unit. If they are null, a matching value must be provided at
         nullable: True  # the lowest level of the yaml structure (if database units are not also empty).
+        empty: False
+        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+      db_name: # A string containing the title of this database instance.
+        type: 'string'
+        nullable: True
         empty: False
         regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
       db_instance_type: # A string containing the db type to use for this RDS instance
@@ -303,7 +313,7 @@ elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traff
   type: 'string'
   nullable: True
   empty: False
-hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
+stack_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for your stack
   type: 'string'
   nullable: True
   empty: False
@@ -322,3 +332,8 @@ db_port: # A string containing the port to use for communication into RDS instan
   type: 'string'
   nullable: True
   empty: False
+db_name: # A string containing the title of any database instance created in this stack.
+  type: 'string'
+  nullable: True
+  empty: False
+  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title

@@ -18,7 +18,7 @@ reviewers:
   - smclauch
   - snayler0
   - alicelee999
-  - mathewaugustine
+  - ga-autobots
   conditions:
     branches:
       - integration

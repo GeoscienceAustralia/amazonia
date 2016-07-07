@@ -43,22 +43,21 @@ runcmd:
                                                        CidrBlock='10.0.2.0/24'))]
     nat = SingleInstance(title='nat',
                          keypair='pipeline',
-                         si_image_id='ami-162c0c75',
+                         si_image_id='ami-53371f30',
                          si_instance_type='t2.nano',
                          vpc=vpc,
                          subnet=public_subnets[0],
-                         template=template)
-    nat.DependsOn = internet_gateway.title
+                         template=template,
+                         instance_dependencies=internet_gateway.title)
 
     jump = SingleInstance(title='jump',
                           keypair='pipeline',
-                          si_image_id='ami-162c0c75',
+                          si_image_id='ami-dc361ebf',
                           si_instance_type='t2.nano',
                           vpc=vpc,
                           subnet=public_subnets[0],
-                          template=template)
-
-    jump.DependsOn = internet_gateway.title
+                          template=template,
+                          instance_dependencies=internet_gateway.title)
 
     service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
@@ -77,13 +76,13 @@ runcmd:
         health_check_grace_period=300,
         health_check_type='ELB',
         keypair='pipeline',
-        image_id='ami-05446966',
+        image_id='ami-dc361ebf',
         instance_type='t2.nano',
         userdata=userdata,
         cd_service_role_arn=service_role_arn,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
@@ -109,13 +108,13 @@ runcmd:
         health_check_grace_period=300,
         health_check_type='ELB',
         keypair='pipeline',
-        image_id='ami-05446966',
+        image_id='ami-dc361ebf',
         instance_type='t2.nano',
         userdata=userdata,
         cd_service_role_arn=service_role_arn,
         nat=nat,
         jump=jump,
-        hosted_zone_name=None,
+        unit_hosted_zone_name=None,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         iam_instance_profile_arn=None,
         sns_topic_arn=None,

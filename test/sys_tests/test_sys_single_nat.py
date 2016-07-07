@@ -14,12 +14,14 @@ def main():
     template = Template()
     SingleInstance(title='nat1',
                    keypair='pipeline',
-                   si_image_id='ami-162c0c75',
+                   si_image_id='ami-53371f30',
                    si_instance_type='t2.micro',
                    vpc=vpc,
                    subnet=subnet,
                    template=template,
-                   is_nat=True)
+                   is_nat=True,
+                   instance_dependencies=vpc.title,
+                   hosted_zone_name=None)
 
     template.add_resource(vpc)
     template.add_resource(subnet)
