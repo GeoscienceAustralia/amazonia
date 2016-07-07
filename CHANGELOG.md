@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Updated single_instance to create an elastic IP and a route 53 record set for jump hosts if stack_hosted_zone_name is provided
 - Updated 'DependsOn' options for single instance to be passed in rather than assigned after creation.
 - Added 'db_name' yaml value to match DBName value in RDS instances.
+- Added 'hdd_size' yaml value to change the size of Autoscaling unit instances.
 
 ## [1.0.14] - 04/07/2016
 - Updated amazonia/test/sys_tests/test_sys_stack_create.py to include cases for CREATE_FAILED, DELETE_FAILED, ROLLBACK_FAILED for create_and_delete_stack()
