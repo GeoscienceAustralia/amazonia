@@ -8,7 +8,7 @@ from nose.tools import *
 from cerberus import ValidationError
 from amazonia.classes.yaml import Yaml, InsecureVariableError
 
-default_data = None
+default_data = schema = None
 
 
 def setup_resources():

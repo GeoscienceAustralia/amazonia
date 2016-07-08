@@ -1,10 +1,12 @@
 #!/usr/bin/python3
-import boto3
-import time
-import yaml
-import json
 import argparse
+import json
 import os
+import time
+
+import boto3
+import yaml
+
 import amazonia.amz as amz
 
 """
@@ -53,7 +55,8 @@ def upload_s3(s3_client, template_path, s3_bucket, s3_key):
 
 def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters):
     """
-    This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
+    This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws
+    using boto3
     http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#CloudFormation.Client.create_stack
     :param cf_client: Boto Cloudformation client API
     :param stack_name: name of stack to create and delete
@@ -185,6 +188,7 @@ def main():
     create_template(yaml_data, default_data, schema_data, template_path)
     upload_s3(s3_client, template_path, s3_bucket, s3_key)
     create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters)
+
 
 if __name__ == '__main__':
     main()

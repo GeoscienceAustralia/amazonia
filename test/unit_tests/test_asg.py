@@ -161,6 +161,7 @@ def test_no_cd_group_and_no_sns():
     assert_is_none(asg.cd_app)
     assert_is_none(asg.cd_deploygroup)
 
+
 @with_setup(setup_resources())
 def test_no_userdata():
     """
@@ -173,6 +174,7 @@ def test_no_userdata():
     asg = create_asg('nouserdata')
 
     assert_equals(asg.lc.UserData, '')
+
 
 @with_setup(setup_resources())
 def test_change_hdd_size():

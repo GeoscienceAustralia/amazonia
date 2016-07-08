@@ -104,8 +104,9 @@ class Asg(SecurityEnabledObject):
 
         if sns_topic_arn is not None:
             if sns_notification_types is not None and isinstance(sns_notification_types, list):
-                self.trop_asg.NotificationConfigurations = [NotificationConfigurations(TopicARN=sns_topic_arn,
-                                                                                       NotificationTypes=sns_notification_types)]
+                self.trop_asg.NotificationConfigurations = [
+                    NotificationConfigurations(TopicARN=sns_topic_arn,
+                                               NotificationTypes=sns_notification_types)]
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
@@ -122,7 +123,8 @@ class Asg(SecurityEnabledObject):
             self.lc.UserData = ''
         return title
 
-    def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata, hdd_size):
+    def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata,
+                             hdd_size):
         """
         Method to add a launch configuration resource to a cloud formation document
         AWS Cloud Formation links:
