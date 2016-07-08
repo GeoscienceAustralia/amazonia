@@ -51,7 +51,7 @@ def upload_s3(s3_client, template_path, s3_bucket, s3_key):
     print('File Successfully Uploaded to S3')
 
 
-def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters='{}'):
+def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters):
     """
     This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
     http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#CloudFormation.Client.create_stack
@@ -167,6 +167,7 @@ def main():
                         action='store_true',
                         help='Output template to stdout rather than a file.')
     parser.add_argument('-p', '--parameters',
+                        default='{}',
                         help='JSON formatted parameters object.')
     args = parser.parse_args()
 
