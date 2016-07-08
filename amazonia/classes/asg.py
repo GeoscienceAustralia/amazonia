@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from troposphere import Base64, codedeploy, Ref, Join, Output
+from troposphere import Base64, codedeploy, Ref, Join, Output, ec2
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
@@ -9,7 +9,8 @@ from amazonia.classes.security_enabled_object import SecurityEnabledObject
 class Asg(SecurityEnabledObject):
     def __init__(self, title, vpc, template, minsize, maxsize, subnets, load_balancer,
                  keypair, image_id, instance_type, health_check_grace_period, health_check_type,
-                 iam_instance_profile_arn, userdata, sns_topic_arn, sns_notification_types, cd_service_role_arn):
+                 iam_instance_profile_arn, userdata, sns_topic_arn, sns_notification_types, cd_service_role_arn,
+                 hdd_size=None):
         """
         Creates an autoscaling group and codedeploy definition
         :param title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
@@ -29,6 +30,7 @@ class Asg(SecurityEnabledObject):
         :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
         :param sns_notification_types: list of SNS autoscale notification types
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
+        :param hdd_size: the size of the hard drive on the instances.
         """
         super(Asg, self).__init__(vpc=vpc, title=title, template=template)
 
@@ -52,7 +54,8 @@ class Asg(SecurityEnabledObject):
             iam_instance_profile_arn=iam_instance_profile_arn,
             sns_topic_arn=sns_topic_arn,
             sns_notification_types=sns_notification_types,
-            userdata=userdata
+            userdata=userdata,
+            hdd_size=hdd_size
         )
         if cd_service_role_arn is not None:
             self.create_cd_deploygroup(
@@ -62,11 +65,11 @@ class Asg(SecurityEnabledObject):
 
     def create_asg(self, title, minsize, maxsize, subnets, load_balancer, keypair, image_id, instance_type,
                    health_check_grace_period, health_check_type, iam_instance_profile_arn, userdata, sns_topic_arn,
-                   sns_notification_types):
+                   sns_notification_types, hdd_size):
         """
         Creates an autoscaling group object
         AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-group.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         :param title: Title of the autoscaling application
         :param minsize: minimum size of autoscaling group
@@ -82,6 +85,7 @@ class Asg(SecurityEnabledObject):
         :param userdata: Instance boot script
         :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
         :param sns_notification_types: list of SNS autoscale notification types
+        :param hdd_size: the size of the hard drive on the instances.
         :return string representing Auto Scaling Group name
         """
 
@@ -100,8 +104,9 @@ class Asg(SecurityEnabledObject):
 
         if sns_topic_arn is not None:
             if sns_notification_types is not None and isinstance(sns_notification_types, list):
-                self.trop_asg.NotificationConfigurations = [NotificationConfigurations(TopicARN=sns_topic_arn,
-                                                                                       NotificationTypes=sns_notification_types)]
+                self.trop_asg.NotificationConfigurations = [
+                    NotificationConfigurations(TopicARN=sns_topic_arn,
+                                               NotificationTypes=sns_notification_types)]
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
@@ -111,24 +116,30 @@ class Asg(SecurityEnabledObject):
             image_id=image_id,
             instance_type=instance_type,
             iam_instance_profile_arn=iam_instance_profile_arn,
-            userdata=userdata
+            userdata=userdata,
+            hdd_size=hdd_size
         ))
         if userdata is None:
             self.lc.UserData = ''
         return title
 
-    def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata):
+    def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata,
+                             hdd_size):
         """
         Method to add a launch configuration resource to a cloud formation document
-        AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
-        Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
+        AWS Cloud Formation links:
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig-blockdev-mapping.html
+        Troposphere links:
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         :param title: Title of the autoscaling application
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
         :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
         :param iam_instance_profile_arn: Iam instance profile ARN to allow isntance access to services like S3
         :param userdata: Instance boot script
+        :param hdd_size: the size of the hard drive on the instances.
         :return string representing Launch Configuration name
         """
         launch_config_title = title + 'Lc'
@@ -145,13 +156,26 @@ class Asg(SecurityEnabledObject):
         if iam_instance_profile_arn is not None:
             self.lc.IamInstanceProfile = iam_instance_profile_arn
         self.lc.UserData = Base64(userdata)
+
+        # TODO: Work out how to avoid the assumption here of an amazon linux OS.
+        if hdd_size is not None:
+            self.lc.BlockDeviceMappings = [
+                ec2.BlockDeviceMapping(
+                    DeviceName="/dev/xvda",
+                    Ebs=ec2.EBSBlockDevice(
+                        VolumeSize=hdd_size,
+                        VolumeType='gp2'
+                    )
+                ),
+            ]
+
         return launch_config_title
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):
         """
         Creates a CodeDeploy application and deploy group and associates with autoscaling group
         AWS Cloud Formation:
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/codedeploy.py
         :param title: Title of the code deploy application
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions

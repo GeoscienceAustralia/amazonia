@@ -44,8 +44,10 @@ class Yaml(object):
                                            'elb_log_bucket',
                                            'public_unit',
                                            'health_check_type',
-                                           'dependencies'],
+                                           'dependencies',
+                                           'hdd_size'],
                      'database_units': ['unit_title',
+                                        'db_name',
                                         'db_instance_type',
                                         'db_engine',
                                         'db_port']

@@ -1,9 +1,12 @@
 #!/usr/bin/python3
-import boto3
-import time
-import yaml
 import argparse
+import json
 import os
+import time
+
+import boto3
+import yaml
+
 import amazonia.amz as amz
 
 """
@@ -50,14 +53,16 @@ def upload_s3(s3_client, template_path, s3_bucket, s3_key):
     print('File Successfully Uploaded to S3')
 
 
-def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
+def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters):
     """
-    This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
+    This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws
+    using boto3
     http://boto3.readthedocs.org/en/latest/reference/services/cloudformation.html#CloudFormation.Client.create_stack
     :param cf_client: Boto Cloudformation client API
     :param stack_name: name of stack to create and delete
     :param s3_bucket: S3 bucket where to read template from
     :param s3_key: Folder and file path key where to read template from
+    :param cf_parameters: JSON formatted cf_parameters
     """
     template_url = \
         'https://s3-ap-southeast-2.amazonaws.com/' + s3_bucket + '/' + s3_key
@@ -67,6 +72,7 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
         StackName=stack_name,
         TemplateURL=template_url,
         TimeoutInMinutes=123,
+        Parameters=json.loads(cf_parameters),
         ResourceTypes=['AWS::*'],
         OnFailure='ROLLBACK',
         Tags=[
@@ -163,6 +169,9 @@ def main():
     parser.add_argument('-o', '--out',
                         action='store_true',
                         help='Output template to stdout rather than a file.')
+    parser.add_argument('-p', '--parameters',
+                        default='[]',
+                        help='JSON formatted parameters object.')
     args = parser.parse_args()
 
     # YAML ingestion
@@ -170,6 +179,7 @@ def main():
     default_data = read_yaml(args.default)
     schema_data = read_yaml(args.schema)
     template_path = os.path.join(__location__, args.template)
+    cf_parameters = args.parameters
     s3_key = 'amazonia/' + args.template
     s3_bucket = args.s3_bucket
     stack_name = args.stack_name
@@ -177,7 +187,8 @@ def main():
     # Create template, upload to s3 then create and delete stack
     create_template(yaml_data, default_data, schema_data, template_path)
     upload_s3(s3_client, template_path, s3_bucket, s3_key)
-    create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key)
+    create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters)
+
 
 if __name__ == '__main__':
     main()
