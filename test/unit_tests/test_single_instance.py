@@ -40,6 +40,7 @@ def test_not_nat_single_instance():
         print(sio)
         assert_in('PublicIp', sio)
 
+
 def test_jump_with_hostedzone_creates_r53_record():
     """
     Tests that creating a jump host and supplying a hostedzone creates an elastic IP, r53 recordset and output for
@@ -62,6 +63,7 @@ def create_si(title, is_nat=False):
     """
     Helper function to create Single instance Troposhpere object to interate through.
     :param title: name of instance
+    :param is_nat: is the instance a nat
     :return: Troposphere object for single instance, security group and output
     """
     vpc = 'vpc-12345'

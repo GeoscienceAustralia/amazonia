@@ -42,7 +42,7 @@ class Elb(SecurityEnabledObject):
                                                      InstancePort=network_tuple[1],
                                                      InstanceProtocol=network_tuple[2]) for network_tuple
                                         in network_tuples],
-                             Scheme='internet-facing' if public_unit is True else 'private',
+                             Scheme='internet-facing' if public_unit is True else 'internal',
                              SecurityGroups=[Ref(self.security_group)],
                              Subnets=[Ref(x) for x in subnets],
                              Tags=Tags(Name=self.title)))
