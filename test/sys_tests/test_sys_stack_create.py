@@ -69,7 +69,7 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_paramet
         StackName=stack_name,
         TemplateURL=template_url,
         TimeoutInMinutes=123,
-        Parameters=[json.loads(cf_parameters)],
+        Parameters=json.loads(cf_parameters),
         ResourceTypes=['AWS::*'],
         OnFailure='ROLLBACK',
         Tags=[
@@ -167,7 +167,7 @@ def main():
                         action='store_true',
                         help='Output template to stdout rather than a file.')
     parser.add_argument('-p', '--parameters',
-                        default='{}',
+                        default='[]',
                         help='JSON formatted parameters object.')
     args = parser.parse_args()
 
