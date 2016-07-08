@@ -1,10 +1,9 @@
 #
 # Test Stack Yaml for Amazonia
 #
-
 stack_title: 'testStack'
-code_deploy_service_role: 'arn:aws:iam::1234567890124:role/CodeDeployServiceRole'
 keypair: 'key'
+code_deploy_service_role: 'arn:aws:iam::1234567890123:role/CodeDeployServiceRole'
 availability_zones:
   - 'ap-southeast-2a'
   - 'ap-southeast-2b'
@@ -17,18 +16,18 @@ jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
 nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
-stack_hosted_zone_name: '.test.lan'
 home_cidrs:
-  - name: 'GA1'
-    cidr: '124.47.132.132/32'
-  - name: 'GA2'
-    cidr: '192.104.44.10/22'
+  - name: 'office'
+    cidr: '123.45.12.34/16'
+stack_hosted_zone_name: 'test.org.'
+
 autoscaling_units:
   -
     unit_title: 'app1'
-    unit_hosted_zone_name: '.dev.lan'
+#    unit_hosted_zone_name: 'test.org.'
     image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
+    iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
     protocols:
      - 'HTTP'
     loadbalancerports:
@@ -39,12 +38,16 @@ autoscaling_units:
     minsize: '1'
     maxsize: '1'
     health_check_grace_period: '300'
-    iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
+    health_check_type: 'ELB'
+    hdd_size: '8'
     sns_topic_arn: 'sns_topic_arn'
     sns_notification_types:
-     - 'sns_notification_types'
+      - 'autoscaling:EC2_INSTANCE_LAUNCH'
+      - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+      - 'autoscaling:EC2_INSTANCE_TERMINATE'
+      - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
     elb_log_bucket: 'elb_log_bucket'
-    health_check_type: 'ELB'
+    public_unit: true
     dependencies:
      - 'app2'
      - 'db1'
@@ -52,38 +55,69 @@ autoscaling_units:
       #cloud-config
       repo_update: true
       repo_upgrade: all
-
       packages:
        - httpd
-
+      write_files:
+       - content: |
+          <html>
+          <body>
+          <h1>Amazonia created this stack!</h1>
+          </body>
+          </html>
+         path: /var/www/html/index.html
+         permissions: '0644'
+         owner: root:root
       runcmd:
        - service httpd start
   -
     unit_title: 'app2'
+    unit_hosted_zone_name: 'test.lan.'
     image_id: 'ami-dc361ebf'
     instance_type: 't2.micro'
+    iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
     protocols:
-     - 'HTTPS'
+     - 'HTTP'
     loadbalancerports:
-     - '443'
+     - '80'
     instanceports:
-     - '443'
+     - '80'
     path2ping: '/index.html'
     minsize: '1'
     maxsize: '1'
+    health_check_grace_period: '300'
+    health_check_type: 'ELB'
+    hdd_size: '8'
+    sns_topic_arn: 'sns_topic_arn'
+    sns_notification_types:
+      - 'autoscaling:EC2_INSTANCE_LAUNCH'
+      - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+      - 'autoscaling:EC2_INSTANCE_TERMINATE'
+      - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+    elb_log_bucket: 'elb_log_bucket'
+    public_unit: false
     userdata: |
       #cloud-config
       repo_update: true
       repo_upgrade: all
-
       packages:
        - httpd
-
+      write_files:
+       - content: |
+          <html>
+          <body>
+          <h1>Amazonia created this stack!</h1>
+          </body>
+          </html>
+         path: /var/www/html/index.html
+         permissions: '0644'
+         owner: root:root
       runcmd:
        - service httpd start
+
 database_units:
   -
     unit_title: 'db1'
     db_instance_type: 'db.m1.small'
     db_engine: 'postgres'
     db_port: '5432'
+    db_name: 'myDb'

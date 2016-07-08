@@ -330,6 +330,10 @@ hdd_size: # the size for the hard drive of instances in any autocaling unit in t
     - 'number'
     - 'string'
   nullable: True
+unit_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for this unit
+  type: 'string'
+  nullable: True
+  empty: False
 db_instance_type: # A string containing the db type to use for RDS instances
   type: 'string'
   nullable: True
