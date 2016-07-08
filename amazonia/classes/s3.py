@@ -7,6 +7,7 @@ class S3(object):
     def __init__(self, unit_title, template, s3_access, bucket_policy):
         """
         AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+        AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/s3.py
         s3_access = [Private,
                     PublicRead,
@@ -29,7 +30,8 @@ class S3(object):
         # Add S3 Bucket
         self.s3_b = template.add_resource(Bucket(title,
                                                  BucketName=title,
-                                                 AccessControl=s3_access))
+                                                 AccessControl=s3_access,
+                                                 DeletionPolicy='Retain'))
         template.add_output(Output(
             title,
             Value=Join('', [Ref(self.s3_b),
@@ -46,5 +48,6 @@ class S3(object):
         if bucket_policy:
             self.s3_b_policy = template.add_resource(BucketPolicy(s3_b_policy_name,
                                                                   Bucket=title,
-                                                                  PolicyDocument=bucket_policy))
-            self.s3_b_policy.DependsOn = [self.s3_b.title]
+                                                                  PolicyDocument=bucket_policy,
+                                                                  DependsOn=[self.s3_b.title]))
+
