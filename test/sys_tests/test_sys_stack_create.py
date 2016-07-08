@@ -67,6 +67,18 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key):
         StackName=stack_name,
         TemplateURL=template_url,
         TimeoutInMinutes=123,
+        Parameters=[
+            {
+                'ParameterKey': 'testStackdb1RdsPassword',
+                'ParameterValue': 'password123',
+                'UsePreviousValue': False
+            },
+            {
+                'ParameterKey': 'testStackdb1RdsUsername',
+                'ParameterValue': 'testdbusername',
+                'UsePreviousValue': False
+            },
+        ],
         ResourceTypes=['AWS::*'],
         OnFailure='ROLLBACK',
         Tags=[
