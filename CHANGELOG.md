@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.17] - 08/07/2016
+- Adding s3 Class, Unit tests, System tests
+- Adding Cloudtrail Class, Unit tests, Systems tests
 - Updated yaml to be more consistant
 - Updated yaml and tests to be more encompassing
 - Removed test inner and intra test stubs (will return soon)
