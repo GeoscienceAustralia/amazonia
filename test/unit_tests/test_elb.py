@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# noinspection PyUnresolvedReferences
+import re
 from nose.tools import *
 from troposphere import Template, Ref
 
