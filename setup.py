@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='amazonia',
-    version='1.0.18',
+    version='1.0.19',
     description="GA AWS CloudFormation creation library",
     author="The Geoscience Australia Autobots, and Lazar Bodor",
     author_email="autobots@ga.gov.au , lazar.bodor@ga.gov.au",
