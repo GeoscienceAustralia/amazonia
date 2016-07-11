@@ -52,7 +52,8 @@ class KmsKey(object):
         }
 
         self.k_key = template.add_resource(Key(key_title,
-                                               Description=Join('', ['AWS Master key used for stack: {0}',
+                                               Description=Join('', [key_title,
+                                                                     ' on ',
                                                                      Ref('AWS::StackName')]),
                                                Enabled=True,
                                                EnableKeyRotation=key_rotation,
