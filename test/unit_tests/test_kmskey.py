@@ -17,8 +17,8 @@ def test_key_title():
     for key_name in key_names:
         kms_key = (KmsKey(key_title=key_name,
                           key_rotation=True,
-                          key_admins="arn:aws:iam::111122223333:root",
-                          key_users=["arn:aws:iam::111122223333:root", "arn:aws:iam::444455556666:root"],
+                          key_admins="arn:aws:iam::111122223333:user/admin1",
+                          key_users=["arn:aws:iam::111122223333:user/user1", "arn:aws:iam::444455556666:user/user2"],
                           template=template))
         assert_equals(kms_key.k_key.title, key_name)
 
@@ -29,8 +29,8 @@ def test_kms_key_policy():
     """
     template = Template()
 
-    key_admins = "arn:aws:iam::111122223333:root",
-    key_users = ["arn:aws:iam::111122223333:root", "arn:aws:iam::444455556666:root"],
+    key_admins = "arn:aws:iam::111122223333:user/admin1",
+    key_users = ["arn:aws:iam::111122223333:user/user1", "arn:aws:iam::444455556666:user/user2"],
 
     kms_key = (KmsKey(key_title='MyTestKey',
                       key_rotation=True,
