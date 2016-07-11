@@ -1,3 +1,8 @@
+# This yaml is used to generate the API and web front end service for amazonia.
+# Web Front End: http://amazonia.gadevs.ga/amazonia/web/index.html
+# API: http://amazonia.gadevs.ga/yaml
+# (The API will only work for POST requests with correctly formatted YAML data)
+stack_hosted_zone_name: 'gadevs.ga.'
 autoscaling_units:
   -
     unit_title: 'api'
@@ -9,7 +14,6 @@ autoscaling_units:
     loadbalancerports:
       - '80'
     path2ping: '/amazonia/web/index.html'
-    hosted_zone_name: 'gadevs.ga.'
     userdata: |
       #cloud-config
       repo_update: true

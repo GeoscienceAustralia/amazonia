@@ -8,9 +8,9 @@ from amazonia.classes.elb import Elb
 class AutoscalingUnit(object):
     def __init__(self, unit_title, vpc, template, protocols, public_cidr, instanceports, loadbalancerports, path2ping,
                  public_subnets, private_subnets, minsize, maxsize, keypair, image_id, instance_type, userdata,
-                 cd_service_role_arn, nat, jump, hosted_zone_name, gateway_attachment, iam_instance_profile_arn,
+                 cd_service_role_arn, nat, jump, unit_hosted_zone_name, gateway_attachment, iam_instance_profile_arn,
                  sns_topic_arn, sns_notification_types, health_check_grace_period, health_check_type, elb_log_bucket,
-                 public_unit, dependencies):
+                 public_unit, dependencies, hdd_size=None):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',
@@ -33,7 +33,7 @@ class AutoscalingUnit(object):
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
         :param nat: nat instance for outbound traffic
         :param jump: jump instance for inbound ssh
-        :param hosted_zone_name: Route53 hosted zone name string for Route53 record sets
+        :param unit_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
         :param gateway_attachment: Stack's gateway attachment troposphere object
         :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
         :param sns_notification_types: list of SNS autoscale notification types
@@ -42,6 +42,7 @@ class AutoscalingUnit(object):
         :param elb_log_bucket: S3 bucket to log access log to
         :param dependencies: list of unit names this unit needs access to
         :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
+        :param hdd_size: the size of the hard drive on the instances.
         """
         self.template = template
         self.public_cidr = public_cidr
@@ -56,7 +57,7 @@ class AutoscalingUnit(object):
             loadbalancerports=self.loadbalancerports,
             path2ping=path2ping,
             subnets=public_subnets if public_unit is True else private_subnets,
-            hosted_zone_name=hosted_zone_name,
+            hosted_zone_name=unit_hosted_zone_name,
             gateway_attachment=gateway_attachment,
             elb_log_bucket=elb_log_bucket,
             public_unit=public_unit
@@ -78,7 +79,8 @@ class AutoscalingUnit(object):
             cd_service_role_arn=cd_service_role_arn,
             iam_instance_profile_arn=iam_instance_profile_arn,
             sns_topic_arn=sns_topic_arn,
-            sns_notification_types=sns_notification_types
+            sns_notification_types=sns_notification_types,
+            hdd_size=hdd_size
         )
         [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
          self.loadbalancerports]

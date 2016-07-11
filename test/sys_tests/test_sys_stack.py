@@ -57,6 +57,7 @@ runcmd:
         nat_instance_type=instance_type,
         home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+        stack_hosted_zone_name=None,
         autoscaling_units=[{'unit_title': 'app1',
                             'protocols': ['HTTP'],
                             'instanceports': ['80'],
@@ -66,7 +67,7 @@ runcmd:
                             'maxsize': 1,
                             'health_check_grace_period': 300,
                             'health_check_type': 'ELB',
-                            'hosted_zone_name': 'gadevs.ga.',
+                            'unit_hosted_zone_name': 'gadevs.ga.',
                             'image_id': app_image_id,
                             'instance_type': instance_type,
                             'iam_instance_profile_arn': None,
@@ -85,7 +86,7 @@ runcmd:
                             'maxsize': 1,
                             'health_check_grace_period': 300,
                             'health_check_type': 'ELB',
-                            'hosted_zone_name': 'gadevs.ga.',
+                            'unit_hosted_zone_name': 'gadevs.ga.',
                             'image_id': app_image_id,
                             'instance_type': instance_type,
                             'iam_instance_profile_arn': None,
@@ -99,7 +100,8 @@ runcmd:
         database_units=[{'unit_title': 'db1',
                          'db_instance_type': 'db.m1.small',
                          'db_engine': 'postgres',
-                         'db_port': '5432'
+                         'db_port': '5432',
+                         'db_name': 'myDb'
                          }]
 
     )

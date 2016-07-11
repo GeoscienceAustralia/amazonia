@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+# noinspection PyUnresolvedReferences
 import re
 from nose.tools import *
 from troposphere import Template, Ref
@@ -136,6 +137,6 @@ def test_public_unit():
     Test to determine that elb scheme is private if public_unit is set to False
     """
     helper_elb = create_elb(public_unit=False)
-    assert_equals(helper_elb.trop_elb.Scheme, 'private')
+    assert_equals(helper_elb.trop_elb.Scheme, 'internal')
     helper_elb = create_elb(public_unit=True)
     assert_equals(helper_elb.trop_elb.Scheme, 'internet-facing')

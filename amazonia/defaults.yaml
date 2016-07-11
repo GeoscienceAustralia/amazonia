@@ -1,8 +1,16 @@
-unit_title: 'defaulttitle'
-image_id: 'ami-dc361ebf'
-instance_type: 't2.micro'
+#
+# Amazonia's default values to be used for YAML ingestion and overwritten by user values
+#
+
+## YAML TIPS:
+#   Lists: are denoted by indented hypens
+#   Strings: do not need to be enclosed in quotes or double quotes
+#   Multi line strings: can be used by establishing a literal block '|'
+
+#stack values
 stack_title: 'myStack'
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
+code_deploy_service_role:
 availability_zones:
   - 'ap-southeast-2a'
   - 'ap-southeast-2b'
@@ -16,10 +24,26 @@ jump_instance_type: 't2.micro'
 nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
 home_cidrs:
-  - name: 'home'
-    cidr: '127.0.0.1/32'
   - name: 'office'
     cidr: '123.45.12.34/16'
+stack_hosted_zone_name:
+autoscaling_units:
+database_units:
+
+#Common unit default values
+unit_title: 'defaulttitle'
+
+#Database unit default values
+db_instance_type: 'db.t2.small'
+db_engine: 'postgres'
+db_port: '5432'
+db_name: 'myDb'
+
+#Autoscaling unit default values
+unit_hosted_zone_name:
+image_id: 'ami-dc361ebf'
+instance_type: 't2.micro'
+iam_instance_profile_arn:
 protocols:
   - 'HTTP'
 instanceports:
@@ -31,16 +55,12 @@ minsize: '1'
 maxsize: '1'
 health_check_grace_period: '300'
 health_check_type: 'ELB'
-dependencies:
-autoscaling_units:
-database_units:
-code_deploy_service_role:
-iam_instance_profile_arn:
+hdd_size:
 sns_topic_arn:
 sns_notification_types:
 elb_log_bucket:
 public_unit: true
-hosted_zone_name:
+dependencies:
 userdata: |
       #cloud-config
       repo_update: true
@@ -59,10 +79,3 @@ userdata: |
          owner: root:root
       runcmd:
        - service httpd start
-db_instance_type:
-db_engine:
-db_port:
-## YAML TIPS:
-#   Lists: are denoted by indented hypens
-#   Strings: do not need to be enclosed in quotes or double quotes
-#   Multi line strings: can be used by establishing a literal block '|'

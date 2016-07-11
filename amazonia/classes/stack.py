@@ -10,7 +10,7 @@ from amazonia.classes.database_unit import DatabaseUnit
 class Stack(object):
     def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, autoscaling_units,
-                 database_units):
+                 database_units, stack_hosted_zone_name):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -30,8 +30,9 @@ class Stack(object):
         :param nat_image_id: AMI for nat
         :param nat_instance_type: instance type for nat
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
-        maxsize, image_id, instance_type, userdata, hosted_zone_name)
+        maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
+        :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
         """
         super(Stack, self).__init__()
         self.title = stack_title
@@ -42,6 +43,7 @@ class Stack(object):
         self.vpc_cidr = vpc_cidr
         self.home_cidrs = home_cidrs
         self.public_cidr = public_cidr
+        self.hosted_zone_name = stack_hosted_zone_name
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
         self.units = {}
@@ -102,9 +104,10 @@ class Stack(object):
             si_instance_type=jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template
+            template=self.template,
+            hosted_zone_name=self.hosted_zone_name,
+            instance_dependencies=self.gateway_attachment.title
         )
-        self.jump.single.DependsOn = self.gateway_attachment.title
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
 
@@ -116,9 +119,9 @@ class Stack(object):
             subnet=self.public_subnets[0],
             vpc=self.vpc,
             template=self.template,
-            is_nat=True
+            is_nat=True,
+            instance_dependencies=self.gateway_attachment.title
         )
-        self.nat.single.DependsOn = self.gateway_attachment.title
 
         # Add Routes
         self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
