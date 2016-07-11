@@ -9,8 +9,9 @@ class KmsKey(object):
         """
         AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-key.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/kms.py
+        Create a Custumer Master key in KMS
         """
-
+        # Policy for Admins and users
         k_key_policy = {
             "Version": "2012-10-17",
             "Id": "key-default-1",
@@ -51,6 +52,7 @@ class KmsKey(object):
             ]
         }
 
+        # Create Key Resource
         self.k_key = template.add_resource(Key(key_title,
                                                Description=Join('', [key_title,
                                                                      ' on Stack: ',
