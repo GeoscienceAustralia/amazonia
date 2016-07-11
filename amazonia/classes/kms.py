@@ -53,7 +53,7 @@ class KmsKey(object):
 
         self.k_key = template.add_resource(Key(key_title,
                                                Description=Join('', [key_title,
-                                                                     ' on ',
+                                                                     ' on Stack: ',
                                                                      Ref('AWS::StackName')]),
                                                Enabled=True,
                                                EnableKeyRotation=key_rotation,
