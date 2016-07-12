@@ -10,6 +10,11 @@ class KmsKey(object):
         AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-key.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/kms.py
         Create a Customer Master key in KMS for encrpytion and use with credstash
+        :param key_title: String title of the key in AWS, not the alias name
+        :param key_rotation: Boolean to enable or disable key rotation at a cost
+        :param key_admins: single string or list of ARNs of IAM objects for apply key admin policy to
+        :param key_users: single string or list of ARNs of IAM objects for apply key user policy to
+        :param template: The troposphere template to add the Elastic Loadbalancer to.
         """
         # Policy for Admins and users
         k_key_policy = {
