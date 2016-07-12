@@ -43,8 +43,10 @@ def test_kms_key_policy():
 
     # TODO assert user in key policy
     # Test user are in policy
-    # for key_user in key_users:
-    #     print('key user = {0}'.format(key_user))
-    #     assert_in(key_user, kms_key.k_key.KeyPolicy)
-    # for key_admin in key_admins:
-    #     assert_in(key_admin, kms_key.k_key.KeyPolicy)
+    for num, key_admin in enumerate(key_admins):
+        admin_dict_key = kms_key.k_key.KeyPolicy['Statement'][0]['Principal']['AWS'][num]
+        assert_in(key_admin, admin_dict_key)
+
+    for num, key_user in enumerate(key_users):
+        users_dict_key = kms_key.k_key.KeyPolicy['Statement'][1]['Principal']['AWS'][num]
+        assert_in(key_user, users_dict_key)
