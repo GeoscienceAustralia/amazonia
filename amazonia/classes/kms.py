@@ -9,7 +9,7 @@ class KmsKey(object):
         """
         AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-key.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/kms.py
-        Create a Custumer Master key in KMS
+        Create a Customer Master key in KMS for encrpytion and use with credstash
         """
         # Policy for Admins and users
         k_key_policy = {
