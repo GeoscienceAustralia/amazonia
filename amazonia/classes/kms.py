@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from troposphere import Output, Join, Ref
+from troposphere import Join, Ref
 from troposphere.kms import Key
 
 
