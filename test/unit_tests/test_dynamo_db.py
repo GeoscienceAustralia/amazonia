@@ -7,13 +7,13 @@ Tests the functions of the Dynomo DB class
 """
 
 
-def test_key_title():
+def test_ddb_title():
     """
     Test that the key title is correctly set
     """
 
 
-def test_kms_key_policy():
+def test_ddb_attribute_tuple():
     """
     To test that key policy is applied is passed in
     """

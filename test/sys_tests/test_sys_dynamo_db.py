@@ -9,7 +9,9 @@ def main():
     """
     template = Template()
 
-    DynamoDB(dyndb_title='MyDynamoDB',
+    DynamoDB(ddb_title='MyDynamoDB',
+             ddb_att_dict=[{'ddb_name': 'Name', 'ddb_atttype': 'S', 'ddb_keytype': 'HASH'},
+                           {'ddb_name': 'Version', 'ddb_atttype': 'S', 'ddb_keytype': 'RANGE'}],
              template=template)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
