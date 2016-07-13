@@ -13,19 +13,19 @@ class DynamoDB(object):
         Create a NoSQL AWS DynamoDB table as a troposphere object
         :param
         """
-        attribute_definitions = []
-        key_schema = []
+        self.attribute_definitions = []
+        self.key_schema = []
 
         for ddb_att in ddb_att_dict:
-            attribute_definitions.append(AttributeDefinition(AttributeName=(ddb_att['ddb_name']),
-                                                             AttributeType=attribute_type_validator(ddb_att['ddb_atttype'])))
-            key_schema.append(KeySchema(AttributeName=ddb_att['ddb_name'],
-                                        KeyType=key_type_validator(ddb_att['ddb_keytype'])))
+            self.attribute_definitions.append(AttributeDefinition(AttributeName=(ddb_att['ddb_name']),
+                                                                  AttributeType=attribute_type_validator(ddb_att['ddb_atttype'])))
+            self.key_schema.append(KeySchema(AttributeName=ddb_att['ddb_name'],
+                                             KeyType=key_type_validator(ddb_att['ddb_keytype'])))
 
         # Create Table Resource
         self.ddb_table = template.add_resource(Table(ddb_title,
                                                      TableName=ddb_title,
-                                                     AttributeDefinitions=attribute_definitions,
-                                                     KeySchema=key_schema,
+                                                     AttributeDefinitions=self.attribute_definitions,
+                                                     KeySchema=self.key_schema,
                                                      ProvisionedThroughput=ProvisionedThroughput(ReadCapacityUnits=1,
                                                                                                  WriteCapacityUnits=1)))

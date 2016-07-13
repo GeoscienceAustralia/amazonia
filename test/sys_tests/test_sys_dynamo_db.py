@@ -1,4 +1,4 @@
-from troposphere import Template, Ref, Join
+from troposphere import Template
 
 from amazonia.classes.dynamo_db import DynamoDB
 
