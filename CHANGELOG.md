@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.21] - 13/07/2016
+- Adding Dynamo DB Class, Units Tests and Systems Tests
+
+## [1.0.20] - 12/07/2016
+- Adding KMS Class, Units Tests and Systems Tests
+
 ## [1.0.17] - 08/07/2016
 - Adding s3 Class, Unit tests, System tests
 - Adding Cloudtrail Class, Unit tests, Systems tests
