@@ -11,8 +11,8 @@ class SNS(object):
         https://github.com/cloudtools/troposphere/blob/master/troposphere/sns.py
         :param unit_title: Title of the sns unit
         :param template: The troposphere template to add the Elastic Loadbalancer to.
-        :param topic_name
-        :param display_name
+        :param topic_name: The SNS topic name
+        :param display_name: The SNS display name
         """
         title = unit_title + 'sns'
         self.sns_topic = template.add_resource(Topic(title, TopicName=topic_name, DisplayName=display_name))
