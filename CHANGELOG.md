@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.23] - 15/07/2016
+- Adding SNS class, Unit Tests and System Tests
+
 ## [1.0.21] - 13/07/2016
 - Adding Dynamo DB Class, Units Tests and Systems Tests
 
