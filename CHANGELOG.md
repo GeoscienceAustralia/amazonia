@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.26] - 18/07/2016
+- Updating cloudtrail Class so DependsOn exists within troposphere function rather than outside it.  
+
 ## [1.0.23] - 15/07/2016
 - Adding SNS class, Unit Tests and System Tests
 
