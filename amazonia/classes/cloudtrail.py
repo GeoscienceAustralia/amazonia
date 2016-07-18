@@ -60,9 +60,9 @@ class Cloudtrail(object):
                                                  S3BucketName=self.s3_b_trail.s3_b.title,
                                                  EnableLogFileValidation=True,
                                                  IncludeGlobalServiceEvents=True,
-                                                 IsMultiRegionTrail=True
+                                                 IsMultiRegionTrail=True,
+                                                 DependsOn=[self.s3_b_trail.s3_b_policy.title]
                                                  ))
-        self.trail.DependsOn = [self.s3_b_trail.s3_b_policy.title]
 
         template.add_output(Output(
             trail_title,
