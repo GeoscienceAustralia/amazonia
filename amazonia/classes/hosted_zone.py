@@ -4,42 +4,47 @@ from troposphere import route53, Ref, Join, GetAtt
 
 
 class HostedZone(object):
-    def __init__(self, template, title, region=None, vpcs=None):
+    def __init__(self, template, title, domain, vpcs=None):
         """
-
-        :param template:
-        :param title:
-        :param region:
-        :param vpcs:
+        Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
+        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
+        :param template: The cloud formation template to add this hosted zone to.
+        :param title: A title to give the Hostedzone.
+        :param domain: The domain you would like for your hosted zone. MUST be 'something.something' (eg 'example.com')
+        :param vpcs: A list of VPCs to associate this hosted zone with (if none, a public hosted zone is created)
         """
 
         self.template = template
-        self.trop_hosted_zone = self.create_hosted_zone(title, vpcs, region)
+        self.trop_hosted_zone = self.create_hosted_zone(title, domain, vpcs)
+        self.recordsets = []
 
-    def add_vpc(self, vpc, region):
+    def add_vpc(self, vpc):
         """
-
-        :param vpc:
-        :param region:
-        :return:
+        Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
+        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone-hostedzonevpcs.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
+        :param vpc: A troposphere VPC object
+        :return: A route53 HostedZoneVPC object to associate the hosted zone with.
         """
 
         return route53.HostedZoneVPCs(
-            'hz'.format(vpc.title),
-            VPCId=vpc.title,
-            VPCRegion=region
+            '{0}hz'.format(vpc.title),
+            VPCId=Ref(vpc),
+            VPCRegion=Ref("AWS::Region")
         )
 
-    def create_hosted_zone(self, title, vpcs, region):
+    def create_hosted_zone(self, title, domain, vpcs):
         """
-
-        :param title:
-        :param vpcs:
-        :param region:
+        Creates a route53 hosted zone object either public (vpcs=None) or private (vpcs=[vpc1,...])
+        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
+        :param title: A title to give the Hostedzone.
+        :param domain: The domain you would like for your hosted zone. MUST be 'something.something' (eg 'example.com')
+        :param vpcs: A list of VPCs to associate this hosted zone with (if none, a public hosted zone is created)
         """
 
         hz_type = 'public' if vpcs is None else 'private'
-
 
         hz_config = route53.HostedZoneConfiguration(
             Comment=Join('', [hz_type,
@@ -49,19 +54,17 @@ class HostedZone(object):
 
         hz_vpcs = []
 
-        if vpcs:
+        if hz_type is 'private':
             for vpc in vpcs:
-                hz_vpcs.append(self.add_vpc(vpc, region))
+                hz_vpcs.append(self.add_vpc(vpc))
 
         if not hz_vpcs:
             hz_vpcs = None
 
-        hz_title = '{0}{1}hz'.format(title, hz_type)
-
         hz = self.template.add_resource(route53.HostedZone(
-            hz_title,
+            title,
             HostedZoneConfig=hz_config,
-            Name=title
+            Name=domain
         ))
 
         if hz_vpcs is not None:
@@ -71,20 +74,27 @@ class HostedZone(object):
 
     def add_record_set(self, title, ip=None, elb=None):
         """
-
-        :param title:
-        :param ip:
-        :param elb:
+        Creates a route53 recordset to point to either the provided ip or elb.
+        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-recordset.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
+        :param title: A title for the recordset being added to this hostedzone.
+        :param ip: An IP for this recordset to point at. Cannot provide 'elb' with this.
+        :param elb: An Elastic Loadbalancer for this recordset to point at. Cannot provide 'ip' with this.
         """
 
         if ip is None and elb is None:
-            raise NoTargetError('Error: Either an ip or an elb must be provided for recordset to point to')
+            raise BadTargetError('Error: Either an ip or an elb must be provided for the \
+            recordset "{0}" to point to'.format(title))
+
+        if ip is not None and elb is not None:
+            raise BadTargetError('Error: An ip and an elb cannot be specified at the same time. \
+            Please check objects provided for recordset "{0}"'.format(title))
 
         record = route53.RecordSetType(
             title,
             HostedZoneId=Ref(self.trop_hosted_zone),
             Comment=Join('', ['record set created by Amazonia for stack: ', Ref('AWS::StackName')]),
-            Name=Join('', [Ref('AWS::StackName'), '-', title, '.', self.trop_hosted_zone.title]),
+            Name=Join('', [title, '.', self.trop_hosted_zone.Name]),
             Type='A'
         )
 
@@ -94,16 +104,15 @@ class HostedZone(object):
         elif elb is not None:
             record.AliasTarget = route53.AliasTarget(dnsname=GetAtt(elb, 'DNSName'),
                                                      hostedzoneid=GetAtt(elb, 'CanonicalHostedZoneNameID'))
-        else:
-            raise NoTargetError('Error: Either an ip or an elb must be provided for recordset to point to')
 
+        self.recordsets.append(record)
         self.template.add_resource(record)
 
 
-class NoTargetError(Exception):
+class BadTargetError(Exception):
     def __init__(self, value):
         """
-
-        :param value:
+        An error to raise if the user provides Neither or Both ip, and an elb for a recordset to point to.
+        :param value: The error message to display to the user.
         """
         self.value = value

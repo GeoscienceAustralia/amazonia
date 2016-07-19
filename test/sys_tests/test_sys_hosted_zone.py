@@ -68,7 +68,7 @@ def main():
                                                            Listeners=[elb.Listener(LoadBalancerPort='80',
                                                                                    Protocol='HTTP',
                                                                                    InstancePort='80',
-                                                                                   InstanceProtocol='80')],
+                                                                                   InstanceProtocol='HTTP')],
                                                            Scheme='internet-facing',
                                                            SecurityGroups=[Ref(security_group)],
                                                            Subnets=[Ref(subnet) for subnet in public_subnets]
@@ -77,7 +77,7 @@ def main():
     ec2_instance = template.add_resource(ec2.Instance(
         'myinstance',
         KeyName='INSERT_YOUR_KEYPAIR_HERE',
-        ImageId='ami-12345',
+        ImageId='ami-dc361ebf',
         InstanceType='t2.nano',
         NetworkInterfaces=[ec2.NetworkInterfaceProperty(
             GroupSet=[Ref(security_group)],
@@ -89,22 +89,11 @@ def main():
         DependsOn=internet_gateway.title
         ))
 
-    public_hz = HostedZone(template=template, title='testpublichz')
-    private_hz = HostedZone(template=template, title='testprivatehz', region='ap-southeast-2', vpcs=[vpc])
+    public_hz = HostedZone(template=template, domain='mypublic.hz', title='public')
+    public_hz.add_record_set('publicrecord', ip=GetAtt(ec2_instance, 'PublicIp'))
 
-    public_hz.add_record_set('publicrecordtest', ip=GetAtt(ec2_instance, 'PublicIp'))
-    private_hz.add_record_set('privaterecordtest', elb=load_balancer)
-
-    vpc_dhcp_options = template.add_resource(ec2.DHCPOptions(
-        'MyVPCDHCPOptions',
-        DomainName=private_hz.trop_hosted_zone.Name
-    ))
-
-    template.add_resource(ec2.VPCDHCPOptionsAssociation(
-        'MyVPCDHCPOptionsAssociation',
-        DhcpOptionsId=Ref(vpc_dhcp_options),
-        VpcId=Ref(vpc)
-    ))
+    private_hz = HostedZone(template=template, domain='myprivate.hz', title='private', vpcs=[vpc])
+    private_hz.add_record_set('privaterecord', elb=load_balancer)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
