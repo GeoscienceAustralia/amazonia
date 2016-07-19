@@ -78,7 +78,7 @@ class SingleInstance(SecurityEnabledObject):
             # Create an output for the Record Set that has been created.
 
             self.template.add_output(Output(
-                 self.single.title + 'EIP',
+                 self.single.title + 'URL',
                  Description='URL of the jump host {0}'.format(self.single.title),
                  Value=self.si_r53.Name
             ))
