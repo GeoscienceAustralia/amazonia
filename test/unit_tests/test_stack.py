@@ -5,7 +5,7 @@ from amazonia.classes.stack import Stack, DuplicateUnitNameError
 
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = path2ping = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
-    health_check_type = db_instance_type = db_engine = db_port = None
+    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = None
 availability_zones = []
 home_cidrs = []
 instanceports = []
@@ -17,7 +17,7 @@ def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port
+        db_engine, db_port, db_hdd_size
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -50,6 +50,7 @@ runcmd:
     db_instance_type = 'db.m1.small'
     db_engine = 'postgres'
     db_port = '5432'
+    db_hdd_size = 5
 
 
 @with_setup(setup_resources())
@@ -175,11 +176,15 @@ def test_duplicate_unit_names():
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
                             'db_port': db_port,
+                            'db_hdd_size': db_hdd_size,
+                            'db_snapshot_id': None,
                             'db_name': 'MyDb1'},
                            {'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
                             'db_port': db_port,
+                            'db_hdd_size': db_hdd_size,
+                            'db_snapshot_id': None,
                             'db_name': 'MyDb2'}]
     })
 
@@ -219,6 +224,8 @@ def test_duplicate_unit_names():
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
                             'db_port': db_port,
+                            'db_hdd_size': db_hdd_size,
+                            'db_snapshot_id': None,
                             'db_name': 'MyDb'}]
     })
 
@@ -288,6 +295,8 @@ def create_stack(stack_title):
                          'db_instance_type': db_instance_type,
                          'db_engine': db_engine,
                          'db_port': db_port,
+                         'db_hdd_size': db_hdd_size,
+                         'db_snapshot_id': None,
                          'db_name': 'MyDb'}]
     )
     return stack
