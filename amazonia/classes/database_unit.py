@@ -62,14 +62,9 @@ class DatabaseUnit(SecurityEnabledObject):
         self.trop_db = template.add_resource(rds.DBInstance(self.title, **rds_params))
 
         self.template.add_output(Output(
-            self.trop_db.title + 'Address',
+            self.trop_db.title + 'Endpoint',
             Description='Address of the {0} RDS'.format(self.title),
-            Value=GetAtt(self.trop_db, 'Endpoint.Address')))
-
-        self.template.add_output(Output(
-            self.trop_db.title + 'Port',
-            Description='Port of the {0} RDS'.format(self.title),
-            Value=GetAtt(self.trop_db, 'Endpoint.Port')))
+            Value=Join('', [GetAtt(self.trop_db, 'Endpoint.Address'), ':', GetAtt(self.trop_db, 'Endpoint.Port')])))
 
     def get_dependencies(self):
         """

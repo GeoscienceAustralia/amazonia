@@ -47,7 +47,7 @@ def test_database():
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
     assert_equals(db.trop_db.DBName, 'MyDb')
-    assert_equals(len(template.outputs), 2)
+    assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 2)
     assert_equals(db.trop_db.AllocatedStorage, 5)
 
@@ -95,6 +95,6 @@ def test_databse_snapshot():
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
     assert_equals(db.trop_db.DBName, 'MyDb')
-    assert_equals(len(template.outputs), 2)
+    assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 0)
     assert_equals(db.trop_db.AllocatedStorage, 5)
