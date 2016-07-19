@@ -17,7 +17,7 @@ class DynamoDB(object):
         self.key_schema = []
 
         for ddb_att in ddb_att_dict:
-            self.attribute_definitions.append(AttributeDefinition(AttributeName=(ddb_att['ddb_name']),
+            self.attribute_definitions.append(AttributeDefinition(AttributeName=ddb_att['ddb_name'],
                                                                   AttributeType=attribute_type_validator(ddb_att['ddb_atttype'])))
             self.key_schema.append(KeySchema(AttributeName=ddb_att['ddb_name'],
                                              KeyType=key_type_validator(ddb_att['ddb_keytype'])))
