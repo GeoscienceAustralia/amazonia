@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.29] - 19/07/2016
+## [1.0.31] - 19/07/2016
 - Adding db_hdd_size (allocation size) and db_snapshot_id to database class
 - Add HostedZone class, with support for public/private hosted zones.
 - Updated Stack class to create a VPC supporting private hosted zones.
