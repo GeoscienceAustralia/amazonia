@@ -13,7 +13,8 @@ packages:
 write_files:
 -   content: |
         <html>
-        <body>This stack was created by Amazonia
+        <body>
+        <h1>Amazonia created this stack!</h1>
         </body>
         </html>
     path: /var/www/html/index.html
@@ -31,7 +32,8 @@ packages:
 write_files:
 -   content: |
         <html>
-        <body background="https://i.ytimg.com/vi/UJ8ZUubtkJo/maxresdefault.jpg">
+        <body>
+        <h1>Amazonia created this stack too!</h1>
         </body>
         </html>
     path: /var/www/html/index.html
