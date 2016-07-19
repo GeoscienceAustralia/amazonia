@@ -13,7 +13,8 @@ packages:
 write_files:
 -   content: |
         <html>
-        <body background="http://mulataria.com/wp-content/uploads/2015/05/269944_Papel-de-Parede-Vitoria-regia-na-Amazonia_1920x1200.jpg">
+        <body>
+        <h1>Amazonia created this stack!</h1>
         </body>
         </html>
     path: /var/www/html/index.html
@@ -31,7 +32,8 @@ packages:
 write_files:
 -   content: |
         <html>
-        <body background="https://i.ytimg.com/vi/UJ8ZUubtkJo/maxresdefault.jpg">
+        <body>
+        <h1>Amazonia created this stack too!</h1>
         </body>
         </html>
     path: /var/www/html/index.html
@@ -101,7 +103,9 @@ runcmd:
                          'db_instance_type': 'db.m1.small',
                          'db_engine': 'postgres',
                          'db_port': '5432',
-                         'db_name': 'myDb'
+                         'db_name': 'myDb',
+                         'db_hdd_size': 5,
+                         'db_snapshot_id': None
                          }]
 
     )

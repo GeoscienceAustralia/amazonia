@@ -38,6 +38,8 @@ db_instance_type: 'db.t2.small'
 db_engine: 'postgres'
 db_port: '5432'
 db_name: 'myDb'
+db_hdd_size: 5
+db_snapshot_id:
 
 #Autoscaling unit default values
 unit_hosted_zone_name:
