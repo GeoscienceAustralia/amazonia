@@ -8,6 +8,7 @@ from amazonia.classes.hosted_zone import HostedZone, BadTargetError
 
 template = domain = title = vpc = ec2_instance = my_elb = None
 
+
 def setup_resources():
     """
     Create generic testing data
@@ -130,7 +131,8 @@ def test_add_record_sets():
     assert_equals(pub_hz.recordsets[1].Type, 'A')
     assert_equals(type(pub_hz.recordsets[0].ResourceRecords[0]), type(GetAtt(ec2_instance, 'PublicIp')))
     assert_equals(pub_hz.recordsets[0].TTL, '300')
-    assert_equals(type(aliastarget), type(route53.AliasTarget()))
+    assert_equals(type(aliastarget), type(route53.AliasTarget(dnsname=GetAtt(elb, 'DNSName'),
+                                                              hostedzoneid=GetAtt(elb, 'CanonicalHostedZoneNameID'))))
     assert_raises(BadTargetError, pub_hz.add_record_set, **{'title': 'notarget'})
     assert_raises(BadTargetError, pub_hz.add_record_set, **{'title': 'toomanytargets',
                                                             'ip': GetAtt(ec2_instance, 'PublicIp'),
