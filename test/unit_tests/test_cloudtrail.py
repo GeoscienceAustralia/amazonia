@@ -1,6 +1,6 @@
 from nose.tools import *
 from amazonia.classes.cloudtrail import Cloudtrail
-from troposphere import Template, Join, s3
+from troposphere import Template
 """
 Tests the functions of the Cloudtrail class
 """

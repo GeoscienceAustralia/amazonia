@@ -38,7 +38,20 @@ def main():
                  db_instance_type='db.m1.small',
                  db_engine='postgres',
                  db_port='5432',
-                 db_name='myDb'
+                 db_name='myDb',
+                 db_hdd_size=5,
+                 db_snapshot_id=None
+                 )
+    DatabaseUnit(unit_title='MyDb2',
+                 subnets=public_subnets,
+                 vpc=vpc,
+                 template=template,
+                 db_instance_type='db.m1.small',
+                 db_engine='postgres',
+                 db_port='5432',
+                 db_name='myDb',
+                 db_hdd_size=5,
+                 db_snapshot_id='ss123456785v00'
                  )
 
     print(template.to_json(indent=2, separators=(',', ': ')))

@@ -32,7 +32,8 @@ class Stack(object):
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
-        :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record sets in.
+        :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
+        sets in.
         """
         super(Stack, self).__init__()
         self.title = stack_title
