@@ -55,7 +55,7 @@ def test_jump_with_hostedzone_creates_r53_record():
         assert_equals(si.eip_address.Domain, 'vpc')
         assert_equals(si.si_r53.HostedZoneName, 'my.hostedzone.')
 
-        sio = si.template.outputs[title + 'EIP'].Value
+        sio = si.template.outputs[title + 'URL'].Value
         assert_equals(sio, si.si_r53.Name)
 
 
