@@ -55,7 +55,14 @@ class Stack(object):
         vpc_name = self.title + 'Vpc'
         self.vpc = self.template.add_resource(
             ec2.VPC(
-                vpc_name, CidrBlock=self.vpc_cidr, Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', vpc_name]))))
+                vpc_name,
+                CidrBlock=self.vpc_cidr,
+                EnableDnsSupport='true',
+                EnableDnsHostnames='true',
+                Tags=Tags(
+                    Name=Join('', [Ref('AWS::StackName'), '-', vpc_name])
+                )
+            ))
 
         ig_name = self.title + 'Ig'
         self.internet_gateway = self.template.add_resource(
