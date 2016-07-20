@@ -9,7 +9,7 @@ def main():
     """
     template = Template()
 
-    Credstash(unit_title='credstash1',
+    Credstash(unit_title='Credstash1',
               key_title='TestCredstashKey',
               key_rotation=False,
               key_admins="arn:aws:iam::111122223333:user/admin1",

@@ -38,3 +38,25 @@ class Credstash(object):
                             Ref('AWS::StackName'),
                             ]),
             Description='Amazonia Key and DDB'))
+
+        template.add_output(Output(
+            'CredstashPut',
+            Value=Join('', ['credstash -r ',
+                            Ref('AWS::Region'),
+                            ' -t ',
+                            self.credstash_ddb.ddb_table.TableName,
+                            ' put -k ',
+                            Ref(self.credstash_key.k_key),
+                            ' -a [credential-name] [credential-secret]'
+                            ]),
+            Description='Credstash: Put Secret in Credstash Store'))
+
+        template.add_output(Output(
+            'CredstashGet',
+            Value=Join('', ['credstash -r ',
+                            Ref('AWS::Region'),
+                            ' -t ',
+                            self.credstash_ddb.ddb_table.TableName,
+                            ' get -v [credential-version] [credential-name]'
+                            ]),
+            Description='Credstash: Get Secret from Credstash Store'))
