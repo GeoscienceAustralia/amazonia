@@ -10,6 +10,8 @@ class Cloudtrail(object):
         """
         AWS - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudtrail.py
+        :param unit_title: Name of the Cloudtrail Unit e.g. MyCloudTrail
+        :param template: The troposphere template to add the Cloudtrail and s3 troposphere objects to.
         """
 
         trail_title = unit_title + 'Trail'
