@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix jumphost output to specify that it is a URL rather than an EIP.
 - Add HostedZone class, with support for public/private hosted zones.
 - Updated Stack class to create a VPC supporting private hosted zones.
+- Added Cloudtrail and DynamoDB documentation
+- Added Credstash class
+- Added key rotation for kms and Credstash commands
 
 ## [1.0.29] - 19/07/2016
 - Adding db_hdd_size (allocation size) and db_snapshot_id to database class
