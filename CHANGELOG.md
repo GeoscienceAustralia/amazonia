@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.31] - 19/07/2016
-- Adding db_hdd_size (allocation size) and db_snapshot_id to database class
+
+## [1.0.32] - 20/07/2016
+- Updated rules to allow 0-65535 between NAT and ASG's
 - Fix jumphost output to specify that it is a URL rather than an EIP.
+
+## [1.0.29] - 19/07/2016
+- Adding db_hdd_size (allocation size) and db_snapshot_id to database class
 
 ## [1.0.26] - 18/07/2016
 - Updating cloudtrail Class so DependsOn exists within troposphere function rather than outside it.  
