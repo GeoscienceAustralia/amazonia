@@ -38,17 +38,28 @@ class SecurityEnabledObject(object):
         :param port: Port to send, and receive traffic on
         """
 
-        common = {'IpProtocol': 'tcp', 'FromPort': port, 'ToPort': port, 'GroupId': Ref(self.security_group)}
+        if port == '-1':
+            common = {'IpProtocol': 'tcp', 'FromPort': '0', 'ToPort': '65535', 'GroupId': Ref(self.security_group)}
+        else:
+            common = {'IpProtocol': 'tcp', 'FromPort': port, 'ToPort': port, 'GroupId': Ref(self.security_group)}
 
         if isinstance(sender, SecurityEnabledObject):
-            name = self.title + port + 'From' + sender.title + port
+            if port == '-1':
+                name = self.title + 'AllFrom' + sender.title + 'All'
+            else:
+                name = self.title + port + 'From' + sender.title + port
+
             self.ingress.append(self.template.add_resource(ec2.SecurityGroupIngress(
                 name,
                 SourceSecurityGroupId=GetAtt(sender.security_group.title, 'GroupId'),
                 **common
                 )))
         else:
-            name = self.title + port + 'From' + sender['name'] + port
+            if port == '-1':
+                name = self.title + 'AllFrom' + sender['name'] + 'All'
+            else:
+                name = self.title + port + 'From' + sender['name'] + port
+
             self.ingress.append(self.template.add_resource(ec2.SecurityGroupIngress(
                 name,
                 CidrIp=sender['cidr'],
@@ -65,17 +76,28 @@ class SecurityEnabledObject(object):
         :param port: Port to send, and receive traffic on
         """
 
-        common = {'IpProtocol': 'tcp', 'FromPort': port, 'ToPort': port, 'GroupId': Ref(self.security_group)}
+        if port == '-1':
+            common = {'IpProtocol': 'tcp', 'FromPort': '0', 'ToPort': '65535', 'GroupId': Ref(self.security_group)}
+        else:
+            common = {'IpProtocol': 'tcp', 'FromPort': port, 'ToPort': port, 'GroupId': Ref(self.security_group)}
 
         if isinstance(receiver, SecurityEnabledObject):
-            name = self.title + port + 'To' + receiver.title + port
+            if port == '-1':
+                name = self.title + 'AllTo' + receiver.title + 'All'
+            else:
+                name = self.title + port + 'To' + receiver.title + port
+
             self.egress.append(self.template.add_resource(ec2.SecurityGroupEgress(
                 name,
                 DestinationSecurityGroupId=GetAtt(receiver.security_group.title, 'GroupId'),
                 **common
                 )))
         else:
-            name = self.title + port + 'To' + receiver['name'] + port
+            if port == '-1':
+                name = self.title + 'AllTo' + receiver['name'] + 'All'
+            else:
+                name = self.title + port + 'To' + receiver['name'] + port
+
             self.egress.append(self.template.add_resource(ec2.SecurityGroupEgress(
                 name,
                 CidrIp=receiver['cidr'],
