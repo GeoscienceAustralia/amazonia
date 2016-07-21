@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.34] - 21/07/2016
+- Updated Credstash System tests
+
 ## [1.0.32] - 20/07/2016
 - Updated rules to allow 0-65535 between NAT and ASG's
 - Fix jumphost output to specify that it is a URL rather than an EIP.
