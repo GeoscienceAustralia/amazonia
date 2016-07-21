@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.33] - 20/07/2016
+## [1.0.34] - 21/07/2016
 - Updated Credstash System tests
 
 ## [1.0.32] - 20/07/2016
