@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.34] - 21/07/2016
 - Updated Credstash System tests
+- Created tests for '-1' port in security enabled object.
+- Added Cloudwatch monitoring userdata to single instance class
 
 ## [1.0.32] - 20/07/2016
 - Updated rules to allow 0-65535 between NAT and ASG's
