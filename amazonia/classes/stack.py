@@ -121,8 +121,7 @@ class Stack(object):
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
-        self.jump.add_egress(receiver=self.public_cidr, port='80')
-        self.jump.add_egress(receiver=self.public_cidr, port='443')
+        self.jump.add_egress(receiver=self.public_cidr, port='-1')
 
         self.nat = SingleInstance(
             title=self.title + 'Nat',
