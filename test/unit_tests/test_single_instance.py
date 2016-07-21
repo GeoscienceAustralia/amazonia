@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from nose.tools import *
-from troposphere import Template
+from troposphere import Template, ec2
 from amazonia.classes.single_instance import SingleInstance
 
 
@@ -14,11 +14,10 @@ def test_nat_single_instance():
 
     si = create_si('nat', is_nat=True)
     si_sdc = si.single.SourceDestCheck
-    print('SourceDestCheck='.format(si_sdc))
     assert_equals(si_sdc, 'false')
     sio = si.template.outputs['nat'].Description
-    print(sio)
     assert_in('PrivateIp', sio)
+    assert_equals(si.single.IamInstanceProfile, 'instance-profile')
 
 
 def test_not_nat_single_instance():
@@ -31,14 +30,11 @@ def test_not_nat_single_instance():
 
     for title in jump_titles:
         si = create_si(title)
-        print('title={0}'.format(si.title))
         si_sdc = si.single.SourceDestCheck
-        print('SourceDestCheck='.format(si_sdc))
         assert_equals(si_sdc, 'true')
-
         sio = si.template.outputs[title].Description
-        print(sio)
         assert_in('PublicIp', sio)
+        assert_equals(si.single.IamInstanceProfile, 'instance-profile')
 
 
 def test_jump_with_hostedzone_creates_r53_record():
@@ -67,10 +63,13 @@ def create_si(title, is_nat=False):
     :return: Troposphere object for single instance, security group and output
     """
     vpc = 'vpc-12345'
-    subnet = 'subnet-123456'
     dependencies = 'igw-12345'
     hosted_zone_name = None if is_nat else 'my.hostedzone.'
     template = Template()
+    subnet = template.add_resource(ec2.Subnet('subnet12345',
+                                              AvailabilityZone='ap-southeast-2a',
+                                              VpcId=vpc,
+                                              CidrBlock='10.0.1.0/24'))
     si = SingleInstance(title=title,
                         keypair='pipeline',
                         si_image_id='ami-53371f30',
@@ -80,5 +79,6 @@ def create_si(title, is_nat=False):
                         hosted_zone_name=hosted_zone_name,
                         instance_dependencies=dependencies,
                         template=template,
-                        is_nat=is_nat)
+                        is_nat=is_nat,
+                        iam_instance_profile_arn='my/instance-profile')
     return si
