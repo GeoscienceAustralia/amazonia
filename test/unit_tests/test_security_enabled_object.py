@@ -64,10 +64,39 @@ def test_add_ingress():
 
     myobj.add_ingress(otherobj, '80')
 
+    myobj.add_ingress(otherobj, '-1')
+
     assert_equals(myobj.ingress[0].title, 'Unit01Web80FromUnit02Web80')
     assert_equals(myobj.ingress[0].IpProtocol, 'tcp')
     assert_equals(myobj.ingress[0].FromPort, '80')
     assert_equals(myobj.ingress[0].ToPort, '80')
+    assert_equals(myobj.ingress[1].title, 'Unit01WebAllFromUnit02WebAll')
+    assert_equals(myobj.ingress[1].IpProtocol, 'tcp')
+    assert_equals(myobj.ingress[1].FromPort, '0')
+    assert_equals(myobj.ingress[1].ToPort, '65535')
+
+
+def test_add_egress():
+    """
+    Test egress rules are correctly applied to security group
+    """
+    template = Template()
+    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
+    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
+
+    myobj.add_egress(otherobj, '80')
+
+    myobj.add_egress(otherobj, '-1')
+
+    assert_equals(myobj.egress[0].title, 'Unit01Web80ToUnit02Web80')
+    assert_equals(myobj.egress[0].IpProtocol, 'tcp')
+    assert_equals(myobj.egress[0].FromPort, '80')
+    assert_equals(myobj.egress[0].ToPort, '80')
+    assert_equals(myobj.egress[1].title, 'Unit01WebAllToUnit02WebAll')
+    assert_equals(myobj.egress[1].IpProtocol, 'tcp')
+    assert_equals(myobj.egress[1].FromPort, '0')
+    assert_equals(myobj.egress[1].ToPort, '65535')
 
 
 def test_add_ip_ingress():
@@ -108,20 +137,3 @@ def test_add_ip_egress():
         assert_equals(myobj.egress[num].IpProtocol, 'tcp')
         assert_equals(myobj.egress[num].FromPort, '80')
         assert_equals(myobj.egress[num].ToPort, '80')
-
-
-def test_add_egress():
-    """
-    Test egress rules are correctly applied to security group
-    """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
-
-    myobj.add_egress(otherobj, '80')
-
-    assert_equals(myobj.egress[0].title, 'Unit01Web80ToUnit02Web80')
-    assert_equals(myobj.egress[0].IpProtocol, 'tcp')
-    assert_equals(myobj.egress[0].FromPort, '80')
-    assert_equals(myobj.egress[0].ToPort, '80')

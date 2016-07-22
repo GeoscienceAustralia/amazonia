@@ -15,7 +15,8 @@ def main():
               key_admins="arn:aws:iam::111122223333:user/admin1",
               key_users=["arn:aws:iam::111122223333:user/user1", "arn:aws:iam::444455556666:user/user2"],
               ddb_title='MyCredstashDDB',
-              ddb_att_dict={},
+              ddb_att_dict=[{'ddb_name': 'Name', 'ddb_atttype': 'S', 'ddb_keytype': 'HASH'},
+                            {'ddb_name': 'Version', 'ddb_atttype': 'S', 'ddb_keytype': 'RANGE'}],
               template=template)
 
     print(template.to_json(indent=2, separators=(',', ': ')))

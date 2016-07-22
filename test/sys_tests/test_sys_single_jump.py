@@ -10,15 +10,15 @@ def main():
                         VpcId=Ref(vpc),
                         CidrBlock='10.0.1.0/24')
     template = Template()
-    SingleInstance(title='jump',
-                   keypair='pipeline',
-                   si_image_id='ami-dc361ebf',
-                   si_instance_type='t2.micro',
-                   vpc=vpc,
-                   subnet=subnet,
-                   template=template,
-                   instance_dependencies=vpc.title,
-                   hosted_zone_name=None)
+    si = SingleInstance(title='jump',
+                        keypair='pipeline',
+                        si_image_id='ami-dc361ebf',
+                        si_instance_type='t2.micro',
+                        vpc=vpc,
+                        subnet=subnet,
+                        template=template,
+                        instance_dependencies=vpc.title,
+                        hosted_zone_name=None)
 
     template.add_resource(vpc)
     template.add_resource(subnet)

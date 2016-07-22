@@ -25,7 +25,8 @@ class Yaml(object):
                       'home_cidrs',
                       'stack_hosted_zone_name',
                       'autoscaling_units',
-                      'database_units']
+                      'database_units',
+                      'iam_instance_profile_arn']
     unit_key_list = {'autoscaling_units': ['unit_title',
                                            'userdata',
                                            'image_id',
