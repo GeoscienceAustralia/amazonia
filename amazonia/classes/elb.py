@@ -31,7 +31,7 @@ class Elb(SecurityEnabledObject):
         self.trop_elb = self.template.add_resource(
             elb.LoadBalancer(self.title,
                              CrossZone=True,
-                             # Assume health check against first protocl/instance port pair
+                             # Assume health check against first protocol/instance port pair
                              HealthCheck=elb.HealthCheck(Target=protocols[0] + ':' + instanceports[0] + path2ping,
                                                          HealthyThreshold='10',
                                                          UnhealthyThreshold='2',

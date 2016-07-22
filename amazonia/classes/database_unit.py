@@ -72,11 +72,11 @@ class DatabaseUnit(SecurityEnabledObject):
         """
         return self.dependencies
 
-    def get_destination(self):
+    def get_destinations(self):
         """
         :return: returns a reference to the destination security enabled object of the unit, in this case: itself
         """
-        return self
+        return [self]
 
     def get_inbound_ports(self):
         """

@@ -75,7 +75,7 @@ class AutoscalingUnit(object):
             health_check_grace_period=health_check_grace_period,
             health_check_type=health_check_type,
             userdata=userdata,
-            load_balancer=self.elb.trop_elb,
+            load_balancers=[self.elb.trop_elb],
             cd_service_role_arn=cd_service_role_arn,
             iam_instance_profile_arn=iam_instance_profile_arn,
             sns_topic_arn=sns_topic_arn,
@@ -96,11 +96,11 @@ class AutoscalingUnit(object):
         """
         return self.dependencies
 
-    def get_destination(self):
+    def get_destinations(self):
         """
         :return: return the local ELB for destination of other unit's traffic
         """
-        return self.elb
+        return [self.elb]
 
     def get_inbound_ports(self):
         """
@@ -114,4 +114,5 @@ class AutoscalingUnit(object):
         :param receiver: Other Amazonia Unit
         """
         for port in receiver.get_inbound_ports():
-            self.asg.add_flow(receiver=receiver.get_destination(), port=port)
+            for destination in receiver.get_destinations():
+                self.asg.add_flow(receiver=destination, port=port)

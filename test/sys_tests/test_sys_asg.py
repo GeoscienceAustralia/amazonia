@@ -56,7 +56,7 @@ runcmd:
         subnets=subnets,
         minsize=1,
         maxsize=1,
-        load_balancer=load_balancer,
+        load_balancers=[load_balancer],
         userdata=userdata,
         health_check_grace_period=300,
         health_check_type='ELB',

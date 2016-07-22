@@ -1,4 +1,3 @@
-from nose.tools import *
 from amazonia.classes.credstash import Credstash
 from troposphere import Template
 

@@ -7,7 +7,7 @@ from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class Asg(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, minsize, maxsize, subnets, load_balancer,
+    def __init__(self, title, vpc, template, minsize, maxsize, subnets, load_balancers,
                  keypair, image_id, instance_type, health_check_grace_period, health_check_type,
                  iam_instance_profile_arn, userdata, sns_topic_arn, sns_notification_types, cd_service_role_arn,
                  hdd_size=None):
@@ -19,7 +19,7 @@ class Asg(SecurityEnabledObject):
         :param minsize: minimum size of autoscaling group
         :param maxsize: maximum size of autoscaling group
         :param subnets: subnets to create autoscaled instances in
-        :param load_balancer: load balancer to associate autoscaling group with
+        :param load_balancers: list of load balancers to associate autoscaling group with
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
         :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
@@ -45,7 +45,7 @@ class Asg(SecurityEnabledObject):
             minsize=minsize,
             maxsize=maxsize,
             subnets=subnets,
-            load_balancer=load_balancer,
+            load_balancers=load_balancers,
             keypair=keypair,
             image_id=image_id,
             instance_type=instance_type,
@@ -63,7 +63,7 @@ class Asg(SecurityEnabledObject):
                 cd_service_role_arn=cd_service_role_arn
             )
 
-    def create_asg(self, title, minsize, maxsize, subnets, load_balancer, keypair, image_id, instance_type,
+    def create_asg(self, title, minsize, maxsize, subnets, load_balancers, keypair, image_id, instance_type,
                    health_check_grace_period, health_check_type, iam_instance_profile_arn, userdata, sns_topic_arn,
                    sns_notification_types, hdd_size):
         """
@@ -75,7 +75,7 @@ class Asg(SecurityEnabledObject):
         :param minsize: minimum size of autoscaling group
         :param maxsize: maximum size of autoscaling group
         :param subnets: subnets to create autoscaled instances in
-        :param load_balancer: load balancer to associate autoscaling group with
+        :param load_balancers: list of load balancers to associate autoscaling group with
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
         :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
@@ -96,7 +96,7 @@ class Asg(SecurityEnabledObject):
             MaxSize=maxsize,
             VPCZoneIdentifier=[Ref(subnet.title) for subnet in subnets],
             AvailabilityZones=availability_zones,
-            LoadBalancerNames=[Ref(load_balancer)],
+            LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=health_check_grace_period,
             HealthCheckType=health_check_type,
             Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)])
