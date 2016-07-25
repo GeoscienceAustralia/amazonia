@@ -63,6 +63,8 @@ sns_notification_types:
 elb_log_bucket:
 public_unit: true
 dependencies:
+owner_emails:
+nat_alerting: false
 userdata: |
       #cloud-config
       repo_update: true

@@ -20,6 +20,8 @@ home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'
 stack_hosted_zone_name: 'test.org.'
+owner_emails:
+nat_alerting: false
 
 autoscaling_units:
   -

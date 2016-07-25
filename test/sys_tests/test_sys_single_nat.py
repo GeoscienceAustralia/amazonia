@@ -12,16 +12,18 @@ def main():
                         VpcId=Ref(vpc),
                         CidrBlock='10.0.1.0/24')
     template = Template()
-    SingleInstance(title='nat1',
-                   keypair='pipeline',
-                   si_image_id='ami-53371f30',
-                   si_instance_type='t2.micro',
-                   vpc=vpc,
-                   subnet=subnet,
-                   template=template,
-                   is_nat=True,
-                   instance_dependencies=vpc.title,
-                   hosted_zone_name=None)
+    si = SingleInstance(title='nat1',
+                        keypair='pipeline',
+                        si_image_id='ami-53371f30',
+                        si_instance_type='t2.micro',
+                        vpc=vpc,
+                        subnet=subnet,
+                        template=template,
+                        is_nat=True,
+                        instance_dependencies=vpc.title,
+                        hosted_zone_name=None,
+                        alert=False,
+                        alert_emails=[])
 
     template.add_resource(vpc)
     template.add_resource(subnet)

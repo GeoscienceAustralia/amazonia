@@ -2,11 +2,12 @@
 
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53, Base64
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.sns import SNS
 
 
 class SingleInstance(SecurityEnabledObject):
     def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, instance_dependencies,
-                 iam_instance_profile_arn=None, is_nat=False, hosted_zone_name=None):
+                 alert_emails, alert, iam_instance_profile_arn=None, is_nat=False, hosted_zone_name=None):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
@@ -22,6 +23,8 @@ class SingleInstance(SecurityEnabledObject):
         :param hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
         :param instance_dependencies: a list of dependencies to wait for before creating the single instance.
         :param iam_instance_profile_arn: the ARN for an IAM profile that enables cloudwatch logging.
+        :param alert_emails: a list of email addresses to send alerts to if the instance fails the AWS status checks.
+        :param alert: a boolean to specify wether or not to alert to alert_emails or not.
         """
 
         super(SingleInstance, self).__init__(vpc=vpc, title=title, template=template)
@@ -84,6 +87,22 @@ runcmd:
                                DependsOn=instance_dependencies,
                                UserData=Base64(userdata)
                                ))
+
+        if is_nat and alert and alert_emails:
+            snsName = title + 'topic'
+            self.topic = SNS(title, self.template, snsName)
+
+            for email in alert_emails:
+                self.topic.add_subscription(email, 'email')
+
+            metric = 'CPUUtilization'
+            self.topic.add_alarm(
+                description='Alarms when {0} metric {1} reaches {2}'.format(self.single.title, metric, '60'),
+                metric=metric,
+                namespace='AWS/EC2',
+                threshold='60',
+                instance=self.single
+            )
 
         if iam_instance_profile_arn:
             self.single.IamInstanceProfile = iam_instance_profile_arn.split('/')[1]

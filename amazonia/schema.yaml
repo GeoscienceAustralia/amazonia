@@ -44,7 +44,9 @@
 #                       'stack_hosted_zone_name',
 #                       'autoscaling_units',
 #                       'database_units',
-#                       'iam_instance_profile_arn']
+#                       'iam_instance_profile_arn',
+#                       'owner_emails',
+#                       'nat_alerting']
 #     unit_key_list = {'autoscaling_units': ['unit_title',
 #                                            'userdata',
 #                                            'image_id',
@@ -371,3 +373,13 @@ db_hdd_size: # the size for the rds hard drive/allocated storage
     - 'number'
     - 'string'
   nullable: False
+owner_emails:  # A list of email addresses to specify ownership of this stack and also send alerts to if
+  type: 'list' # alerts have been set up.
+  nullable: True
+  schema:
+    type: 'string'
+    empty: False
+nat_alerting: # A True/False advising whether or not to alert on the NAT instance to the owner_emails list.
+  type: 'boolean'
+  nullable: False
+  empty: False

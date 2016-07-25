@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from amazonia.classes.single_instance import SingleInstance
 from troposphere import ec2, Ref, Template
 
@@ -18,7 +20,9 @@ def main():
                         subnet=subnet,
                         template=template,
                         instance_dependencies=vpc.title,
-                        hosted_zone_name=None)
+                        hosted_zone_name=None,
+                        alert=False,
+                        alert_emails=[])
 
     template.add_resource(vpc)
     template.add_resource(subnet)
