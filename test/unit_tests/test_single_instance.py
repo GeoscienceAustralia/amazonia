@@ -65,10 +65,9 @@ def test_nat_with_SNS_topic():
 
     si = create_si(title, is_nat=True, alert=True, alert_emails=['some@email.com'])
 
-    # Topic Created?
     assert_equals(si.topic.sns_topic.title, title + 'sns')
     assert_equals(si.topic.sns_topic.DisplayName, title + 'topic')
-    assert_equals(type(si.template.outputs[title + 'sns'].Description), type(Ref(None)))
+    assert_equals(type(si.template.outputs[title + 'sns'].Description), type(str(None)))
 
 
 def test_nat_with_SNS_subscription():
@@ -81,7 +80,6 @@ def test_nat_with_SNS_subscription():
 
     si = create_si(title, is_nat=True, alert=True, alert_emails=['some@email.com'])
 
-    # Subscription Created?
     assert_equals(si.topic.sns_topic.Subscription[0].title, title + 'snsSubscription0')
     assert_equals(si.topic.sns_topic.Subscription[0].Endpoint, 'some@email.com')
     assert_equals(si.topic.sns_topic.Subscription[0].Protocol, 'email')
