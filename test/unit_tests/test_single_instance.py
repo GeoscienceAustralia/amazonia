@@ -78,15 +78,15 @@ def test_nat_with_SNS_and_alerting():
 
     # Alarm Created?
     assert_equals(si.topic.alarms[0].title, title + 'snsAlarm0')
-    assert_equals(si.topic.alarms[0].AlarmDescription, 'Alarms when ' + title + ' metric StatusCheckFailed reaches 1')
+    assert_equals(si.topic.alarms[0].AlarmDescription, 'Alarms when ' + title + ' metric CPUUtilization reaches 60')
     assert_equals(type(si.topic.alarms[0].AlarmActions[0]), type(Ref('abc')))
     assert_equals(type(si.topic.alarms[0].OKActions[0]), type(Ref('abc')))
-    assert_equals(si.topic.alarms[0].MetricName, 'StatusCheckFailed')
+    assert_equals(si.topic.alarms[0].MetricName, 'CPUUtilization')
     assert_equals(si.topic.alarms[0].Namespace, 'AWS/EC2')
-    assert_equals(si.topic.alarms[0].Threshold, '1')
+    assert_equals(si.topic.alarms[0].Threshold, '60')
     assert_equals(si.topic.alarms[0].ComparisonOperator, 'GreaterThanOrEqualToThreshold')
     assert_equals(si.topic.alarms[0].EvaluationPeriods, '1')
-    assert_equals(si.topic.alarms[0].Period, '60')
+    assert_equals(si.topic.alarms[0].Period, '300')
     assert_equals(si.topic.alarms[0].Statistic, 'Sum')
     assert_equals(si.topic.alarms[0].Dimensions[0].Name, 'InstanceId')
 
