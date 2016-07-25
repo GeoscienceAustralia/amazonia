@@ -21,7 +21,7 @@ class SNS(object):
         self.template.add_output(Output(
             title,
             Value=Join('', ['SNS topic created with Amazonia as part of ', Ref('AWS::StackName')]),
-            Description=Ref(self.sns_topic)
+            Description=self.sns_topic.DisplayName
         ))
 
         self.subscriptions = []
