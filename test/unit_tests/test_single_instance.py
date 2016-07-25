@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from nose.tools import *
-from troposphere import Template, ec2
+from troposphere import Template, ec2, Ref
 from amazonia.classes.single_instance import SingleInstance
 
 
@@ -55,7 +55,42 @@ def test_jump_with_hostedzone_creates_r53_record():
         assert_equals(sio, si.si_r53.Name)
 
 
-def create_si(title, is_nat=False):
+def test_nat_with_SNS_and_alerting():
+    """
+    Tests that creating a NAT and supplying a True value to 'alert' and at least one email in a list to alert_emails
+    will create an SNS topic, subscriptions, and alarms for the NAT.
+    """
+
+    title = 'natreport'
+
+    si = create_si(title, is_nat=True, alert=True, alert_emails=['some@email.com'])
+
+    # Topic Created?
+    assert_equals(si.topic.sns_topic.title, title + 'sns')
+    assert_equals(si.topic.sns_topic.TopicName, title + 'topic')
+    assert_equals(si.topic.sns_topic.DisplayName, title + 'topic')
+    assert_in(si.template.outputs[title + 'sns'].Description, 'SNS topic created with Amazonia')
+
+    # Subscription Created?
+    assert_equals(si.topic.sns_topic.Subscription[0].title, title + 'snsSubscription0')
+    assert_equals(si.topic.sns_topic.Subscription[0].Endpoint, 'some@email.com')
+    assert_equals(si.topic.sns_topic.Subscription[0].Protocol, 'email')
+
+    # Alarm Created?
+    assert_equals(si.topic.alarms[0].title, title + 'snsAlarm0')
+    assert_equals(si.topic.alarms[0].AlarmDescription, 'Alarms when ' + title + ' metric StatusCheckFailed reaches 1')
+    assert_equals(type(si.topic.alarms[0].AlarmActions[0]), type(Ref('abc')))
+    assert_equals(type(si.topic.alarms[0].OKActions[0]), type(Ref('abc')))
+    assert_equals(si.topic.alarms[0].MetricName, 'StatusCheckFailed')
+    assert_equals(si.topic.alarms[0].Namespace, 'AWS/EC2')
+    assert_equals(si.topic.alarms[0].Threshold, '1')
+    assert_equals(si.topic.alarms[0].ComparisonOperator, 'GreaterThanOrEqualToThreshold')
+    assert_equals(si.topic.alarms[0].EvaluationPeriods, '1')
+    assert_equals(si.topic.alarms[0].Period, '60')
+    assert_equals(si.topic.alarms[0].Statistic, 'Sum')
+    assert_equals(si.topic.alarms[0].Dimensions[0].Name, 'InstanceId')
+
+def create_si(title, is_nat=False, alert=False, alert_emails=None):
     """
     Helper function to create Single instance Troposhpere object to interate through.
     :param title: name of instance
@@ -80,5 +115,7 @@ def create_si(title, is_nat=False):
                         instance_dependencies=dependencies,
                         template=template,
                         is_nat=is_nat,
-                        iam_instance_profile_arn='my/instance-profile')
+                        iam_instance_profile_arn='my/instance-profile',
+                        alert=alert,
+                        alert_emails=alert_emails)
     return si

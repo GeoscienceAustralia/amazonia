@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from troposphere import Output, Ref, Join
-from troposphere.sns import Topic
+from troposphere import Output, Ref, cloudwatch
+from troposphere.sns import Topic, Subscription
 
 
 class SNS(object):
@@ -15,12 +15,60 @@ class SNS(object):
         :param display_name: The SNS display name
         """
         title = unit_title + 'sns'
-        self.sns_topic = template.add_resource(Topic(title, TopicName=topic_name, DisplayName=display_name))
 
-        template.add_output(Output(
+        self.template = template
+        self.sns_topic = self.template.add_resource(Topic(title, TopicName=topic_name, DisplayName=display_name))
+
+        self.template.add_output(Output(
             title,
             Value=Ref(self.sns_topic),
-            Description=Join('', ['SNS topic, created with Amazonia as part of ',
-                                  Ref('AWS::StackName')
-                                  ])
-        ))
+            Description='SNS topic created with Amazonia'))
+
+        self.subscriptions = []
+        self.alarms = []
+
+    def add_subscription(self, endpoint, protocol):
+        """
+        Adds a subscription to this sns topic
+        :param endpoint: the endpoint to send the notification to (eg 'my@email.com')
+        :param protocol: the protocol to use to send the notification (eg 'email')
+        """
+        sub = Subscription(
+            '{0}Subscription{1}'.format(self.sns_topic.title, str(len(self.subscriptions))),
+            Endpoint=endpoint,
+            Protocol=protocol
+        )
+
+        self.subscriptions.append(sub)
+        self.sns_topic.Subscription = self.subscriptions
+
+    def add_alarm(self, description, metric, namespace, threshold, instance):
+        """
+        Adds an alarm to this sns topic. For this to be useful, subscriptions must be added to this topic
+        using the add_subscription function above.
+        :param description: A description for the Alarm being created
+        :param metric: The metric to track and alarm on.
+        :param namespace: the namespace that the provided metric belongs to.
+        :param threshold: The threshold to alarm on
+        :param instance: an instance to refer to in particular
+        """
+
+        self.alarms.append(
+            self.template.add_resource(
+                cloudwatch.Alarm(
+                    '{0}Alarm{1}'.format(self.sns_topic.title, str(len(self.alarms))),
+                    AlarmDescription=str(description),
+                    AlarmActions=[Ref(self.sns_topic.title)],
+                    OKActions=[Ref(self.sns_topic.title)],
+                    MetricName=metric,
+                    Namespace=namespace,
+                    Threshold=threshold,
+                    ComparisonOperator="GreaterThanOrEqualToThreshold",
+                    EvaluationPeriods='1',
+                    Period='300',
+                    Statistic='Sum',
+                    DependsOn=self.sns_topic.title,
+                    Dimensions=[cloudwatch.MetricDimension(Name='InstanceId', Value=Ref(instance))]
+                )
+            )
+        )
