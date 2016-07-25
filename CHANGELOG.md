@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.38] - 25/07/2016
+- Added Cloudwatch alarm option for NAT instances
+- Added 'add_subscription' and 'add_alarm' function to SNS class
+
 ## [1.0.34] - 21/07/2016
 - Updated Credstash System tests
 - Created tests for '-1' port in security enabled object.
