@@ -86,20 +86,6 @@ def test_nat_with_SNS_subscription():
     assert_equals(si.topic.sns_topic.Subscription[0].Endpoint, 'some@email.com')
     assert_equals(si.topic.sns_topic.Subscription[0].Protocol, 'email')
 
-    # Alarm Created?
-    assert_equals(si.topic.alarms[0].title, title + 'snsAlarm0')
-    assert_equals(si.topic.alarms[0].AlarmDescription, 'Alarms when ' + title + ' metric CPUUtilization reaches 60')
-    assert_equals(type(si.topic.alarms[0].AlarmActions[0]), type(Ref(si.topic.sns_topic.title)))
-    assert_equals(type(si.topic.alarms[0].OKActions[0]), type(Ref(si.topic.sns_topic.title)))
-    assert_equals(si.topic.alarms[0].MetricName, 'CPUUtilization')
-    assert_equals(si.topic.alarms[0].Namespace, 'AWS/EC2')
-    assert_equals(si.topic.alarms[0].Threshold, '60')
-    assert_equals(si.topic.alarms[0].ComparisonOperator, 'GreaterThanOrEqualToThreshold')
-    assert_equals(si.topic.alarms[0].EvaluationPeriods, '1')
-    assert_equals(si.topic.alarms[0].Period, '300')
-    assert_equals(si.topic.alarms[0].Statistic, 'Sum')
-    assert_equals(si.topic.alarms[0].Dimensions[0].Name, 'InstanceId')
-
 
 def test_nat_with_SNS_alarm():
     """
