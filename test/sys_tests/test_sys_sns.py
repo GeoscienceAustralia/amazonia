@@ -41,12 +41,7 @@ def main():
 
     mysns = SNS(unit_title='test',
                 template=template,
-                topic_name='topic_name',
                 display_name='display_name')
-
-    mysns.add_subscription('some.email@some.domain.com', 'email')
-
-    mysns.add_alarm('test alarm', 'StatusCheckFailed', 'AWS/EC2', '1', myinstance)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

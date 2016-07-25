@@ -1,35 +1,37 @@
 #!/usr/bin/python3
 
-from troposphere import Output, Ref, cloudwatch
+from troposphere import Output, Ref, Join, cloudwatch
 from troposphere.sns import Topic, Subscription
 
 
 class SNS(object):
-    def __init__(self, unit_title, template, topic_name, display_name):
+    def __init__(self, unit_title, template, display_name):
         """
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-topic.html
-        https://github.com/cloudtools/troposphere/blob/master/troposphere/sns.py
+        AWS: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-topic.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/sns.py
         :param unit_title: Title of the sns unit
         :param template: The troposphere template to add the Elastic Loadbalancer to.
-        :param topic_name: The SNS topic name
         :param display_name: The SNS display name
         """
         title = unit_title + 'sns'
 
         self.template = template
-        self.sns_topic = self.template.add_resource(Topic(title, TopicName=topic_name, DisplayName=display_name))
+        self.sns_topic = self.template.add_resource(Topic(title, DisplayName=display_name))
 
         self.template.add_output(Output(
             title,
-            Value=Ref(self.sns_topic),
-            Description='SNS topic created with Amazonia'))
+            Value=Join('', ['SNS topic created with Amazonia as part of ', Ref('AWS::StackName')]),
+            Description=Ref(self.sns_topic)
+        ))
 
         self.subscriptions = []
         self.alarms = []
 
     def add_subscription(self, endpoint, protocol):
         """
-        Adds a subscription to this sns topic
+        Adds a subscription to this sns topic.
+        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-subscription.html
+        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/sns.py
         :param endpoint: the endpoint to send the notification to (eg 'my@email.com')
         :param protocol: the protocol to use to send the notification (eg 'email')
         """
@@ -53,11 +55,9 @@ class SNS(object):
         :param instance: an instance to refer to in particular
         """
 
-        self.alarms.append(
-            self.template.add_resource(
-                cloudwatch.Alarm(
+        alarm = cloudwatch.Alarm(
                     '{0}Alarm{1}'.format(self.sns_topic.title, str(len(self.alarms))),
-                    AlarmDescription=str(description),
+                    AlarmDescription=description,
                     AlarmActions=[Ref(self.sns_topic.title)],
                     OKActions=[Ref(self.sns_topic.title)],
                     MetricName=metric,
@@ -70,5 +70,6 @@ class SNS(object):
                     DependsOn=self.sns_topic.title,
                     Dimensions=[cloudwatch.MetricDimension(Name='InstanceId', Value=Ref(instance))]
                 )
-            )
-        )
+
+        self.alarms.append(alarm)
+        self.template.add_resource(alarm)

@@ -88,21 +88,20 @@ runcmd:
                                UserData=Base64(userdata)
                                ))
 
-        if is_nat and alert and alert_emails is not None:
-
+        if is_nat and alert and alert_emails:
             snsName = title + 'topic'
-            self.topic = SNS(title, self.template, snsName, snsName)
+            self.topic = SNS(title, self.template, snsName)
 
             for email in alert_emails:
                 self.topic.add_subscription(email, 'email')
 
             metric = 'CPUUtilization'
             self.topic.add_alarm(
-                'Alarms when {0} metric {1} reaches {2}'.format(self.single.title, metric, '60'),
-                metric,
-                'AWS/EC2',
-                '60',
-                self.single
+                description='Alarms when {0} metric {1} reaches {2}'.format(self.single.title, metric, '60'),
+                metric=metric,
+                namespace='AWS/EC2',
+                threshold='60',
+                instance=self.single
             )
 
         if iam_instance_profile_arn:
