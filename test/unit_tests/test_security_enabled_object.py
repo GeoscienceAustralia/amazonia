@@ -111,12 +111,21 @@ def test_add_ip_ingress():
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},
              {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}]
 
+    allcidr = {'name': 'All', 'cidr': '0.0.0.0/0'}
+
     for num, cidr in enumerate(cidrs):
         myobj.add_ingress(cidr, port='80')
         assert_equals(myobj.ingress[num].title, 'Unit01Web80From{0}80'.format(cidr['name']))
         assert_equals(myobj.ingress[num].IpProtocol, 'tcp')
         assert_equals(myobj.ingress[num].FromPort, '80')
         assert_equals(myobj.ingress[num].ToPort, '80')
+
+    myobj.add_ingress(sender=allcidr, port='-1')
+
+    assert_equals(myobj.ingress[3].title, 'Unit01WebAllFrom{0}All'.format(allcidr['name']))
+    assert_equals(myobj.ingress[3].IpProtocol, 'tcp')
+    assert_equals(myobj.ingress[3].FromPort, '0')
+    assert_equals(myobj.ingress[3].ToPort, '65535')
 
 
 def test_add_ip_egress():
@@ -131,9 +140,18 @@ def test_add_ip_egress():
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},
              {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}]
 
+    allcidr = {'name': 'All', 'cidr': '0.0.0.0/0'}
+
     for num, cidr in enumerate(cidrs):
         myobj.add_egress(cidr, port='80')
         assert_equals(myobj.egress[num].title, 'Unit01Web80To{0}80'.format(cidr['name']))
         assert_equals(myobj.egress[num].IpProtocol, 'tcp')
         assert_equals(myobj.egress[num].FromPort, '80')
         assert_equals(myobj.egress[num].ToPort, '80')
+
+    myobj.add_egress(receiver=allcidr, port='-1')
+
+    assert_equals(myobj.egress[3].title, 'Unit01WebAllTo{0}All'.format(allcidr['name']))
+    assert_equals(myobj.egress[3].IpProtocol, 'tcp')
+    assert_equals(myobj.egress[3].FromPort, '0')
+    assert_equals(myobj.egress[3].ToPort, '65535')

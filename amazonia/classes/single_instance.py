@@ -89,8 +89,8 @@ runcmd:
                                ))
 
         if is_nat and alert and alert_emails:
-            snsName = title + 'topic'
-            self.topic = SNS(title, self.template, snsName)
+            snsname = title + 'topic'
+            self.topic = SNS(title, self.template, snsname)
 
             for email in alert_emails:
                 self.topic.add_subscription(email, 'email')
