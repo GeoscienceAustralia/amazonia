@@ -53,7 +53,9 @@ class Yaml(object):
                                         'db_name',
                                         'db_instance_type',
                                         'db_engine',
-                                        'db_port']
+                                        'db_port',
+                                        'db_hdd_size',
+                                        'db_snapshot_id']
                      }
 
     def __init__(self, user_stack_data, default_data, schema):

@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added Cloudwatch alarm option for NAT instances
 - Added 'add_subscription' and 'add_alarm' function to SNS class
 - Updated code to fix some QA issues raised by sonarqube
+- Corrected database yaml values so that defaults can be correctly overridden (or left out) as expected
 
 ## [1.0.34] - 21/07/2016
 - Updated Credstash System tests
