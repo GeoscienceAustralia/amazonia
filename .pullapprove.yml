@@ -19,6 +19,7 @@ reviewers:
   - snayler0
   - alicelee999
   - ga-autobots
+  - aynsof
   conditions:
     branches:
       - integration
