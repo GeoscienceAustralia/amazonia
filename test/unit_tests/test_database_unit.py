@@ -94,7 +94,7 @@ def test_databse_snapshot():
     assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
-    assert_equals(db.trop_db.DBName, 'MyDb')
+    assert_equals(db.trop_db.DBName, '')
     assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 0)
     assert_equals(db.trop_db.AllocatedStorage, 5)
