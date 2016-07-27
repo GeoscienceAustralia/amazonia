@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.38] - 26/07/2016
+## [1.0.38] - 27/07/2016
 - Added Cloudwatch alarm option for NAT instances
 - Added 'add_subscription' and 'add_alarm' function to SNS class
 - Updated code to fix some QA issues raised by sonarqube
