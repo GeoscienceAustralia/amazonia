@@ -35,7 +35,7 @@ def main():
                  subnets=public_subnets,
                  vpc=vpc,
                  template=template,
-                 db_instance_type='db.m1.small',
+                 db_instance_type='db.t2.micro',
                  db_engine='postgres',
                  db_port='5432',
                  db_name='myDb',
@@ -46,12 +46,12 @@ def main():
                  subnets=public_subnets,
                  vpc=vpc,
                  template=template,
-                 db_instance_type='db.m1.small',
+                 db_instance_type='db.t2.micro',
                  db_engine='postgres',
                  db_port='5432',
                  db_name='myDb',
                  db_hdd_size=5,
-                 db_snapshot_id='ss123456785v00'
+                 db_snapshot_id='amazonia-verbose-snapshot'
                  )
 
     print(template.to_json(indent=2, separators=(',', ': ')))
