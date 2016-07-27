@@ -1,13 +1,14 @@
-#!/usr/bin/python3
-
 from nose.tools import *
 from troposphere import ec2, Ref, Tags, Template
-
 from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
 
+"""
+Tests the functions of the Database Unit class
+"""
 
 def test_database():
-    """ Tests correct structure of Database unit.
+    """
+    Tests correct structure of Database unit.
     """
     template = Template()
     vpc = template.add_resource(ec2.VPC('MyVPC',
@@ -36,14 +37,14 @@ def test_database():
                       subnets=private_subnets,
                       vpc=vpc,
                       template=template,
-                      db_instance_type='db.m1.small',
+                      db_instance_type='db.t2.micro',
                       db_engine='postgres',
                       db_port='5432',
                       db_name='MyDb',
                       db_snapshot_id=None,
                       db_hdd_size=5)
 
-    assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
+    assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
     assert_equals(db.trop_db.DBName, 'MyDb')
@@ -55,8 +56,9 @@ def test_database():
 
 
 def test_databse_snapshot():
-    """ Tests correct structure of Database provisioned from snapshot.
-        """
+    """
+    Tests correct structure of Database provisioned from snapshot.
+    """
     template = Template()
     vpc = template.add_resource(ec2.VPC('MyVPC',
                                         CidrBlock='10.0.0.0/16'))
@@ -84,14 +86,14 @@ def test_databse_snapshot():
                       subnets=private_subnets,
                       vpc=vpc,
                       template=template,
-                      db_instance_type='db.m1.small',
+                      db_instance_type='db.t2.micro',
                       db_hdd_size=5,
                       db_engine='postgres',
                       db_snapshot_id='ss123456789v00-final-snapshot',
                       db_port='5432',
                       db_name='MyDb')
 
-    assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
+    assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
     assert_equals(db.trop_db.DBName, '')
