@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.40] - 29/07/2016
+- Updated DB unit tests with working instance type, fixed styling issues
+
 ## [1.0.38] - 27/07/2016
 - Added Cloudwatch alarm option for NAT instances
 - Added 'add_subscription' and 'add_alarm' function to SNS class
