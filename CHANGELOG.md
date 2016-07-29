@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.40] - 29/07/2016
 - Updated DB unit tests with working instance type, fixed styling issues
+- Added Angelo Pace to .pullapprove.yml
 
 ## [1.0.38] - 27/07/2016
 - Added Cloudwatch alarm option for NAT instances
