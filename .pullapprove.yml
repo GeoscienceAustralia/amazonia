@@ -20,6 +20,7 @@ reviewers:
   - alicelee999
   - ga-autobots
   - aynsof
+  - TheAngeloPace
   conditions:
     branches:
       - integration
