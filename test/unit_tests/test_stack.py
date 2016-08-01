@@ -53,7 +53,7 @@ runcmd:
     db_hdd_size = 5
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_stack():
     """ Test stack structure
     """
@@ -136,7 +136,8 @@ def test_duplicate_unit_names():
                                'elb_log_bucket': None,
                                'public_unit': True,
                                'dependencies': ['app2', 'db1'],
-                               'unit_hosted_zone_name': None},
+                               'unit_hosted_zone_name': None,
+                               'hdd_size': None},
                               {'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -155,7 +156,8 @@ def test_duplicate_unit_names():
                                'elb_log_bucket': None,
                                'public_unit': True,
                                'dependencies': [],
-                               'unit_hosted_zone_name': None}],
+                               'unit_hosted_zone_name': None,
+                               'hdd_size': None}],
         'database_units': []
     })
 
@@ -222,7 +224,8 @@ def test_duplicate_unit_names():
                                'elb_log_bucket': None,
                                'public_unit': True,
                                'dependencies': ['app2', 'db1'],
-                               'unit_hosted_zone_name': None}],
+                               'unit_hosted_zone_name': None,
+                               'hdd_size': None}],
         'database_units': [{'unit_title': 'app1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
@@ -275,7 +278,8 @@ def create_stack(stack_title):
                             'elb_log_bucket': None,
                             'public_unit': True,
                             'dependencies': ['app2', 'db1'],
-                            'unit_hosted_zone_name': None},
+                            'unit_hosted_zone_name': None,
+                            'hdd_size': None},
                            {'unit_title': 'app2',
                             'protocols': protocols,
                             'instanceports': instanceports,
@@ -294,7 +298,8 @@ def create_stack(stack_title):
                             'elb_log_bucket': None,
                             'public_unit': True,
                             'dependencies': [],
-                            'unit_hosted_zone_name': None}],
+                            'unit_hosted_zone_name': None,
+                            'hdd_size': None}],
         database_units=[{'unit_title': 'db1',
                          'db_instance_type': db_instance_type,
                          'db_engine': db_engine,

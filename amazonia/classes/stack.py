@@ -174,7 +174,7 @@ class Stack(object):
                                    cd_service_role_arn=self.code_deploy_service_role,
                                    health_check_grace_period=unit['health_check_grace_period'],
                                    health_check_type=unit['health_check_type'],
-                                   iam_instance_profile_arn=unit['iam_instance_profille_arn'],
+                                   iam_instance_profile_arn=unit['iam_instance_profile_arn'],
                                    image_id=unit['image_id'],
                                    instance_type=unit['instance_type'],
                                    maxsize=unit['maxsize'],
