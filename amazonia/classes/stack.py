@@ -5,6 +5,10 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.database_config import DatabaseConfig
 
 
 class Stack(object):
@@ -149,39 +153,63 @@ class Stack(object):
                                                                   DestinationCidrBlock=self.public_cidr['cidr']))
         self.private_route.DependsOn = self.gateway_attachment.title
 
+        self.network_config = NetworkConfig(vpc=self.vpc, public_subnets=self.public_subnets,
+                                            private_subnets=self.private_subnets, jump=self.jump, nat=self.nat,
+                                            public_cidr=self.public_cidr, unit_hosted_zone_name=self.hosted_zone_name)
         # Add Autoscaling Units
-        for unit in self.autoscaling_units:
+        for unit in self.autoscaling_units:  # type: dict
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: autoscaling unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
+            elb_config = ElbConfig(instanceports=unit['instanceports'],
+                                   elb_log_bucket=unit['elb_log_bucket'],
+                                   loadbalancerports=unit['loadbalancerports'],
+                                   protocols=unit['protocols'],
+                                   path2ping=unit['path2ping'],
+                                   public_unit=unit['public_unit'])
+            asg_config = AsgConfig(keypair=self.keypair,
+                                   cd_service_role_arn=self.code_deploy_service_role,
+                                   health_check_grace_period=unit['health_check_grace_period'],
+                                   health_check_type=unit['health_check_type'],
+                                   iam_instance_profile_arn=unit['iam_instance_profille_arn'],
+                                   image_id=unit['image_id'],
+                                   instance_type=unit['instance_type'],
+                                   maxsize=unit['maxsize'],
+                                   minsize=unit['minsize'],
+                                   sns_notification_types=unit['sns_notification_types'],
+                                   sns_topic_arn=unit['sns_topic_arn'],
+                                   userdata=unit['userdata']
+                                   )
             self.units[orig_unit_title] = AutoscalingUnit(
-                vpc=self.vpc,
+                unit_title=unit['unit_title'],
                 template=self.template,
-                public_subnets=self.public_subnets,
-                private_subnets=self.private_subnets,
-                keypair=self.keypair,
-                cd_service_role_arn=self.code_deploy_service_role,
-                nat=self.nat,
-                jump=self.jump,
-                gateway_attachment=self.gateway_attachment,
-                public_cidr=self.public_cidr,
-                **unit
+                network_config=self.network_config,
+                elb_config=elb_config,
+                asg_config=asg_config,
+                dependencies=unit['dependencies']
             )
         # Add Database Units
-        for unit in self.database_units:
+        for unit in self.database_units:  # type: dict
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             unit['unit_title'] = self.title + orig_unit_title
+            database_config = DatabaseConfig(
+                db_hdd_size=unit['db_hdd_size'],
+                db_instance_type=unit['db_instance_type'],
+                db_engine=unit['db_engine'],
+                db_port=unit['db_port'],
+                db_name=unit['db_name'],
+                db_snapshot_id=unit['db_snapshot_id'])
             self.units[orig_unit_title] = DatabaseUnit(
-                vpc=self.vpc,
+                unit_title=unit['unit_title'],
                 template=self.template,
-                subnets=self.private_subnets,
-                **unit
+                network_config=self.network_config,
+                database_config=database_config
             )
         # Add Unit flow
         for unit_name in self.units:

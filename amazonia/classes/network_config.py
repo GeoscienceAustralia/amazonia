@@ -1,5 +1,5 @@
-class NetworkConfig():
-    def __init__ (self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, unit_hosted_zone_name):
+class NetworkConfig(object):
+    def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, unit_hosted_zone_name):
         """
         Simple config class to contain networking related parameters
         :param public_cidr: Public cidr pattern

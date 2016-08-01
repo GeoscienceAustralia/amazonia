@@ -1,5 +1,5 @@
-class ElbConfig():
-    def __init__ (self, protocols, instanceports, loadbalancerports, path2ping, public_unit, elb_log_bucket):
+class ElbConfig(object):
+    def __init__(self, protocols, instanceports, loadbalancerports, path2ping, public_unit, elb_log_bucket):
         """
         Simple config class to contain elb related parameters
         :param protocols: protocols for ELB and webserver to communicate via

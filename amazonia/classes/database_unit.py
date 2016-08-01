@@ -5,48 +5,41 @@ from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter
 
 
 class DatabaseUnit(SecurityEnabledObject):
-    def __init__(self, unit_title, vpc, template, subnets, db_hdd_size, db_instance_type, db_engine, db_port, db_name,
-                 db_snapshot_id):
+    def __init__(self, unit_title, template, network_config, database_config):
         """
         Class to create an RDS and DB subnet group in a vpc
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/rds.py
         :param unit_title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
-        :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
         :param template: Troposphere stack to append resources to
-        :param subnets: subnets to create autoscaled instances in
-        :param db_snapshot_id: id of snapshot to restore from
-        :param db_hdd_size: allocated storage size
-        :param db_name: the specific name of the database to be created
-        :param db_instance_type: Size of the RDS instance
-        :param db_engine: DB engine type (Postgres, Oracle, MySQL, etc)
-        :param db_port: Port of RDS instance
+        :param network_config: object containing network related variables
+        :param database_config: object containing database related variablea
         """
         self.title = unit_title + 'Rds'
         self.dependencies = []
         self.db_subnet_group_title = unit_title + 'Dsg'
-        self.port = db_port
-        super(DatabaseUnit, self).__init__(vpc=vpc, title=self.title, template=template)
+        self.port = database_config.db_port
+        super(DatabaseUnit, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
 
         self.trop_db_subnet_group = template.add_resource(
             rds.DBSubnetGroup(self.db_subnet_group_title,
                               DBSubnetGroupDescription=self.db_subnet_group_title,
-                              SubnetIds=[Ref(x) for x in subnets],
+                              SubnetIds=[Ref(x) for x in network_config.private_subnets],
                               Tags=Tags(Name=self.db_subnet_group_title)))
         rds_params = {
-            'AllocatedStorage': db_hdd_size,
+            'AllocatedStorage': database_config.db_hdd_size,
             'AllowMajorVersionUpgrade': True,
             'AutoMinorVersionUpgrade': True,
             'MultiAZ': True,
-            'DBInstanceClass': db_instance_type,
+            'DBInstanceClass': database_config.db_instance_type,
             'DBSubnetGroupName': Ref(self.trop_db_subnet_group),
-            'DBName': db_name,
-            'Engine': db_engine,
+            'DBName': database_config.db_name,
+            'Engine': database_config.db_engine,
             'Port': self.port,
             'VPCSecurityGroups': [Ref(self.security_group)],
             'Tags': Tags(Name=Join('', [Ref('AWS::StackName'), '-', self.title]))
         }
-        if db_snapshot_id is None:
+        if database_config.db_snapshot_id is None:
             self.username = self.template.add_parameter(Parameter(
                 self.title + 'Username', Type='String', Description='Master username of {0} RDS'.format(self.title),
                 NoEcho=True))
@@ -57,7 +50,7 @@ class DatabaseUnit(SecurityEnabledObject):
             rds_params['MasterUsername'] = Ref(self.username)
             rds_params['MasterUserPassword'] = Ref(self.password)
         else:
-            rds_params['DBSnapshotIdentifier'] = db_snapshot_id
+            rds_params['DBSnapshotIdentifier'] = database_config.db_snapshot_id
 
         self.trop_db = template.add_resource(rds.DBInstance(self.title, **rds_params))
 

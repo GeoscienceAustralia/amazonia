@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from troposphere import Tags, Ref, Output, Join, GetAtt, route53
 import troposphere.elasticloadbalancing as elb
+from troposphere import Tags, Ref, Output, Join, GetAtt, route53
+
+from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class Elb(SecurityEnabledObject):
@@ -24,11 +25,13 @@ class Elb(SecurityEnabledObject):
             elb.LoadBalancer(self.title,
                              CrossZone=True,
                              # Assume health check against first protocol/instance port pair
-                             HealthCheck=elb.HealthCheck(Target=elb_config.protocols[0] + ':' + elb_config.instanceports[0] + elb_config.path2ping,
-                                                         HealthyThreshold='10',
-                                                         UnhealthyThreshold='2',
-                                                         Interval='300',
-                                                         Timeout='60'),
+                             HealthCheck=elb.HealthCheck(
+                                 Target=elb_config.protocols[0] + ':' + elb_config.instanceports[
+                                     0] + elb_config.path2ping,
+                                 HealthyThreshold='10',
+                                 UnhealthyThreshold='2',
+                                 Interval='300',
+                                 Timeout='60'),
                              Listeners=[elb.Listener(LoadBalancerPort=listener_tuple[0],
                                                      Protocol=listener_tuple[2],
                                                      InstancePort=listener_tuple[1],

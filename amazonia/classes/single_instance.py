@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#  pylint: disable=line-too-long
 
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53, Base64
 from amazonia.classes.security_enabled_object import SecurityEnabledObject

@@ -74,4 +74,3 @@ class Cloudtrail(object):
                             ]),
             Description='Amazonia Cloudtrail'
         ))
-
