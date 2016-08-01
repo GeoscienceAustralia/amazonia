@@ -10,7 +10,7 @@ class DatabaseConfig(object):
         :param db_port: Port of RDS instance
         """
         self.db_hdd_size = db_hdd_size
-        self.db_instace_type = db_instance_type
+        self.db_instance_type = db_instance_type
         self.db_engine = db_engine
         self.db_port = db_port
         self.db_name = db_name

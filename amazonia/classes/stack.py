@@ -181,7 +181,8 @@ class Stack(object):
                                    minsize=unit['minsize'],
                                    sns_notification_types=unit['sns_notification_types'],
                                    sns_topic_arn=unit['sns_topic_arn'],
-                                   userdata=unit['userdata']
+                                   userdata=unit['userdata'],
+                                   hdd_size=unit['hdd_size']
                                    )
             self.units[orig_unit_title] = AutoscalingUnit(
                 unit_title=unit['unit_title'],

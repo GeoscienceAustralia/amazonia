@@ -1,7 +1,7 @@
 class AsgConfig(object):
     def __init__(self, sns_topic_arn, sns_notification_types, cd_service_role_arn, health_check_grace_period,
                  health_check_type, keypair, minsize, maxsize, image_id, instance_type, userdata,
-                 iam_instance_profile_arn, hdd_size=None):
+                 iam_instance_profile_arn, hdd_size):
         """
         Simple config class to contain autoscaling group related parameters
         :param minsize: minimum size of autoscaling group

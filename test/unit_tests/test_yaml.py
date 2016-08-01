@@ -34,7 +34,7 @@ def open_yaml_file(file_path):
         return yaml.safe_load(input_yaml)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_complete_valid_values():
     """
     Validate stack yaml value is a list of dictionaries
@@ -133,7 +133,7 @@ def test_complete_valid_values():
     assert_equals(database_unit_input['db_name'], 'myDb')
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_validate_cidr_yaml():
     """
     Test the detection of invalid CIDRs
@@ -154,7 +154,7 @@ def test_validate_cidr_yaml():
                                             'schema': schema})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_get_invalid_values_yaml():
     """
     Test the detection of unrecognized or invalid keys within YAML files
@@ -175,7 +175,7 @@ def test_get_invalid_values_yaml():
                                             'schema': schema})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_insecure_variables_yaml():
     """
     Test the detection of insecure variables within YAML files
@@ -192,7 +192,7 @@ def test_insecure_variables_yaml():
                                                   'schema': schema})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_invalid_min_max_asg():
     """
     Test the detection of a larger minimum that the provided maximum for an auto scaling unit

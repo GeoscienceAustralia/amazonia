@@ -74,7 +74,7 @@ runcmd:
         hdd_size=8)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_autoscaling_unit():
     """Test zdtd autoscaling unit structure"""
     title = 'app'
@@ -124,7 +124,7 @@ def test_autoscaling_unit():
     assert_equals(len(unit.test_elb.egress), 1)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_unit_association():
     """Test zdtd autoscaling unit flow"""
     blue_asg_config = AsgConfig(minsize=None,

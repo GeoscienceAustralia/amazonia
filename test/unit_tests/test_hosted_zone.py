@@ -104,7 +104,7 @@ def test_private_hosted_zone():
     assert_equals(hz.trop_hosted_zone.Name, domain)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_add_record_sets():
     """
     Tests the addition of record sets with various configurations.
