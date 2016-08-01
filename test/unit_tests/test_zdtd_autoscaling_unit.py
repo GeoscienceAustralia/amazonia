@@ -2,7 +2,7 @@ from nose.tools import *
 from troposphere import ec2, Ref, Template
 
 from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.zdtd_autoscaling_unit import ZdtdAutoscalingUnit
+from amazonia.classes.zd_autoscaling_unit import ZdtdAutoscalingUnit
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
