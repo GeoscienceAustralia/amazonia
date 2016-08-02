@@ -57,6 +57,7 @@ runcmd:
         jump_instance_type=instance_type,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
+        iam_instance_profile_arn=None,
         home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         stack_hosted_zone_name=None,
@@ -78,6 +79,7 @@ runcmd:
                             'elb_log_bucket': None,
                             'userdata': userdata1,
                             'public_unit': True,
+                            'hdd_size': None,
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
                             'protocols': ['HTTP'],
@@ -97,6 +99,7 @@ runcmd:
                             'elb_log_bucket': None,
                             'userdata': userdata2,
                             'public_unit': True,
+                            'hdd_size': None,
                             'dependencies': []}
                            ],
         database_units=[{'unit_title': 'db1',
