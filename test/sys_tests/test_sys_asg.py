@@ -4,6 +4,8 @@ import troposphere.elasticloadbalancing as elb
 from troposphere import ec2, Ref, Template
 
 from amazonia.classes.asg import Asg
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.network_config import NetworkConfig
 
 
 def main():
@@ -48,15 +50,22 @@ runcmd:
                                                            Scheme='internet-facing',
                                                            Subnets=[Ref(subnet) for subnet in subnets]))
 
-    Asg(title='simple',
+    network_config = NetworkConfig(
+        vpc=vpc,
+        private_subnets=subnets,
+        public_subnets=None,
+        jump=None,
+        nat=None,
+        public_cidr=None,
+        unit_hosted_zone_name=None
+    )
+
+    asg_config = AsgConfig(
         keypair='pipeline',
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
-        vpc=vpc,
-        subnets=subnets,
         minsize=1,
         maxsize=1,
-        load_balancers=[load_balancer],
         userdata=userdata,
         health_check_grace_period=300,
         health_check_type='ELB',
@@ -67,7 +76,14 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        template=template
+        hdd_size=None
+    )
+
+    Asg(title='simple',
+        network_config=network_config,
+        load_balancers=[load_balancer],
+        template=template,
+        asg_config=asg_config
         )
 
     print(template.to_json(indent=2, separators=(',', ': ')))

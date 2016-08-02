@@ -38,7 +38,7 @@ def setup_resources():
                                                         SubnetId='subnet-12345')],
         SourceDestCheck=True,
         DependsOn='igw-12345'
-        ))
+    ))
 
     my_elb = template.add_resource(elb.LoadBalancer('myLoadBalancer',
                                                     CrossZone=True,

@@ -3,6 +3,8 @@
 from troposphere import ec2, Ref, Tags, Template
 
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.database_config import DatabaseConfig
 
 
 def main():
@@ -18,40 +20,50 @@ def main():
                                                                         VpcId=Ref(vpc)))
     gateway_attachment.DependsOn = internet_gateway.title
 
-    public_subnets = [template.add_resource(ec2.Subnet('MyPubSub1',
-                                                       AvailabilityZone='ap-southeast-2a',
-                                                       VpcId=Ref(vpc),
-                                                       CidrBlock='10.0.1.0/24')),
-                      template.add_resource(ec2.Subnet('MyPubSub2',
-                                                       AvailabilityZone='ap-southeast-2b',
-                                                       VpcId=Ref(vpc),
-                                                       CidrBlock='10.0.2.0/24')),
-                      template.add_resource(ec2.Subnet('MyPubSub3',
-                                                       AvailabilityZone='ap-southeast-2c',
-                                                       VpcId=Ref(vpc),
-                                                       CidrBlock='10.0.3.0/24'))]
+    private_subnets = [template.add_resource(ec2.Subnet('MyPubSub1',
+                                                        AvailabilityZone='ap-southeast-2a',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.1.0/24')),
+                       template.add_resource(ec2.Subnet('MyPubSub2',
+                                                        AvailabilityZone='ap-southeast-2b',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.2.0/24')),
+                       template.add_resource(ec2.Subnet('MyPubSub3',
+                                                        AvailabilityZone='ap-southeast-2c',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.3.0/24'))]
+
+    network_config = NetworkConfig(
+        public_subnets=None,
+        vpc=vpc,
+        private_subnets=private_subnets,
+        jump=None,
+        nat=None,
+        public_cidr=None,
+        unit_hosted_zone_name=None
+    )
+
+    database_config = DatabaseConfig(
+        db_instance_type='db.m1.small',
+        db_engine='postgres',
+        db_port='5432',
+        db_name='myDb',
+        db_hdd_size=5,
+        db_snapshot_id=None
+    )
 
     DatabaseUnit(unit_title='MyDb',
-                 subnets=public_subnets,
-                 vpc=vpc,
+                 network_config=network_config,
                  template=template,
-                 db_instance_type='db.m1.small',
-                 db_engine='postgres',
-                 db_port='5432',
-                 db_name='myDb',
-                 db_hdd_size=5,
-                 db_snapshot_id=None
+                 database_config=database_config
                  )
+
+    database_config.db_snapshot_id = 'ss123456785v00'
+
     DatabaseUnit(unit_title='MyDb2',
-                 subnets=public_subnets,
-                 vpc=vpc,
+                 network_config=network_config,
                  template=template,
-                 db_instance_type='db.m1.small',
-                 db_engine='postgres',
-                 db_port='5432',
-                 db_name='myDb',
-                 db_hdd_size=5,
-                 db_snapshot_id='ss123456785v00'
+                 database_config=database_config
                  )
 
     print(template.to_json(indent=2, separators=(',', ': ')))

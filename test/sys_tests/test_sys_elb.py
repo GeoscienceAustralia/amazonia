@@ -3,6 +3,9 @@
 from troposphere import ec2, Ref, Tags, Template, route53
 
 from amazonia.classes.elb import Elb
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.elb_config import ElbConfig
 
 
 def main():
@@ -37,19 +40,38 @@ def main():
                                                        AvailabilityZone='ap-southeast-2c',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.3.0/24'))]
+    nat = SingleInstance(title='Nat',
+                         keypair='pipeline',
+                         si_image_id='ami-53371f30',
+                         si_instance_type='t2.nano',
+                         vpc=vpc,
+                         subnet=public_subnets[0],
+                         template=template,
+                         instance_dependencies=vpc.title)
 
-    Elb(title='MyUnit',
+    network_config = NetworkConfig(
+        vpc=vpc,
+        public_subnets=public_subnets,
+        unit_hosted_zone_name=hosted_zone.Name,
+        private_subnets=None,
+        jump=None,
+        nat=nat,
+        public_cidr=None
+    )
+    elb_config = ElbConfig(
         instanceports=['80'],
         loadbalancerports=['80'],
-        subnets=public_subnets,
         protocols=['HTTP'],
-        vpc=vpc,
-        hosted_zone_name=hosted_zone.Name,
         path2ping='/index.html',
-        template=template,
-        gateway_attachment=gateway_attachment,
         elb_log_bucket='my-s3-bucket',
-        public_unit=False)
+        public_unit=True
+    )
+
+    Elb(title='MyUnit',
+        network_config=network_config,
+        elb_config=elb_config,
+        template=template
+        )
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
