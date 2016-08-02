@@ -14,7 +14,7 @@ from amazonia.classes.database_config import DatabaseConfig
 class Stack(object):
     def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, autoscaling_units,
-                 database_units, stack_hosted_zone_name, iam_instance_profile_arn):
+                 database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_alerting):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -39,7 +39,10 @@ class Stack(object):
         :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
         sets in.
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
+        :param owner_emails: a list of emails for owners of this stack. Used for alerting.
+        :param nat_alerting: True/False for whether or not to alert on the nat instance status.
         """
+
         super(Stack, self).__init__()
         self.title = stack_title
         self.template = Template()
@@ -121,7 +124,9 @@ class Stack(object):
             template=self.template,
             hosted_zone_name=self.hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
-            iam_instance_profile_arn=self.iam_instance_profile_arn
+            iam_instance_profile_arn=self.iam_instance_profile_arn,
+            alert_emails=owner_emails,
+            alert=nat_alerting
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
@@ -137,7 +142,9 @@ class Stack(object):
             template=self.template,
             is_nat=True,
             instance_dependencies=self.gateway_attachment.title,
-            iam_instance_profile_arn=self.iam_instance_profile_arn
+            iam_instance_profile_arn=self.iam_instance_profile_arn,
+            alert_emails=owner_emails,
+            alert=nat_alerting
         )
 
         # Add Routes

@@ -33,7 +33,9 @@ def setup_resources():
                          vpc=vpc,
                          subnet=public_subnets[0],
                          template=template,
-                         instance_dependencies=vpc.title)
+                         instance_dependencies=vpc.title,
+                         alert=False,
+                         alert_emails=['some@email.com'])
     jump = SingleInstance(title='Jump',
                           keypair='pipeline',
                           si_image_id='ami-dc361ebf',
@@ -41,7 +43,9 @@ def setup_resources():
                           vpc=vpc,
                           subnet=public_subnets[0],
                           template=template,
-                          instance_dependencies=vpc.title)
+                          instance_dependencies=vpc.title,
+                          alert=False,
+                          alert_emails=['some@email.com'])
 
     network_config = NetworkConfig(
         vpc=vpc,

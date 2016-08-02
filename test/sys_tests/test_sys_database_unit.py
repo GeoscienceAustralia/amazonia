@@ -44,7 +44,7 @@ def main():
     )
 
     database_config = DatabaseConfig(
-        db_instance_type='db.m1.small',
+        db_instance_type='db.t2.micro',
         db_engine='postgres',
         db_port='5432',
         db_name='myDb',
@@ -58,7 +58,7 @@ def main():
                  database_config=database_config
                  )
 
-    database_config.db_snapshot_id = 'ss123456785v00'
+    database_config.db_snapshot_id = 'amazonia-verbose-snapshot'
 
     DatabaseUnit(unit_title='MyDb2',
                  network_config=network_config,

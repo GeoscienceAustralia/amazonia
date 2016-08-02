@@ -5,7 +5,7 @@ from amazonia.classes.stack import Stack, DuplicateUnitNameError
 
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = path2ping = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
-    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = None
+    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = None
 availability_zones = []
 home_cidrs = []
 instanceports = []
@@ -17,7 +17,7 @@ def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, db_hdd_size
+        db_engine, db_port, db_hdd_size, owner_emails, nat_alerting
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -46,6 +46,8 @@ runcmd:
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
+    owner_emails=['some@email.com']
+    nat_alerting=False
 
     db_instance_type = 'db.m1.small'
     db_engine = 'postgres'
@@ -118,6 +120,8 @@ def test_duplicate_unit_names():
         'nat_instance_type': instance_type,
         'stack_hosted_zone_name': None,
         'iam_instance_profile_arn': None,
+        'owner_emails': owner_emails,
+        'nat_alerting': nat_alerting,
         'autoscaling_units': [{'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -176,6 +180,8 @@ def test_duplicate_unit_names():
         'autoscaling_units': [],
         'stack_hosted_zone_name': None,
         'iam_instance_profile_arn': None,
+        'owner_emails': owner_emails,
+        'nat_alerting': nat_alerting,
         'database_units': [{'unit_title': 'db1',
                             'db_instance_type': db_instance_type,
                             'db_engine': db_engine,
@@ -206,6 +212,8 @@ def test_duplicate_unit_names():
         'nat_instance_type': instance_type,
         'stack_hosted_zone_name': None,
         'iam_instance_profile_arn': None,
+        'owner_emails': owner_emails,
+        'nat_alerting': nat_alerting,
         'autoscaling_units': [{'unit_title': 'app1',
                                'protocols': protocols,
                                'instanceports': instanceports,
@@ -245,7 +253,7 @@ def create_stack(stack_title):
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port
+        db_engine, db_port, owner_emails, nat_alerting
     stack = Stack(
         stack_title=stack_title,
         code_deploy_service_role=code_deploy_service_role,
@@ -260,6 +268,8 @@ def create_stack(stack_title):
         nat_instance_type=instance_type,
         stack_hosted_zone_name=None,
         iam_instance_profile_arn=None,
+        owner_emails=owner_emails,
+        nat_alerting=nat_alerting,
         autoscaling_units=[{'unit_title': 'app1',
                             'protocols': protocols,
                             'instanceports': instanceports,

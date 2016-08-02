@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from nose.tools import *
 from troposphere import ec2, Ref, Tags, Template
 from amazonia.classes.database_config import DatabaseConfig
@@ -12,6 +10,7 @@ template = network_config = database_config = None
 def setup_resources():
     """ Setup global variables between tests"""
     global template, network_config, database_config
+
     template = Template()
     vpc = template.add_resource(ec2.VPC('MyVPC',
                                         CidrBlock='10.0.0.0/16'))
@@ -46,7 +45,7 @@ def setup_resources():
     )
 
     database_config = DatabaseConfig(
-        db_instance_type='db.m1.small',
+        db_instance_type='db.t2.micro',
         db_engine='postgres',
         db_port='5432',
         db_name='MyDb',
@@ -66,7 +65,8 @@ def test_database():
                       database_config=database_config
                       )
 
-    assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
+
+    assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
     assert_equals(db.trop_db.DBName, 'MyDb')
@@ -83,16 +83,18 @@ def test_databse_snapshot():
         """
     global network_config, database_config, template
     database_config.db_snapshot_id = 'ss123456789v00-final-snapshot'
+
     db = DatabaseUnit(unit_title='MyDb',
                       network_config=network_config,
                       template=template,
                       database_config=database_config
                       )
 
-    assert_equals(db.trop_db.DBInstanceClass, 'db.m1.small')
+
+    assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')
     assert_equals(db.trop_db.Port, '5432')
-    assert_equals(db.trop_db.DBName, 'MyDb')
+    assert_equals(db.trop_db.DBName, '')
     assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 0)
     assert_equals(db.trop_db.AllocatedStorage, 5)

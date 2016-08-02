@@ -51,7 +51,7 @@ class DatabaseUnit(SecurityEnabledObject):
             rds_params['MasterUserPassword'] = Ref(self.password)
         else:
             rds_params['DBSnapshotIdentifier'] = database_config.db_snapshot_id
-
+            rds_params['DBName'] = ''
         self.trop_db = template.add_resource(rds.DBInstance(self.title, **rds_params))
 
         self.template.add_output(Output(

@@ -19,7 +19,8 @@ class HostedZone(object):
         self.trop_hosted_zone = self.create_hosted_zone(title, domain, vpcs)
         self.recordsets = []
 
-    def add_vpc(self, vpc):
+    @staticmethod
+    def add_vpc(vpc):
         """
         Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
         AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone-hostedzonevpcs.html

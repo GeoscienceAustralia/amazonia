@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.40] - 29/07/2016
+- Updated DB unit tests with working instance type, fixed styling issues
+- Added Angelo Pace to .pullapprove.yml
+
+## [1.0.38] - 27/07/2016
+- Added Cloudwatch alarm option for NAT instances
+- Added 'add_subscription' and 'add_alarm' function to SNS class
+- Updated code to fix some QA issues raised by sonarqube
+- Corrected database yaml values so that defaults can be correctly overridden (or left out) as expected
+- Added James Kingsmill to .pullapprove.yml
+
 ## [1.0.34] - 21/07/2016
 - Updated Credstash System tests
 - Created tests for '-1' port in security enabled object.
