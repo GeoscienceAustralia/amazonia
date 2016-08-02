@@ -7,6 +7,7 @@ from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 
 def main():
@@ -44,23 +45,30 @@ runcmd:
                                                        AvailabilityZone='ap-southeast-2a',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.2.0/24'))]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=internet_gateway.title,
+        alert=None,
+        alert_emails=None,
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        is_nat=True
+    )
     nat = SingleInstance(title='nat',
-                         keypair='pipeline',
-                         si_image_id='ami-53371f30',
-                         si_instance_type='t2.nano',
-                         vpc=vpc,
-                         subnet=public_subnets[0],
                          template=template,
-                         instance_dependencies=internet_gateway.title)
+                         single_instance_config=single_instance_config
+                         )
+
+    single_instance_config.si_image_id = 'ami-dc361ebf'
+    single_instance_config.is_nat = False
 
     jump = SingleInstance(title='jump',
-                          keypair='pipeline',
-                          si_image_id='ami-dc361ebf',
-                          si_instance_type='t2.nano',
-                          vpc=vpc,
-                          subnet=public_subnets[0],
                           template=template,
-                          instance_dependencies=internet_gateway.title)
+                          single_instance_config=single_instance_config)
 
     service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
@@ -97,7 +105,6 @@ runcmd:
         sns_notification_types=None,
         hdd_size=None
     )
-
 
     unit1 = AutoscalingUnit(
         unit_title='app1',

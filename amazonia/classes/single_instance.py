@@ -2,35 +2,25 @@
 #  pylint: disable=line-too-long
 
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53, Base64
+
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
 from amazonia.classes.sns import SNS
 
 
 class SingleInstance(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, keypair, si_image_id, si_instance_type, subnet, instance_dependencies,
-                 alert_emails, alert, iam_instance_profile_arn=None, is_nat=False, hosted_zone_name=None):
+    def __init__(self, title, template, single_instance_config):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         Create a singleton instance such as a nat or a jumphost
         :param title: Title of instance e.g 'nat1', 'nat2' or 'jump1'
-        :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
         :param template: The template to add the SingleInstance object to.
-        :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
-        :param si_image_id: AWS ami id to create instance from, e.g. 'ami-12345'
-        :param si_instance_type: Instance type for single instance e.g. 't2.micro' or 't2.nano'
-        :param subnet: Troposhere object for subnet created e.g. 'sub_pub1'
-        :param is_nat: a boolean that is used to determine if the instance will be a NAT or not. Default: False
-        :param hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
-        :param instance_dependencies: a list of dependencies to wait for before creating the single instance.
-        :param iam_instance_profile_arn: the ARN for an IAM profile that enables cloudwatch logging.
-        :param alert_emails: a list of email addresses to send alerts to if the instance fails the AWS status checks.
-        :param alert: a boolean to specify wether or not to alert to alert_emails or not.
+        :param single_instance_config: object containing variables specific to single instance configuration
         """
 
-        super(SingleInstance, self).__init__(vpc=vpc, title=title, template=template)
+        super(SingleInstance, self).__init__(vpc=single_instance_config.vpc, title=title, template=template)
 
-        region = subnet.AvailabilityZone[:-1]
+        region = single_instance_config.subnet.AvailabilityZone[:-1]
         userdata = """#cloud-config
 # Capture all cloud-config output into a more readable logfile
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
@@ -67,33 +57,33 @@ runcmd:
 """
 
         self.single = self.template.add_resource(
-                           ec2.Instance(
-                               title,
-                               KeyName=keypair,
-                               ImageId=si_image_id,
-                               InstanceType=si_instance_type,
-                               NetworkInterfaces=[ec2.NetworkInterfaceProperty(
-                                   GroupSet=[Ref(self.security_group)],
-                                   AssociatePublicIpAddress=True,
-                                   DeviceIndex='0',
-                                   DeleteOnTermination=True,
-                                   SubnetId=Ref(subnet),
-                               )],
-                               # The below boolean determines whether source/destination checking is enabled on the
-                               # instance. This needs to be false to enable NAT functionality from the instance, or
-                               # true otherwise. For more info check the below:
-                               # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
-                               SourceDestCheck=False if is_nat else True,
-                               Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
-                               DependsOn=instance_dependencies,
-                               UserData=Base64(userdata)
-                               ))
+            ec2.Instance(
+                title,
+                KeyName=single_instance_config.keypair,
+                ImageId=single_instance_config.si_image_id,
+                InstanceType=single_instance_config.si_instance_type,
+                NetworkInterfaces=[ec2.NetworkInterfaceProperty(
+                    GroupSet=[Ref(self.security_group)],
+                    AssociatePublicIpAddress=True,
+                    DeviceIndex='0',
+                    DeleteOnTermination=True,
+                    SubnetId=Ref(single_instance_config.subnet),
+                )],
+                # The below boolean determines whether source/destination checking is enabled on the
+                # instance. This needs to be false to enable NAT functionality from the instance, or
+                # true otherwise. For more info check the below:
+                # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
+                SourceDestCheck=False if single_instance_config.is_nat else True,
+                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
+                DependsOn=single_instance_config.instance_dependencies,
+                UserData=Base64(userdata)
+            ))
 
-        if is_nat and alert and alert_emails:
+        if single_instance_config.is_nat and single_instance_config.alert and single_instance_config.alert_emails:
             snsname = title + 'topic'
             self.topic = SNS(title, self.template, snsname)
 
-            for email in alert_emails:
+            for email in single_instance_config.alert_emails:
                 self.topic.add_subscription(email, 'email')
 
             metric = 'CPUUtilization'
@@ -105,43 +95,43 @@ runcmd:
                 instance=self.single
             )
 
-        if iam_instance_profile_arn:
-            self.single.IamInstanceProfile = iam_instance_profile_arn.split('/')[1]
+        if single_instance_config.iam_instance_profile_arn:
+            self.single.IamInstanceProfile = single_instance_config.iam_instance_profile_arn.split('/')[1]
 
         if self.single.SourceDestCheck == 'true':
-            self.si_output(nat=False, subnet=subnet)
+            self.si_output(nat=False, subnet=single_instance_config.subnet)
         else:
-            self.si_output(nat=True, subnet=subnet)
+            self.si_output(nat=True, subnet=single_instance_config.subnet)
 
-        if hosted_zone_name:
-
+        if single_instance_config.hosted_zone_name:
             # Give the instance an Elastic IP Address
             self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
-                DependsOn=instance_dependencies,
+                DependsOn=single_instance_config.instance_dependencies,
                 Domain='vpc',
                 InstanceId=Ref(self.single)
-                ))
+            ))
 
             # Create a Route53 Record Set for the instances Elastic IP address.
 
             self.si_r53 = self.template.add_resource(route53.RecordSetType(
                 self.single.title + 'R53',
-                HostedZoneName=hosted_zone_name,
+                HostedZoneName=single_instance_config.hosted_zone_name,
                 Comment='DNS Record for {0}'.format(self.single.title),
-                Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.', hosted_zone_name]),
+                Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.',
+                               single_instance_config.hosted_zone_name]),
                 ResourceRecords=[Ref(self.eip_address)],
                 Type='A',
                 TTL='300',
-                DependsOn=instance_dependencies
+                DependsOn=single_instance_config.instance_dependencies
             ))
 
             # Create an output for the Record Set that has been created.
 
             self.template.add_output(Output(
-                 self.single.title + 'URL',
-                 Description='URL of the jump host {0}'.format(self.single.title),
-                 Value=self.si_r53.Name
+                self.single.title + 'URL',
+                Description='URL of the jump host {0}'.format(self.single.title),
+                Value=self.si_r53.Name
             ))
 
     def si_output(self, nat, subnet):
@@ -158,16 +148,16 @@ runcmd:
             net_interface = 'PublicIp'
 
         self.template.add_output(
-             Output(
-                 self.single.title,
-                 Description='{0} address of {1} single instance'.format(net_interface, self.single.title),
-                 Value=Join(' ', ['{0} {1} address'.format(self.single.title, net_interface),
-                                  GetAtt(self.single, net_interface),
-                                  'on subnet',
-                                  Ref(subnet)
-                                  ]
-                            )
-                 ))
+            Output(
+                self.single.title,
+                Description='{0} address of {1} single instance'.format(net_interface, self.single.title),
+                Value=Join(' ', ['{0} {1} address'.format(self.single.title, net_interface),
+                                 GetAtt(self.single, net_interface),
+                                 'on subnet',
+                                 Ref(subnet)
+                                 ]
+                           )
+            ))
 
-    # TODO Sys Tests: Connect from jumphost to subpub1 instance, subpub2 instance, can't connect on port 80,8080,443
-    # TODO Sys Tests: Try connecting to host in another vpc
+        # TODO Sys Tests: Connect from jumphost to subpub1 instance, subpub2 instance, can't connect on port 80,8080,443
+        # TODO Sys Tests: Try connecting to host in another vpc

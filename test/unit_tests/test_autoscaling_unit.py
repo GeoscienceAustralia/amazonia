@@ -6,6 +6,7 @@ from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 template = network_config = elb_config = asg_config = None
 
@@ -26,26 +27,29 @@ def setup_resources():
                                  AvailabilityZone='ap-southeast-2a',
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=vpc.title,
+        alert=False,
+        alert_emails=['some@email.com'],
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        is_nat=True
+    )
     nat = SingleInstance(title='Nat',
-                         keypair='pipeline',
-                         si_image_id='ami-53371f30',
-                         si_instance_type='t2.nano',
-                         vpc=vpc,
-                         subnet=public_subnets[0],
                          template=template,
-                         instance_dependencies=vpc.title,
-                         alert=False,
-                         alert_emails=['some@email.com'])
+                         single_instance_config=single_instance_config
+                         )
+    single_instance_config.is_nat = False
+    single_instance_config.si_image_id = 'ami-dc361ebf'
     jump = SingleInstance(title='Jump',
-                          keypair='pipeline',
-                          si_image_id='ami-dc361ebf',
-                          si_instance_type='t2.nano',
-                          vpc=vpc,
-                          subnet=public_subnets[0],
                           template=template,
-                          instance_dependencies=vpc.title,
-                          alert=False,
-                          alert_emails=['some@email.com'])
+                          single_instance_config=single_instance_config
+                          )
 
     network_config = NetworkConfig(
         vpc=vpc,

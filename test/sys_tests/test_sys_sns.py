@@ -10,10 +10,10 @@ def main():
 
     vpc = template.add_resource(ec2.VPC('MyVPC', CidrBlock='10.0.0.0/16'))
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway'))
-    gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
-                                                                        InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc),
-                                                                        DependsOn=internet_gateway.title))
+    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
+                                                   InternetGatewayId=Ref(internet_gateway),
+                                                   VpcId=Ref(vpc),
+                                                   DependsOn=internet_gateway.title))
     security_group = template.add_resource(ec2.SecurityGroup('mySecGroup',
                                                              GroupDescription='Security group',
                                                              VpcId=Ref(vpc),
@@ -24,7 +24,7 @@ def main():
                                               VpcId=Ref(vpc),
                                               CidrBlock='10.0.1.0/24'))
 
-    myinstance = template.add_resource(ec2.Instance(
+    template.add_resource(ec2.Instance(
         'myinstance',
         KeyName='INSERT_YOUR_KEYPAIR_HERE',
         ImageId='ami-dc361ebf',
@@ -34,14 +34,14 @@ def main():
             AssociatePublicIpAddress=True,
             DeviceIndex='0',
             DeleteOnTermination=True,
-            SubnetId=Ref(subnets))],
+            SubnetId=Ref(subnet))],
         SourceDestCheck=True,
         DependsOn=internet_gateway.title
-        ))
+    ))
 
-    mysns = SNS(unit_title='test',
-                template=template,
-                display_name='display_name')
+    SNS(unit_title='test',
+        template=template,
+        display_name='display_name')
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

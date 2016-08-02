@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 from nose.tools import *
-from troposphere import Template, ec2, Ref, Join
+from troposphere import Template, ec2, Ref
+
 from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 
 def test_nat_single_instance():
@@ -55,7 +57,7 @@ def test_jump_with_hostedzone_creates_r53_record():
         assert_equals(sio, si.si_r53.Name)
 
 
-def test_nat_with_SNS_topic():
+def test_nat_with_sns_topic():
     """
     Tests that creating a NAT and supplying a True value to 'alert' and at least one email in a list to alert_emails
     will create an SNS topic
@@ -70,7 +72,7 @@ def test_nat_with_SNS_topic():
     assert_equals(type(si.template.outputs[title + 'sns'].Description), type(str(None)))
 
 
-def test_nat_with_SNS_subscription():
+def test_nat_with_sns_subscription():
     """
     Tests that creating a NAT and supplying a True value to 'alert' and at least one email in a list to alert_emails
     will create an SNS subscription
@@ -85,7 +87,7 @@ def test_nat_with_SNS_subscription():
     assert_equals(si.topic.sns_topic.Subscription[0].Protocol, 'email')
 
 
-def test_nat_with_SNS_alarm():
+def test_nat_with_sns_alarm():
     """
     Tests that creating a NAT and supplying a True value to 'alert' and at least one email in a list to alert_emails
     will create a cloudwatch alarm
@@ -114,6 +116,8 @@ def create_si(title, is_nat=False, alert=False, alert_emails=None):
     Helper function to create Single instance Troposhpere object to interate through.
     :param title: name of instance
     :param is_nat: is the instance a nat
+    :param alert: is SNS alerts enabled for this single instance
+    :param alert_emails list of emails to contact for SNS
     :return: Troposphere object for single instance, security group and output
     """
     vpc = 'vpc-12345'
@@ -124,17 +128,21 @@ def create_si(title, is_nat=False, alert=False, alert_emails=None):
                                               AvailabilityZone='ap-southeast-2a',
                                               VpcId=vpc,
                                               CidrBlock='10.0.1.0/24'))
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=subnet,
+        hosted_zone_name=hosted_zone_name,
+        instance_dependencies=dependencies,
+        is_nat=is_nat,
+        iam_instance_profile_arn='my/instance-profile',
+        alert=alert,
+        alert_emails=alert_emails
+    )
     si = SingleInstance(title=title,
-                        keypair='pipeline',
-                        si_image_id='ami-53371f30',
-                        si_instance_type='t2.nano',
-                        vpc=vpc,
-                        subnet=subnet,
-                        hosted_zone_name=hosted_zone_name,
-                        instance_dependencies=dependencies,
                         template=template,
-                        is_nat=is_nat,
-                        iam_instance_profile_arn='my/instance-profile',
-                        alert=alert,
-                        alert_emails=alert_emails)
+                        single_instance_config=single_instance_config
+                        )
     return si

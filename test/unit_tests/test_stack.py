@@ -46,8 +46,8 @@ runcmd:
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
-    owner_emails=['some@email.com']
-    nat_alerting=False
+    owner_emails = ['some@email.com']
+    nat_alerting = False
 
     db_instance_type = 'db.m1.small'
     db_engine = 'postgres'

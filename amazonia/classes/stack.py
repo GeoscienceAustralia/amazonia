@@ -5,6 +5,7 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.asg_config import AsgConfig
@@ -113,38 +114,48 @@ class Stack(object):
                                               cidr=self.generate_subnet_cidr(is_public=True)
                                               ).trop_subnet)
 
-        # Add Jumpbox and NAT and associated security group ingress and egress rules
-        self.jump = SingleInstance(
-            title=self.title + 'Jump',
+        jump_config = SingleInstanceConfig(
             keypair=self.keypair,
             si_image_id=jump_image_id,
             si_instance_type=jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template,
             hosted_zone_name=self.hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
             alert_emails=owner_emails,
-            alert=nat_alerting
+            alert=nat_alerting,
+            is_nat=False
+        )
+
+        # Add Jumpbox and NAT and associated security group ingress and egress rules
+        self.jump = SingleInstance(
+            title=self.title + 'Jump',
+            template=self.template,
+            single_instance_config=jump_config
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
         self.jump.add_egress(receiver=self.public_cidr, port='-1')
 
-        self.nat = SingleInstance(
-            title=self.title + 'Nat',
+        nat_config = SingleInstanceConfig(
             keypair=self.keypair,
             si_image_id=nat_image_id,
             si_instance_type=nat_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template,
             is_nat=True,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
             alert_emails=owner_emails,
-            alert=nat_alerting
+            alert=nat_alerting,
+            hosted_zone_name=None
+        )
+
+        self.nat = SingleInstance(
+            title=self.title + 'Nat',
+            template=self.template,
+            single_instance_config=nat_config
         )
 
         # Add Routes

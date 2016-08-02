@@ -4,6 +4,7 @@ from troposphere import ec2, Ref, Template, Join, Tags
 
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.zd_autoscaling_unit import ZdtdAutoscalingUnit
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
@@ -44,23 +45,28 @@ runcmd:
                                                        AvailabilityZone='ap-southeast-2a',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.2.0/24'))]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=internet_gateway.title,
+        is_nat=True,
+        alert=None,
+        alert_emails=None,
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None
+    )
     nat = SingleInstance(title='nat',
-                         keypair='pipeline',
-                         si_image_id='ami-53371f30',
-                         si_instance_type='t2.nano',
-                         vpc=vpc,
-                         subnet=public_subnets[0],
                          template=template,
-                         instance_dependencies=internet_gateway.title)
-
+                         single_instance_config=single_instance_config
+                         )
+    single_instance_config.si_image_id = 'ami-dc361ebf'
+    single_instance_config.is_nat = False
     jump = SingleInstance(title='jump',
-                          keypair='pipeline',
-                          si_image_id='ami-dc361ebf',
-                          si_instance_type='t2.nano',
-                          vpc=vpc,
-                          subnet=public_subnets[0],
                           template=template,
-                          instance_dependencies=internet_gateway.title)
+                          single_instance_config=single_instance_config)
 
     cd_service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
@@ -127,7 +133,7 @@ runcmd:
         green_asg_config=green_asg_config
     )
 
-    unit3 = ZdtdAutoscalingUnit(
+    ZdtdAutoscalingUnit(
         unit_title='app3',
         template=template,
         zdtd_state='both',
@@ -141,6 +147,7 @@ runcmd:
 
     unit1.add_unit_flow(unit2)
     print(template.to_json(indent=2, separators=(',', ': ')))
+
 
 if __name__ == '__main__':
     main()
