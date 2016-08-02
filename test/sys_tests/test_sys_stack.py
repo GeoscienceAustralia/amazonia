@@ -58,6 +58,8 @@ runcmd:
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
         iam_instance_profile_arn=None,
+        nat_alerting=False,
+        owner_emails=None,
         home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         stack_hosted_zone_name=None,
