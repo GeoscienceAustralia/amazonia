@@ -1,5 +1,5 @@
 class NetworkConfig(object):
-    def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, unit_hosted_zone_name):
+    def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, stack_hosted_zone_name):
         """
         Simple config class to contain networking related parameters
         :param public_cidr: Public cidr pattern
@@ -8,7 +8,7 @@ class NetworkConfig(object):
         :param private_subnets: subnets to autoscale instances in
         :param nat: nat instance for outbound traffic
         :param jump: jump instance for inbound ssh
-        :param unit_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
+        :param stack_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
         """
         self.public_cidr = public_cidr
         self.vpc = vpc
@@ -16,4 +16,4 @@ class NetworkConfig(object):
         self.private_subnets = private_subnets
         self.nat = nat
         self.jump = jump
-        self.unit_hosted_zone_name = unit_hosted_zone_name
+        self.stack_hosted_zone_name = stack_hosted_zone_name

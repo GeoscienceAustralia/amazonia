@@ -5,8 +5,8 @@ from amazonia.classes.asg import Asg
 from amazonia.classes.elb import Elb
 
 
-class ZdtdAutoscalingUnit(object):
-    def __init__(self, unit_title, template, dependencies, zdtd_state, network_config, elb_config, common_asg_config,
+class ZdAutoscalingUnit(object):
+    def __init__(self, unit_title, template, dependencies, zd_state, network_config, elb_config, common_asg_config,
                  blue_asg_config, green_asg_config):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
@@ -14,7 +14,7 @@ class ZdtdAutoscalingUnit(object):
          'MyStackApi2' or 'MyStackDataprocessing'
         :param template: Troposphere template to append resources to
         :param dependencies: list of unit names this unit needs access to
-        :param zdtd_state: blue, green, both
+        :param zd_state: blue, green, both
         :param network_config: network related paramters including subnet, nat, jump, etc
         :param elb_config: shared elb configuration
         :param common_asg_config: default asg configuration
@@ -36,19 +36,19 @@ class ZdtdAutoscalingUnit(object):
             network_config=network_config,
             elb_config=elb_config
         )
-        if zdtd_state not in ['blue', 'green', 'both']:
+        if zd_state not in ['blue', 'green', 'both']:
             raise InvalidZDTDStateError('zdtd_state must be blue, green or both')
 
         blue_load_balancers = []
         green_load_balancers = []
 
-        if zdtd_state == 'blue':
+        if zd_state == 'blue':
             blue_load_balancers.append(self.prod_elb.trop_elb)
             green_load_balancers.append(self.test_elb.trop_elb)
-        if zdtd_state == 'green':
+        if zd_state == 'green':
             green_load_balancers.append(self.prod_elb.trop_elb)
             blue_load_balancers.append(self.test_elb.trop_elb)
-        if zdtd_state == 'both':
+        if zd_state == 'both':
             blue_load_balancers.append(self.prod_elb.trop_elb)
             blue_load_balancers.append(self.test_elb.trop_elb)
             green_load_balancers.append(self.prod_elb.trop_elb)
@@ -71,17 +71,17 @@ class ZdtdAutoscalingUnit(object):
             asg_config=green_asg_config
         )
 
-        if zdtd_state == 'blue':
+        if zd_state == 'blue':
             [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
              for instanceport in elb_config.instanceports]
             [self.test_elb.add_flow(receiver=self.green_asg, port=instanceport)
              for instanceport in elb_config.instanceports]
-        if zdtd_state == 'green':
+        if zd_state == 'green':
             [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
              for instanceport in elb_config.instanceports]
             [self.test_elb.add_flow(receiver=self.blue_asg, port=instanceport)
              for instanceport in elb_config.instanceports]
-        if zdtd_state == 'both':
+        if zd_state == 'both':
             [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
              for instanceport in elb_config.instanceports]
             [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)

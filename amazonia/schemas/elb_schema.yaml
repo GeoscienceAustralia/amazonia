@@ -1,0 +1,29 @@
+protocols: # a list of strings specifying the protocols to allow access through load balancers into this specific autoscaling group.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'string'
+instanceports: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'string'
+loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'string'
+path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
+  type: 'string'
+  nullable: True
+public_unit: # a boolean value that determines the internet-facing scheme for the elb and the subnets it lives on in the asg class
+  type: 'boolean'
+  nullable: False
+  empty: False
+elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
+  type: 'string'
+  nullable: True
+unit_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for this unit
+  type: 'string'
+  nullable: True
+  empty: False

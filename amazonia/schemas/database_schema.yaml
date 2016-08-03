@@ -1,0 +1,30 @@
+unit_title: # A string containing the title of this database unit.
+  type: 'string'  # For all values in a database unit. If they are null, a matching value must be provided at
+  nullable: True  # the lowest level of the yaml structure (if database units are not also empty).
+  empty: False
+  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+db_name: # A string containing the title of this database instance.
+  type: 'string'
+  nullable: True
+  empty: False
+  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+db_instance_type: # A string containing the db type to use for this RDS instance
+  type: 'string'
+  nullable: True
+  empty: False
+db_engine: # A string containing the engine to use. Find the available types here: https://aws.amazon.com/rds/
+  type: 'string'
+  nullable: True
+  empty: False
+db_port: # A string containing the port to use for communication into the RDS instance
+  type: 'string'
+  nullable: True
+  empty: False
+db_snapshot_id: # A string with the identifier of an RDS snapshot to use to provision DB
+  type: 'string'
+  nullable: True
+db_hdd_size: # the size for the rds hard drive/allocated storage
+  type:
+    - 'number'
+    - 'string'
+  nullable: False

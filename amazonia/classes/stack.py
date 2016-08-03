@@ -5,6 +5,7 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
@@ -14,8 +15,9 @@ from amazonia.classes.database_config import DatabaseConfig
 
 class Stack(object):
     def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
-                 public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, autoscaling_units,
-                 database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_alerting):
+                 public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
+                 autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
+                 nat_alerting):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -34,6 +36,7 @@ class Stack(object):
         :param jump_instance_type: instance type for jumphost
         :param nat_image_id: AMI for nat
         :param nat_instance_type: instance type for nat
+        :param zd_autoscaling_units: list of zd_autosclaing_unit dicts
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
@@ -56,6 +59,7 @@ class Stack(object):
         self.hosted_zone_name = stack_hosted_zone_name
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
+        self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.units = {}
         self.private_subnets = []
@@ -173,7 +177,39 @@ class Stack(object):
 
         self.network_config = NetworkConfig(vpc=self.vpc, public_subnets=self.public_subnets,
                                             private_subnets=self.private_subnets, jump=self.jump, nat=self.nat,
-                                            public_cidr=self.public_cidr, unit_hosted_zone_name=self.hosted_zone_name)
+                                            public_cidr=self.public_cidr, stack_hosted_zone_name=self.hosted_zone_name)
+        # Add ZD Autoscaling Units
+        for unit in self.zd_autoscaling_units:  # type: dict
+            orig_unit_title = unit['unit_title']
+            if orig_unit_title in self.units:
+                raise DuplicateUnitNameError("Error: zd_autoscaling unit name '{0}' has already been specified, "
+                                             'it must be unique.'.format(orig_unit_title))
+            # Update unit title with stackname prefix
+            unit['unit_title'] = self.title + orig_unit_title
+            elb_config = ElbConfig(**unit['elb_config'])
+            common_asg_config = AsgConfig(keypair=self.keypair,
+                                          cd_service_role_arn=self.code_deploy_service_role,
+                                          **unit['common_asg_config']
+                                          )
+            blue_asg_config = AsgConfig(keypair=self.keypair,
+                                        cd_service_role_arn=self.code_deploy_service_role,
+                                        **unit['blue_asg_config']
+                                        )
+            green_asg_config = AsgConfig(keypair=self.keypair,
+                                         cd_service_role_arn=self.code_deploy_service_role,
+                                         **unit['green_asg_config']
+                                         )
+            self.units[orig_unit_title] = ZdAutoscalingUnit(
+                unit_title=unit['unit_title'],
+                template=self.template,
+                network_config=self.network_config,
+                elb_config=elb_config,
+                common_asg_config=common_asg_config,
+                blue_asg_config=blue_asg_config,
+                green_asg_config=green_asg_config,
+                zd_state=unit['zd_state'],
+                dependencies=unit['dependencies']
+            )
         # Add Autoscaling Units
         for unit in self.autoscaling_units:  # type: dict
             orig_unit_title = unit['unit_title']
@@ -182,25 +218,10 @@ class Stack(object):
                                              'it must be unique.'.format(orig_unit_title))
             # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
-            elb_config = ElbConfig(instanceports=unit['instanceports'],
-                                   elb_log_bucket=unit['elb_log_bucket'],
-                                   loadbalancerports=unit['loadbalancerports'],
-                                   protocols=unit['protocols'],
-                                   path2ping=unit['path2ping'],
-                                   public_unit=unit['public_unit'])
+            elb_config = ElbConfig(**unit['elb_config'])
             asg_config = AsgConfig(keypair=self.keypair,
                                    cd_service_role_arn=self.code_deploy_service_role,
-                                   health_check_grace_period=unit['health_check_grace_period'],
-                                   health_check_type=unit['health_check_type'],
-                                   iam_instance_profile_arn=unit['iam_instance_profile_arn'],
-                                   image_id=unit['image_id'],
-                                   instance_type=unit['instance_type'],
-                                   maxsize=unit['maxsize'],
-                                   minsize=unit['minsize'],
-                                   sns_notification_types=unit['sns_notification_types'],
-                                   sns_topic_arn=unit['sns_topic_arn'],
-                                   userdata=unit['userdata'],
-                                   hdd_size=unit['hdd_size']
+                                   **unit['asg_config']
                                    )
             self.units[orig_unit_title] = AutoscalingUnit(
                 unit_title=unit['unit_title'],
@@ -217,13 +238,7 @@ class Stack(object):
                 raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             unit['unit_title'] = self.title + orig_unit_title
-            database_config = DatabaseConfig(
-                db_hdd_size=unit['db_hdd_size'],
-                db_instance_type=unit['db_instance_type'],
-                db_engine=unit['db_engine'],
-                db_port=unit['db_port'],
-                db_name=unit['db_name'],
-                db_snapshot_id=unit['db_snapshot_id'])
+            database_config = DatabaseConfig( **unit['database_config'])
             self.units[orig_unit_title] = DatabaseUnit(
                 unit_title=unit['unit_title'],
                 template=self.template,
