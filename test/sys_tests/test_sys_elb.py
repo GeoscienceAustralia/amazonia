@@ -73,7 +73,8 @@ def main():
         protocols=['HTTP'],
         path2ping='/index.html',
         elb_log_bucket='my-s3-bucket',
-        public_unit=True
+        public_unit=True,
+        unit_hosted_zone_name=None
     )
 
     Elb(title='MyUnit',

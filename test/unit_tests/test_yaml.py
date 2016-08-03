@@ -88,28 +88,31 @@ def test_complete_valid_values():
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
-    assert_equals(autoscaling_unit_input['image_id'], 'ami-dc361ebf')
-    assert_equals(autoscaling_unit_input['instance_type'], 't2.micro')
-    assert_equals(autoscaling_unit_input['path2ping'], '/index.html')
-    assert_list_equal(autoscaling_unit_input['protocols'], ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['loadbalancerports'], ['80'])
-    assert_list_equal(autoscaling_unit_input['instanceports'], ['80'])
-    assert_equals(autoscaling_unit_input['minsize'], '1')
-    assert_equals(autoscaling_unit_input['maxsize'], '1')
-    assert_equals(autoscaling_unit_input['health_check_grace_period'], '300')
-    assert_equals(autoscaling_unit_input['iam_instance_profile_arn'], 'arn:aws:iam::1234567890124:role/InstanceProfile')
-    assert_equals(autoscaling_unit_input['sns_topic_arn'], 'sns_topic_arn')
-    assert_equals(autoscaling_unit_input['sns_notification_types'], ['autoscaling:EC2_INSTANCE_LAUNCH',
-                                                                     'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                                                                     'autoscaling:EC2_INSTANCE_TERMINATE',
-                                                                     'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
-    assert_equals(autoscaling_unit_input['elb_log_bucket'], 'elb_log_bucket')
-    assert_equals(autoscaling_unit_input['health_check_type'], 'ELB')
+    assert_equals(autoscaling_unit_input['asg_config']['image_id'], 'ami-dc361ebf')
+    assert_equals(autoscaling_unit_input['asg_config']['instance_type'], 't2.micro')
+    assert_equals(autoscaling_unit_input['elb_config']['path2ping'], '/index.html')
+    assert_list_equal(autoscaling_unit_input['elb_config']['protocols'], ['HTTP'])
+    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancerports'], ['80'])
+    assert_list_equal(autoscaling_unit_input['elb_config']['instanceports'], ['80'])
+    assert_equals(autoscaling_unit_input['asg_config']['minsize'], '1')
+    assert_equals(autoscaling_unit_input['asg_config']['maxsize'], '1')
+    assert_equals(autoscaling_unit_input['asg_config']['health_check_grace_period'], '300')
+    assert_equals(autoscaling_unit_input['asg_config']['iam_instance_profile_arn'],
+                  'arn:aws:iam::1234567890124:role/InstanceProfile')
+    assert_equals(autoscaling_unit_input['asg_config']['sns_topic_arn'], 'sns_topic_arn')
+    assert_equals(autoscaling_unit_input['asg_config']['sns_notification_types'],
+                  ['autoscaling:EC2_INSTANCE_LAUNCH',
+                   'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
+                   'autoscaling:EC2_INSTANCE_TERMINATE',
+                   'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
+    assert_equals(autoscaling_unit_input['elb_config']['elb_log_bucket'], 'elb_log_bucket')
+    assert_equals(autoscaling_unit_input['asg_config']['health_check_type'], 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])
-    assert_equals(autoscaling_unit_input['unit_hosted_zone_name'], 'test.org.')
+    assert_equals(autoscaling_unit_input['elb_config']['unit_hosted_zone_name'], 'test.org.')
 
     # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
-    assert_equals(stack_input['autoscaling_units'][0]['unit_hosted_zone_name'], stack_input['stack_hosted_zone_name'])
+    assert_equals(stack_input['autoscaling_units'][0]['elb_config']['unit_hosted_zone_name'],
+                  stack_input['stack_hosted_zone_name'])
 
     database_unit_input = stack_input['database_units'][0]
 
@@ -125,10 +128,10 @@ def test_complete_valid_values():
     assert_equals(len(expected_database_unit_set.difference(database_unit_input_set)), 0)
 
     assert_equals(database_unit_input['unit_title'], 'db1')
-    assert_equals(database_unit_input['db_instance_type'], 'db.m1.small')
-    assert_equals(database_unit_input['db_engine'], 'postgres')
-    assert_equals(database_unit_input['db_port'], '5432')
-    assert_equals(database_unit_input['db_name'], 'myDb')
+    assert_equals(database_unit_input['database_config']['db_instance_type'], 'db.m1.small')
+    assert_equals(database_unit_input['database_config']['db_engine'], 'postgres')
+    assert_equals(database_unit_input['database_config']['db_port'], '5432')
+    assert_equals(database_unit_input['database_config']['db_name'], 'myDb')
 
 
 @with_setup(setup_resources)

@@ -5,7 +5,9 @@ Overwrite defaults YAML with User YAML
 """
 import os
 import re
+
 import cerberus
+
 from amazonia.classes.util import read_yaml
 
 
@@ -58,7 +60,7 @@ class Yaml(object):
                       'nat_instance_type',
                       'home_cidrs',
                       'stack_hosted_zone_name',
-                      'zd_autoscaling_units'
+                      'zd_autoscaling_units',
                       'autoscaling_units',
                       'database_units',
                       'iam_instance_profile_arn',
@@ -118,49 +120,52 @@ class Yaml(object):
         Process unit input values for given unit type, validate specific fields such as title and userdata
         :param unit_type: unit type (autoscaling, database, etc)
         """
-        #        minsize = 0
-        #        maxsize = 0
+
         for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
             for unit_value in Yaml.unit_key_list[unit_type]:
-                #               if unit_value == 'unit_hosted_zone_name':
-                #                   self.united_data[unit_type][unit][unit_value] = \
-                #                       self.user_stack_data[unit_type][unit].get(unit_value,
-                #                                                                 self.united_data['stack_hosted_zone_name'])
                 if unit_value == 'database_config':
+                    user_database_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
-                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['database_config'],
+                        user_database_config, self.default_data['database_config'],
                         self.database_config_key_list)
                 elif unit_value == 'elb_config':
+                    user_elb_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
-                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['elb_config'],
+                        user_elb_config, self.default_data['elb_config'],
                         self.elb_config_key_list)
                 elif unit_value in ['asg_config', 'common_asg_config', 'blue_asg_config', 'green_asg_config']:
+                    user_asg_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
-                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['asg_config'],
+                        user_asg_config, self.default_data['asg_config'],
                         self.asg_config_key_list)
                 else:
                     self.united_data[unit_type][unit][unit_value] = \
                         self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
-                    # Validate for unecrypted aws access ids and aws secret keys
-                #                if unit_value == 'userdata' and self.united_data[unit_type][unit]['userdata'] is not None:
-                #                    self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
-                # Validate that minsize is less than maxsize
-                #                if unit_value == 'minsize':
-                #                    minsize = self.united_data[unit_type][unit][unit_value]
-                #                    maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
-                #                if minsize > maxsize:
-                #                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
-                #                                                   'larger than maxsize ({1})'.format(minsize, maxsize))
 
     def set_nested_object_values(self, nested_object_user_data, nested_object_default, nested_object_type):
         unified_object = {}
+        minsize = 0
+        maxsize = 0
         for object_key in nested_object_type:
-            unified_object[object_key] = nested_object_user_data.get(object_key, nested_object_default[object_key])
+            if object_key == 'unit_hosted_zone_name':
+                unified_object[object_key] = nested_object_user_data.get(object_key,
+                                                                         self.united_data['stack_hosted_zone_name'])
+            else:
+                unified_object[object_key] = nested_object_user_data.get(object_key, nested_object_default[object_key])
+            # Validate for unecrypted aws access ids and aws secret keys
+            if object_key == 'userdata' and unified_object['userdata'] is not None:
+                self.detect_unencrypted_access_keys(unified_object['userdata'])
+                # Validate that minsize is less than maxsize
+            if object_key == 'minsize':
+                minsize = unified_object[object_key]
+                maxsize = nested_object_user_data.get('maxsize', nested_object_default['maxsize'])
+            if minsize > maxsize:
+                raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
+                                               'larger than maxsize ({1})'.format(minsize, maxsize))
         return unified_object
 
     @staticmethod
     def validate_yaml(data, schema):
-
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):

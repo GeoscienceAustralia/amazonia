@@ -7,34 +7,36 @@ autoscaling_units:
   -
     blah: 'should not be here'
     unit_title: 'app1'
-    unit_hosted_zone_name: '.test.lan'
-    image_id: 'ami-dc361ebf'
-    instance_type: 't2.micro'
-    protocols:
-     - 'HTTP'
-    loadbalancerports:
-     - '80'
-    instanceports:
-     - '80'
-    path2ping: '/index.html'
-    minsize: '1'
-    maxsize: '1'
-    health_check_grace_period: '300'
-    iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
-    sns_topic_arn: 'sns_topic_arn'
-    sns_notification_types: 'sns_notification_types'
-    elb_log_bucket: 'elb_log_bucket'
-    health_check_type: 'ELB'
+    elb_config:
+      unit_hosted_zone_name: '.test.lan'
+      protocols:
+       - 'HTTP'
+      loadbalancerports:
+       - '80'
+      instanceports:
+       - '80'
+      path2ping: '/index.html'
+      elb_log_bucket: 'elb_log_bucket'
+    asg_config:
+      image_id: 'ami-dc361ebf'
+      instance_type: 't2.micro'
+      minsize: '1'
+      maxsize: '1'
+      health_check_grace_period: '300'
+      health_check_type: 'ELB'
+      iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
+      sns_topic_arn: 'sns_topic_arn'
+      sns_notification_types: 'sns_notification_types'
+      userdata: |
+        #cloud-config
+        repo_update: true
+        repo_upgrade: all
+
+        packages:
+         - httpd
+
+        runcmd:
+         - service httpd start
     dependencies:
      - 'app2'
      - 'db1'
-    userdata: |
-      #cloud-config
-      repo_update: true
-      repo_upgrade: all
-
-      packages:
-       - httpd
-
-      runcmd:
-       - service httpd start

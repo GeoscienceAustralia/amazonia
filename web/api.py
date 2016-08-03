@@ -20,10 +20,9 @@ def get_cloud_formation():
     text_content = request.get_data(as_text=True)
     json_content = yaml.safe_load(text_content)
     default_yaml = amz.read_yaml(os.path.join(__location__, '../amazonia/defaults.yaml'))
-    schema = amz.read_yaml(os.path.join(__location__, '../amazonia/schema.yaml'))
 
     try:
-        result = amz.generate_template(json_content, default_yaml, schema)
+        result = amz.generate_template(json_content, default_yaml)
     except ValidationError as e:
         e = str(e).replace('Errors were found in the supplied Yaml values. See below errors: \n', '')
         result = e

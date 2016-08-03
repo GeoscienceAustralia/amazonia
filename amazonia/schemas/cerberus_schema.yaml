@@ -1,3 +1,103 @@
+#
+# A guide yaml file to show which variables can be configured and the expected data types and yaml syntax.
+# For a working example, see the defaults.yaml file in the amazonia folder.
+#
+# Note that some things follow a nested structure and some are in a flat structure.
+#
+# In an applications specific yaml you would want to define variables in a nested fashion (see below example)
+#
+# autoscaling_units:
+#   -
+#     unit_title: 'app1'
+#     image_id: 'ami-some1234'
+#     instance_type: 't2.micro'
+#
+# This will create an autoscaling unit with the title app1 based on the ami ami-some1234 and of the instance type t2.micro.
+#
+# If image_id was not specified, amazonia will look at the provided defaults to find an image_id field to use.
+# In the default the yaml should have a flat structure like below (unless you always want an autoscaling unit or a
+# database unit to be created:
+#
+# unit_title: 'app2'
+# image_id: 'ami-1234some'
+# instance_type: 't2.nano'
+#
+# If the application specific yaml did not specify a unit title, image id, or instance type, amazonia would fill those
+# fields with either app2, ami-1234some, or t2.nano from the defaults depending on what was missing from the application yaml.
+#
+# PLEASE NOTE: When adding new default values to a unit level (that exists in defaults.yaml) please add to both the unit
+# scheme and to the highest level of the scheme, e.g. unit_title, public_unit
+#
+# See following list for values that can be provided.
+#
+# stack_key_list = ['stack_title',
+#                       'code_deploy_service_role',
+#                       'keypair',
+#                       'availability_zones',
+#                       'vpc_cidr',
+#                       'public_cidr',
+#                       'jump_image_id',
+#                       'jump_instance_type',
+#                       'nat_image_id',
+#                       'nat_instance_type',
+#                       'home_cidrs',
+#                       'stack_hosted_zone_name',
+#                       'autoscaling_units',
+#                       'database_units',
+#                       'iam_instance_profile_arn',
+#                       'owner_emails',
+#                       'nat_alerting']
+#     unit_key_list = {'autoscaling_units': ['unit_title',
+#                                            'userdata',
+#                                            'image_id',
+#                                            'instance_type',
+#                                            'path2ping',
+#                                            'protocols',
+#                                            'unit_hosted_zone_name',
+#                                            'loadbalancerports',
+#                                            'instanceports',
+#                                            'minsize',
+#                                            'maxsize',
+#                                            'health_check_grace_period',
+#                                            'iam_instance_profile_arn',
+#                                            'sns_topic_arn',
+#                                            'sns_notification_types',
+#                                            'elb_log_bucket',
+#                                            'public_unit',
+#                                            'health_check_type',
+#                                            'dependencies',
+#                                            'hdd_size'],
+#                      'database_units': ['unit_title',
+#                                         'db_name',
+#                                         'db_instance_type',
+#                                         'db_engine',
+#                                         'db_port',
+#                                         'db_hdd_size',
+#                                         'db_snapshot_id']
+#                      }
+#
+
+unit_title:  &unit_title # A string containing the title of this autoscaling unit.
+  type: 'string'
+  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+  nullable: True
+dependencies: &dependencies # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'string'
+    nullable: True
+zd_state: &zd_state
+  type: 'string'
+  allowed:
+  - 'blue'
+  - 'green'
+  - 'both'
+iam_instance_profile_arn: &iam_instance_profile_arn # A string specifying an instance IAM role by its ARN
+  type: 'string'
+  nullable: True
+  empty: False
+
 elb_config: &elb_config
   type: 'dict'
   nullable: True
@@ -70,9 +170,7 @@ asg_config: &asg_config
     userdata: # A string containing userdata to run on this specific autoscaling group.
       type: 'string'
       nullable: True
-    iam_instance_profile_arn:  # A string specifying an instance IAM role for this specific autoscaling group by its ARN
-      type: 'string'
-      nullable: True
+    iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
     hdd_size: # the size for the hard drive of the instances on this autocaling unit
       type:
         - 'number'
@@ -174,10 +272,6 @@ stack_hosted_zone_name: # A string containing the name of the Route 53 hosted zo
   type: 'string'
   nullable: True
   empty: False
-iam_instance_profile_arn:  # A string specifying an instance IAM role by its ARN
-  type: 'string'
-  nullable: True
-  empty: False
 owner_emails:  # A list of email addresses to specify ownership of this stack and also send alerts to if
   type: 'list' # alerts have been set up.
   nullable: True
@@ -188,48 +282,29 @@ nat_alerting: # A True/False advising whether or not to alert on the NAT instanc
   type: 'boolean'
   nullable: False
   empty: False
+
 zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'
   nullable: True
   schema:
     type: 'dict'
     schema:
-      unit_title:  # A string containing the title of this autoscaling unit.
-        type: 'string'
-        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        nullable: True
-      dependencies: # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
-        type: 'list'
-        nullable: True
-        schema:
-          type: 'string'
-          nullable: True
+      unit_title:  *unit_title # A string containing the title of this autoscaling unit.
+      dependencies: *dependencies # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
+      zd_state: *zd_state
       elb_config: *elb_config #nested dictionary containing elb specific configuration
       common_asg_config: *asg_config #nested dictionary containing common asg specific configuration
       blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
       green_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
-      zd_state:
-        type: 'string'
-        allowed:
-        - 'blue'
-        - 'green'
-        - 'both'
+
 autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'
   nullable: True
   schema:
     type: 'dict'
     schema:
-      unit_title:  # A string containing the title of this autoscaling unit.
-        type: 'string'
-        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        nullable: True
-      dependencies: # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
-        type: 'list'
-        nullable: True
-        schema:
-          type: 'string'
-          nullable: True
+      unit_title: *unit_title  # A string containing the title of this autoscaling unit.
+      dependencies: *dependencies # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
       elb_config: *elb_config #nested dictionary containing elb specific configuration
       asg_config: *asg_config #nested dictionary containing asg specific configuration
 
@@ -239,8 +314,5 @@ database_units: # A list of database units to create. Security groups, Database 
   schema:
     type: 'dict'
     schema:
-      unit_title:  # A string containing the title of this autoscaling unit.
-        type: 'string'
-        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        nullable: True
+      unit_title: *unit_title # A string containing the title of this autoscaling unit.
       database_config: *database_config #nested dictionary containing database specific configuration
