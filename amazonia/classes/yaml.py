@@ -3,8 +3,10 @@
 Ingest User YAML and defaults YAML
 Overwrite defaults YAML with User YAML
 """
+import os
 import re
 import cerberus
+from amazonia.classes.util import read_yaml
 
 
 class Yaml(object):
@@ -12,6 +14,42 @@ class Yaml(object):
     Setting these as class variables rather than instance variables so that they can be resolved and referred to
     statically
     """
+
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    default_schema = read_yaml(os.path.join(__location__, '../schemas/default_schema.yaml'))
+    asg_schema = read_yaml(os.path.join(__location__, '../schemas/asg_schema.yaml'))
+    elb_schema = read_yaml(os.path.join(__location__, '../schemas/elb_schema.yaml'))
+    stack_schema = read_yaml(os.path.join(__location__, '../schemas/stack_schema.yaml'))
+    database_schema = read_yaml(os.path.join(__location__, '../schemas/database_schema.yaml'))
+
+    elb_config_key_list = ['protocols',
+                           'instanceports',
+                           'loadbalancerports',
+                           'path2ping',
+                           'public_unit',
+                           'elb_log_bucket',
+                           'unit_hosted_zone_name'
+                           ]
+    asg_config_key_list = ['sns_topic_arn',
+                           'sns_notification_types',
+                           'health_check_grace_period',
+                           'health_check_type',
+                           'minsize',
+                           'maxsize',
+                           'image_id',
+                           'instance_type',
+                           'userdata',
+                           'iam_instance_profile_arn',
+                           'hdd_size'
+                           ]
+    database_config_key_list = ['db_name',
+                                'db_instance_type',
+                                'db_engine',
+                                'db_port',
+                                'db_hdd_size',
+                                'db_snapshot_id']
     stack_key_list = ['stack_title',
                       'code_deploy_service_role',
                       'keypair',
@@ -24,41 +62,31 @@ class Yaml(object):
                       'nat_instance_type',
                       'home_cidrs',
                       'stack_hosted_zone_name',
+                      'zd_autoscaling_units'
                       'autoscaling_units',
                       'database_units',
                       'iam_instance_profile_arn',
                       'owner_emails',
                       'nat_alerting']
-    unit_key_list = {'autoscaling_units': ['unit_title',
-                                           'userdata',
-                                           'image_id',
-                                           'instance_type',
-                                           'path2ping',
-                                           'protocols',
-                                           'unit_hosted_zone_name',
-                                           'loadbalancerports',
-                                           'instanceports',
-                                           'minsize',
-                                           'maxsize',
-                                           'health_check_grace_period',
-                                           'iam_instance_profile_arn',
-                                           'sns_topic_arn',
-                                           'sns_notification_types',
-                                           'elb_log_bucket',
-                                           'public_unit',
-                                           'health_check_type',
+    unit_key_list = {'zd_autoscaling_units': ['unit_title',
+                                              'dependencies',
+                                              'elb_config',
+                                              'common_asg_config',
+                                              'blue_asg_config',
+                                              'green_asg_config',
+                                              'zd_state'
+                                              ],
+                     'autoscaling_units': ['unit_title',
                                            'dependencies',
-                                           'hdd_size'],
+                                           'elb_config',
+                                           'asg_config'
+                                           ],
                      'database_units': ['unit_title',
-                                        'db_name',
-                                        'db_instance_type',
-                                        'db_engine',
-                                        'db_port',
-                                        'db_hdd_size',
-                                        'db_snapshot_id']
+                                        'database_config'
+                                        ]
                      }
 
-    def __init__(self, user_stack_data, default_data, schema):
+    def __init__(self, user_stack_data, default_data):
         """
         Initializes united, user and default data dictionaries
         :param user_stack_data: User yaml document used to read stack values
@@ -69,12 +97,12 @@ class Yaml(object):
         self.united_data = dict()
 
         # Validate user and default yaml against the provided schema before attempting to combine them.
-        self.validate_yaml(self.user_stack_data, schema)
-        self.validate_yaml(self.default_data, schema)
+        self.validate_yaml(self.user_stack_data, self.stack_schema)
+        self.validate_yaml(self.default_data, self.default_schema)
 
         self.set_values()
         # Validate the combined yaml against the provided schema
-        self.validate_yaml(self.united_data, schema)
+        self.validate_yaml(self.united_data, self.stack_schema)
 
     def set_values(self):
         """
@@ -100,7 +128,8 @@ class Yaml(object):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 if unit_value == 'unit_hosted_zone_name':
                     self.united_data[unit_type][unit][unit_value] = \
-                    self.user_stack_data[unit_type][unit].get(unit_value, self.united_data['stack_hosted_zone_name'])
+                        self.user_stack_data[unit_type][unit].get(unit_value,
+                                                                  self.united_data['stack_hosted_zone_name'])
                 else:
                     self.united_data[unit_type][unit][unit_value] = \
                         self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
@@ -112,9 +141,8 @@ class Yaml(object):
                     minsize = self.united_data[unit_type][unit][unit_value]
                     maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
                 if minsize > maxsize:
-                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '\
+                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
                                                    'larger than maxsize ({1})'.format(minsize, maxsize))
-
 
     @staticmethod
     def validate_yaml(data, schema):
@@ -145,4 +173,3 @@ class Yaml(object):
 class InsecureVariableError(Exception):
     def __init__(self, value):
         self.value = value
-

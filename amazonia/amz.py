@@ -5,21 +5,11 @@ Ingest User YAML and defaults YAML and send to yaml class to return as one unifi
 
 """
 import os
-import yaml
 import argparse
 import sys
 from amazonia.classes.yaml import Yaml
 from amazonia.classes.stack import Stack
-
-
-def read_yaml(user_yaml):
-    """
-    Ingest user YAML
-    :param user_yaml: yaml file location
-    :return: Json serialised version of Yaml
-    """
-    with open(user_yaml, 'r') as stack_yaml:
-        return yaml.safe_load(stack_yaml)
+from amazonia.classes.util import read_yaml
 
 
 def create_stack(united_data):
@@ -34,8 +24,8 @@ def create_stack(united_data):
     return stack
 
 
-def generate_template(yaml_data, default_data, schema_data):
-    yaml_return = Yaml(yaml_data, default_data, schema_data)
+def generate_template(yaml_data, default_data):
+    yaml_return = Yaml(yaml_data, default_data)
     stack_input = yaml_return.united_data
 
     # Create stack and create stack template file
@@ -63,9 +53,6 @@ def main():
     parser.add_argument('-d', '--default',
                         default=os.path.join(__location__, './defaults.yaml'),
                         help='Path to the environmental defaults yaml file')
-    parser.add_argument('-s', '--schema',
-                        default=os.path.join(__location__, './schema.yaml'),
-                        help='Path to the schema to validate the provided yaml values against')
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help='Path for amazonia to place template file')
@@ -77,13 +64,12 @@ def main():
     # YAML ingestion
     user_stack_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
-    schema = read_yaml(args.schema)
 
     # Create stack and create stack template file
     template_file_path = args.template
     send_to_output = args.out
 
-    template_data = generate_template(user_stack_data, default_data, schema)
+    template_data = generate_template(user_stack_data, default_data)
 
     if send_to_output is True:
         sys.stdout.write(template_data)
