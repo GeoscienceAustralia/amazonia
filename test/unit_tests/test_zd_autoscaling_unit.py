@@ -6,7 +6,7 @@ from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.zd_autoscaling_unit import ZdtdAutoscalingUnit
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 
 template = elb_config = network_config = common_asg_config = None
 
@@ -61,10 +61,11 @@ runcmd:
                           single_instance_config=single_instance_config)
     network_config = NetworkConfig(jump=jump, nat=nat, private_subnets=private_subnets, public_subnets=public_subnets,
                                    vpc=vpc, public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-                                   unit_hosted_zone_name=None)
+                                   stack_hosted_zone_name=None)
     elb_config = ElbConfig(elb_log_bucket=None, protocols=['HTTP'],
                            instanceports=['80'],
-                           loadbalancerports=['80'], path2ping='index.html', public_unit=True)
+                           loadbalancerports=['80'], path2ping='index.html', public_unit=True,
+                           unit_hosted_zone_name=None)
     common_asg_config = AsgConfig(
         minsize=1,
         maxsize=1,
@@ -205,11 +206,11 @@ def create_zdtd_autoscaling_unit(unit_title, zdtd_state, blue_asg_config, green_
     :return new zdtd_autoscaling unit
     """
     global template, elb_config, network_config, common_asg_config
-    unit = ZdtdAutoscalingUnit(
+    unit = ZdAutoscalingUnit(
         unit_title=unit_title,
         template=template,
         dependencies=None,
-        zdtd_state=zdtd_state,
+        zd_state=zdtd_state,
         common_asg_config=common_asg_config,
         blue_asg_config=blue_asg_config,
         green_asg_config=green_asg_config,

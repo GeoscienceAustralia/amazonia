@@ -56,7 +56,7 @@ runcmd:
         jump=None,
         nat=None,
         public_cidr=None,
-        unit_hosted_zone_name=None
+        stack_hosted_zone_name=None
     )
 
     load_balancer = elb.LoadBalancer('testElb',

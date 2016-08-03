@@ -4,7 +4,6 @@ class SingleInstanceConfig(object):
         """
         Simple config class to contain networking related parameters
         :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
-        :param template: The template to add the SingleInstance object to.
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param si_image_id: AWS ami id to create instance from, e.g. 'ami-12345'
         :param si_instance_type: Instance type for single instance e.g. 't2.micro' or 't2.nano'

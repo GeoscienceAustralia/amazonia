@@ -58,7 +58,7 @@ def setup_resources():
         nat=nat,
         jump=jump,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        unit_hosted_zone_name=None
+        stack_hosted_zone_name=None
     )
     asg_config = AsgConfig(
         userdata="""
@@ -91,7 +91,9 @@ runcmd:
         loadbalancerports=['80'],
         path2ping='index.html',
         elb_log_bucket=None,
-        public_unit=True)
+        public_unit=True,
+        unit_hosted_zone_name=None
+    )
 
 
 @with_setup(setup_resources())

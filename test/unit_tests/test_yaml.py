@@ -8,7 +8,7 @@ from nose.tools import *
 from cerberus import ValidationError
 from amazonia.classes.yaml import Yaml, InsecureVariableError
 
-default_data = schema = None
+default_data = None
 
 
 def setup_resources():
@@ -16,10 +16,8 @@ def setup_resources():
     Create default data yaml
     """
     global default_data
-    global schema
 
     default_data = open_yaml_file('../../amazonia/defaults.yaml')
-    schema = open_yaml_file('../../amazonia/schema.yaml')
 
 
 def open_yaml_file(file_path):
@@ -42,7 +40,7 @@ def test_complete_valid_values():
     """
     global default_data
     valid_stack_data = open_yaml_file('test_yaml_complete_valid.yaml')
-    amz_yaml = Yaml(valid_stack_data, default_data, schema)
+    amz_yaml = Yaml(valid_stack_data, default_data)
 
     stack_input = amz_yaml.united_data
 
@@ -144,14 +142,11 @@ def test_validate_cidr_yaml():
     invalid_home_cidrs_data = open_yaml_file('test_yaml_invalid_home_cidrs.yaml')
     invalid_home_cidr_title_data = open_yaml_file('test_yaml_invalid_home_cidr_title.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
 @with_setup(setup_resources)
@@ -165,14 +160,11 @@ def test_get_invalid_values_yaml():
     invalid_autoscaling_unit_data = open_yaml_file('test_yaml_invalid_key_autoscaling_unit.yaml')
     invalid_database_unit_data = open_yaml_file('test_yaml_invalid_key_database_unit.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_database_unit_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
 @with_setup(setup_resources)
@@ -185,11 +177,9 @@ def test_insecure_variables_yaml():
     insecure_access_id = open_yaml_file('test_yaml_insecure_access_id.yaml')
     insecure_secret_key = open_yaml_file('test_yaml_insecure_secret_key.yaml')
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_access_id,
-                                                  'default_data': default_data,
-                                                  'schema': schema})
+                                                  'default_data': default_data})
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_secret_key,
-                                                  'default_data': default_data,
-                                                  'schema': schema})
+                                                  'default_data': default_data})
 
 
 @with_setup(setup_resources)
@@ -201,8 +191,7 @@ def test_invalid_min_max_asg():
     invalid_min_max_stack_data = open_yaml_file('test_yaml_invalid_min_max_asg.yaml')
 
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_min_max_stack_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
 def test_detect_unencrypted_access_keys():

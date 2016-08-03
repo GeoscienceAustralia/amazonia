@@ -18,11 +18,7 @@ class Yaml(object):
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-    default_schema = read_yaml(os.path.join(__location__, '../schemas/default_schema.yaml'))
-    asg_schema = read_yaml(os.path.join(__location__, '../schemas/asg_schema.yaml'))
-    elb_schema = read_yaml(os.path.join(__location__, '../schemas/elb_schema.yaml'))
-    stack_schema = read_yaml(os.path.join(__location__, '../schemas/stack_schema.yaml'))
-    database_schema = read_yaml(os.path.join(__location__, '../schemas/database_schema.yaml'))
+    cerberus_schema = read_yaml(os.path.join(__location__, '../schemas/cerberus_schema.yaml'))
 
     elb_config_key_list = ['protocols',
                            'instanceports',
@@ -97,12 +93,12 @@ class Yaml(object):
         self.united_data = dict()
 
         # Validate user and default yaml against the provided schema before attempting to combine them.
-        self.validate_yaml(self.user_stack_data, self.stack_schema)
-        self.validate_yaml(self.default_data, self.default_schema)
+        self.validate_yaml(self.user_stack_data, self.cerberus_schema)
+        self.validate_yaml(self.default_data, self.cerberus_schema)
 
         self.set_values()
         # Validate the combined yaml against the provided schema
-        self.validate_yaml(self.united_data, self.stack_schema)
+        self.validate_yaml(self.united_data, self.cerberus_schema)
 
     def set_values(self):
         """
@@ -122,27 +118,45 @@ class Yaml(object):
         Process unit input values for given unit type, validate specific fields such as title and userdata
         :param unit_type: unit type (autoscaling, database, etc)
         """
-        minsize = 0
-        maxsize = 0
+        #        minsize = 0
+        #        maxsize = 0
         for unit, unit_values in enumerate(self.user_stack_data[unit_type]):
             for unit_value in Yaml.unit_key_list[unit_type]:
-                if unit_value == 'unit_hosted_zone_name':
-                    self.united_data[unit_type][unit][unit_value] = \
-                        self.user_stack_data[unit_type][unit].get(unit_value,
-                                                                  self.united_data['stack_hosted_zone_name'])
+                #               if unit_value == 'unit_hosted_zone_name':
+                #                   self.united_data[unit_type][unit][unit_value] = \
+                #                       self.user_stack_data[unit_type][unit].get(unit_value,
+                #                                                                 self.united_data['stack_hosted_zone_name'])
+                if unit_value == 'database_config':
+                    self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
+                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['database_config'],
+                        self.database_config_key_list)
+                elif unit_value == 'elb_config':
+                    self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
+                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['elb_config'],
+                        self.elb_config_key_list)
+                elif unit_value in ['asg_config', 'common_asg_config', 'blue_asg_config', 'green_asg_config']:
+                    self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
+                        self.user_stack_data[unit_type][unit][unit_value], self.default_data['asg_config'],
+                        self.asg_config_key_list)
                 else:
                     self.united_data[unit_type][unit][unit_value] = \
                         self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
-                # Validate for unecrypted aws access ids and aws secret keys
-                if unit_value == 'userdata' and self.united_data[unit_type][unit]['userdata'] is not None:
-                    self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
+                    # Validate for unecrypted aws access ids and aws secret keys
+                #                if unit_value == 'userdata' and self.united_data[unit_type][unit]['userdata'] is not None:
+                #                    self.detect_unencrypted_access_keys(self.united_data[unit_type][unit]['userdata'])
                 # Validate that minsize is less than maxsize
-                if unit_value == 'minsize':
-                    minsize = self.united_data[unit_type][unit][unit_value]
-                    maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
-                if minsize > maxsize:
-                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
-                                                   'larger than maxsize ({1})'.format(minsize, maxsize))
+                #                if unit_value == 'minsize':
+                #                    minsize = self.united_data[unit_type][unit][unit_value]
+                #                    maxsize = self.user_stack_data[unit_type][unit].get('maxsize', self.default_data['maxsize'])
+                #                if minsize > maxsize:
+                #                    raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
+                #                                                   'larger than maxsize ({1})'.format(minsize, maxsize))
+
+    def set_nested_object_values(self, nested_object_user_data, nested_object_default, nested_object_type):
+        unified_object = {}
+        for object_key in nested_object_type:
+            unified_object[object_key] = nested_object_user_data.get(object_key, nested_object_default[object_key])
+        return unified_object
 
     @staticmethod
     def validate_yaml(data, schema):

@@ -61,7 +61,7 @@ def main():
     network_config = NetworkConfig(
         vpc=vpc,
         public_subnets=public_subnets,
-        unit_hosted_zone_name=hosted_zone.Name,
+        stack_hosted_zone_name=hosted_zone.Name,
         private_subnets=None,
         jump=None,
         nat=nat,

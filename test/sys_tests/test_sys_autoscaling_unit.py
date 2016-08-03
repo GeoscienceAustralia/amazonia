@@ -79,7 +79,7 @@ runcmd:
         private_subnets=private_subnets,
         public_subnets=public_subnets,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        unit_hosted_zone_name=None
+        stack_hosted_zone_name=None
     )
     elb_config = ElbConfig(
         protocols=['HTTP'],
@@ -87,7 +87,8 @@ runcmd:
         loadbalancerports=['80'],
         path2ping='/index.html',
         elb_log_bucket=None,
-        public_unit=True
+        public_unit=True,
+        unit_hosted_zone_name=None
     )
     asg_conifg = AsgConfig(
         minsize=1,

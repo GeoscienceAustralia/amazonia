@@ -25,15 +25,14 @@ def read_yaml(user_yaml):
         return yaml.safe_load(stack_yaml)
 
 
-def create_template(yaml_data, default_data, schema_data, template_path):
+def create_template(yaml_data, default_data, template_path):
     """
     Creates stack template from amazonia and places it inhte template path
     :param yaml_data: User stack data from application's yaml file
     :param default_data: Default data to be used if not specified in applications yaml file
-    :param schema_data: Cerburus schema data used for validation
     :param template_path: path to place template file (inc template file name)
     """
-    template_data = amz.generate_template(yaml_data, default_data, schema_data)
+    template_data = amz.generate_template(yaml_data, default_data)
 
     with open(template_path, 'w') as template_file:
         template_file.write(template_data)
@@ -154,9 +153,6 @@ def main():
     parser.add_argument('-d', '--default',
                         default=os.path.join(__location__, './defaults.yaml'),
                         help='Path to the environmental defaults yaml file')
-    parser.add_argument('-s', '--schema',
-                        default=os.path.join(__location__, './schema.yaml'),
-                        help='Path to the schema to validate the provided yaml values against')
     parser.add_argument('-t', '--template',
                         default='stack.template',
                         help='Path for amazonia to place template file')
@@ -177,7 +173,6 @@ def main():
     # YAML ingestion
     yaml_data = read_yaml(args.yaml)
     default_data = read_yaml(args.default)
-    schema_data = read_yaml(args.schema)
     template_path = os.path.join(__location__, args.template)
     cf_parameters = args.parameters
     s3_key = 'amazonia/' + args.template
@@ -185,7 +180,7 @@ def main():
     stack_name = args.stack_name
 
     # Create template, upload to s3 then create and delete stack
-    create_template(yaml_data, default_data, schema_data, template_path)
+    create_template(yaml_data, default_data, template_path)
     upload_s3(s3_client, template_path, s3_bucket, s3_key)
     create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_parameters)
 

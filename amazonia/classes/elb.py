@@ -53,16 +53,16 @@ class Elb(SecurityEnabledObject):
                                          self.title])
             )
 
-        if network_config.unit_hosted_zone_name:
+        if elb_config.unit_hosted_zone_name:
             self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
                 self.title + 'R53',
-                HostedZoneName=network_config.unit_hosted_zone_name,
+                HostedZoneName=elb_config.unit_hosted_zone_name,
                 RecordSets=[route53.RecordSet(
                     Name=Join('', [Ref('AWS::StackName'),
                                    '-',
                                    self.title,
                                    '.',
-                                   network_config.unit_hosted_zone_name]),
+                                   elb_config.unit_hosted_zone_name]),
                     AliasTarget=route53.AliasTarget(dnsname=GetAtt(self.trop_elb, 'DNSName'),
                                                     hostedzoneid=GetAtt(self.trop_elb, 'CanonicalHostedZoneNameID')),
                     Type='A')]))

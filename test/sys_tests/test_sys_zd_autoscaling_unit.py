@@ -3,7 +3,7 @@
 from troposphere import ec2, Ref, Template, Join, Tags
 
 from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.zd_autoscaling_unit import ZdtdAutoscalingUnit
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
@@ -72,7 +72,7 @@ runcmd:
 
     network_config = NetworkConfig(public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'}, vpc=vpc,
                                    public_subnets=public_subnets, private_subnets=private_subnets, nat=nat,
-                                   jump=jump, unit_hosted_zone_name=None)
+                                   jump=jump, stack_hosted_zone_name=None)
     protocols = ['HTTP']
     instanceports = ['80']
     loadbalancerports = ['80']
@@ -86,7 +86,7 @@ runcmd:
     instance_type = 't2.nano'
 
     elb_config = ElbConfig(protocols=protocols, instanceports=instanceports, loadbalancerports=loadbalancerports,
-                           elb_log_bucket=None, path2ping=path2ping, public_unit=True)
+                           elb_log_bucket=None, path2ping=path2ping, public_unit=True, unit_hosted_zone_name=None)
     common_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
                                   cd_service_role_arn=cd_service_role_arn,
                                   health_check_grace_period=health_check_grace_period,
@@ -109,10 +109,10 @@ runcmd:
                                  instance_type=None, userdata=None,
                                  iam_instance_profile_arn=None, hdd_size=None)
 
-    unit1 = ZdtdAutoscalingUnit(
+    unit1 = ZdAutoscalingUnit(
         unit_title='app1',
         template=template,
-        zdtd_state='blue',
+        zd_state='blue',
         dependencies=['app2'],
         network_config=network_config,
         elb_config=elb_config,
@@ -121,10 +121,10 @@ runcmd:
         green_asg_config=green_asg_config
     )
 
-    unit2 = ZdtdAutoscalingUnit(
+    unit2 = ZdAutoscalingUnit(
         unit_title='app2',
         template=template,
-        zdtd_state='green',
+        zd_state='green',
         dependencies=['app1'],
         network_config=network_config,
         elb_config=elb_config,
@@ -133,10 +133,10 @@ runcmd:
         green_asg_config=green_asg_config
     )
 
-    ZdtdAutoscalingUnit(
+    ZdAutoscalingUnit(
         unit_title='app3',
         template=template,
-        zdtd_state='both',
+        zd_state='both',
         dependencies=None,
         network_config=network_config,
         elb_config=elb_config,

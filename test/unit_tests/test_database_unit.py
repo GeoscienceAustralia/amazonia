@@ -41,7 +41,7 @@ def setup_resources():
         private_subnets=private_subnets,
         jump=None,
         nat=None,
-        unit_hosted_zone_name=None
+        stack_hosted_zone_name=None
     )
 
     database_config = DatabaseConfig(
@@ -64,7 +64,6 @@ def test_database():
                       template=template,
                       database_config=database_config
                       )
-
 
     assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')
@@ -89,7 +88,6 @@ def test_databse_snapshot():
                       template=template,
                       database_config=database_config
                       )
-
 
     assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
     assert_equals(db.trop_db.Engine, 'postgres')

@@ -1,3 +1,114 @@
+elb_config: &elb_config
+  type: 'dict'
+  nullable: True
+  schema:
+    protocols: # a list of strings specifying the protocols to allow access through load balancers into this specific autoscaling group.
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    instanceports: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
+      type: 'string'
+      nullable: True
+    public_unit: # a boolean value that determines the internet-facing scheme for the elb and the subnets it lives on in the asg class
+      type: 'boolean'
+      nullable: False
+      empty: False
+    elb_log_bucket: # A string containing the name of the S3 bucket to log ELB traffic to
+      type: 'string'
+      nullable: True
+    unit_hosted_zone_name: # A string containing the name of the Route 53 hosted zone name to use for creation of record sets for this unit
+      type: 'string'
+      nullable: True
+      empty: False
+
+asg_config: &asg_config
+  type: 'dict'
+  nullable: True
+  schema:
+    sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
+      type: 'string'
+      nullable: True
+    sns_notification_types: # A list of strings containing the notification types for SNS topics
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    health_check_grace_period:  # A string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
+      type: 'string'
+      nullable: True
+    health_check_type: # A string containing the type of health check to use for your autoscaling groups. This should 90% of the time be 'ELB'
+      type: 'string'
+      nullable: True
+    minsize: # a number or string containing the minimum amount of instances for this specific autoscaling group to run
+      type:
+        - 'number'
+        - 'string'
+      nullable: True
+    maxsize: # a number or string containing the maximum amount of instances for this specific autoscaling group to run
+      type:
+        - 'number'
+        - 'string'
+      nullable: True
+    image_id: # A string specifying which ami to use for this specific autoscaling group by its id
+      type: 'string'
+      nullable: True
+      regex: '^(ami-[a-zA-Z0-9]+$)' # matches an ami number eg: ami-some1234
+    instance_type: # A string containing the instance type to use for this specific autoscaling group.
+      type: 'string'
+      nullable: True
+    userdata: # A string containing userdata to run on this specific autoscaling group.
+      type: 'string'
+      nullable: True
+    iam_instance_profile_arn:  # A string specifying an instance IAM role for this specific autoscaling group by its ARN
+      type: 'string'
+      nullable: True
+    hdd_size: # the size for the hard drive of the instances on this autocaling unit
+      type:
+        - 'number'
+        - 'string'
+      nullable: True
+
+database_config: &database_config
+  type: 'dict'
+  nullable: True
+  schema:
+    db_name: # A string containing the title of this database instance.
+      type: 'string'
+      nullable: True
+      empty: False
+      regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+    db_instance_type: # A string containing the db type to use for this RDS instance
+      type: 'string'
+      nullable: True
+      empty: False
+    db_engine: # A string containing the engine to use. Find the available types here: https://aws.amazon.com/rds/
+      type: 'string'
+      nullable: True
+      empty: False
+    db_port: # A string containing the port to use for communication into the RDS instance
+      type: 'string'
+      nullable: True
+      empty: False
+    db_snapshot_id: # A string with the identifier of an RDS snapshot to use to provision DB
+      type: 'string'
+      nullable: True
+    db_hdd_size: # the size for the rds hard drive/allocated storage
+      type:
+        - 'number'
+        - 'string'
+      nullable: False
+
 stack_title: # A string containing the name of the cloud formation stack.
   type: 'string'
   empty: False
@@ -82,7 +193,6 @@ zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers,
   nullable: True
   schema:
     type: 'dict'
-    allow_unknown: True
     schema:
       unit_title:  # A string containing the title of this autoscaling unit.
         type: 'string'
@@ -94,22 +204,10 @@ zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers,
         schema:
           type: 'string'
           nullable: True
-      elb_config: #nested dictionary containing elb specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
-      common_asg_config: #nested dictionary containing common asg specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
-      blue_asg_config: #nested dictionary containing blue asg specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
-      green_asg_config: #nested dictionary containing blue asg specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
+      elb_config: *elb_config #nested dictionary containing elb specific configuration
+      common_asg_config: *asg_config #nested dictionary containing common asg specific configuration
+      blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
+      green_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
       zd_state:
         type: 'string'
         allowed:
@@ -121,7 +219,6 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
   nullable: True
   schema:
     type: 'dict'
-    allow_unknown: True
     schema:
       unit_title:  # A string containing the title of this autoscaling unit.
         type: 'string'
@@ -133,14 +230,9 @@ autoscaling_units:  # A list of autoscaling groups to create. Load balancers, se
         schema:
           type: 'string'
           nullable: True
-      elb_config: #nested dictionary containing elb specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
-      asg_config: #nested dictionary containing asg specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
+      elb_config: *elb_config #nested dictionary containing elb specific configuration
+      asg_config: *asg_config #nested dictionary containing asg specific configuration
+
 database_units: # A list of database units to create. Security groups, Database Subnet Groups, and RDS instances will be created for each of these units
   nullable: True
   type: 'list'
@@ -151,7 +243,4 @@ database_units: # A list of database units to create. Security groups, Database 
         type: 'string'
         regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
         nullable: True
-      database_config: #nested dictionary containing database specific configuration
-        type: 'dict'
-        nullable: True
-        allow_unknown: True
+      database_config: *database_config #nested dictionary containing database specific configuration

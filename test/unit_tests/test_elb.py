@@ -60,7 +60,7 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
         nat=nat,
         private_subnets=private_subnets,
         public_cidr=None,
-        unit_hosted_zone_name=hosted_zone_name
+        stack_hosted_zone_name=None
     )
     elb_config = ElbConfig(
         instanceports=[instanceport],
@@ -68,7 +68,8 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
         protocols=[protocol],
         path2ping=path2ping,
         elb_log_bucket=elb_log_bucket,
-        public_unit=public_unit
+        public_unit=public_unit,
+        unit_hosted_zone_name=hosted_zone_name
     )
 
     elb = Elb(title='elb',

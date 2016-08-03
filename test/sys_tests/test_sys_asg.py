@@ -57,7 +57,7 @@ runcmd:
         jump=None,
         nat=None,
         public_cidr=None,
-        unit_hosted_zone_name=None
+        stack_hosted_zone_name=None
     )
 
     asg_config = AsgConfig(
