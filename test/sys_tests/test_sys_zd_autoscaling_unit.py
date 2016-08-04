@@ -133,18 +133,6 @@ runcmd:
         green_asg_config=green_asg_config
     )
 
-    ZdAutoscalingUnit(
-        unit_title='app3',
-        template=template,
-        zd_state='both',
-        dependencies=None,
-        network_config=network_config,
-        elb_config=elb_config,
-        common_asg_config=common_asg_config,
-        blue_asg_config=blue_asg_config,
-        green_asg_config=green_asg_config
-    )
-
     unit1.add_unit_flow(unit2)
     print(template.to_json(indent=2, separators=(',', ': ')))
 

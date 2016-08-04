@@ -92,7 +92,6 @@ zd_state: &zd_state
   allowed:
   - 'blue'
   - 'green'
-  - 'both'
 iam_instance_profile_arn: &iam_instance_profile_arn # A string specifying an instance IAM role by its ARN
   type: 'string'
   nullable: True

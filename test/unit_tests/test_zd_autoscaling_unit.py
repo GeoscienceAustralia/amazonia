@@ -124,12 +124,12 @@ def test_autoscaling_unit():
 
     assert_equals(len(unit.blue_asg.egress), 1)
     assert_equals(len(unit.green_asg.egress), 1)
-    assert_equals(len(unit.blue_asg.ingress), 2)
-    assert_equals(len(unit.green_asg.ingress), 2)
+    assert_equals(len(unit.blue_asg.ingress), 3)
+    assert_equals(len(unit.green_asg.ingress), 3)
     assert_equals(len(unit.prod_elb.ingress), 1)
     assert_equals(len(unit.test_elb.ingress), 1)
-    assert_equals(len(unit.prod_elb.egress), 1)
-    assert_equals(len(unit.test_elb.egress), 1)
+    assert_equals(len(unit.prod_elb.egress), 2)
+    assert_equals(len(unit.test_elb.egress), 2)
 
 
 @with_setup(setup_resources)
@@ -166,35 +166,25 @@ def test_unit_association():
                                          green_asg_config=green_asg_config)
     unit2 = create_zdtd_autoscaling_unit(unit_title='app2', zdtd_state='blue', blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
-    unit3 = create_zdtd_autoscaling_unit(unit_title='app3', zdtd_state='both', blue_asg_config=blue_asg_config,
-                                         green_asg_config=green_asg_config)
+
     unit1.add_unit_flow(receiver=unit2)
     assert_equals(len(unit1.blue_asg.egress), 3)
     assert_equals(len(unit1.green_asg.egress), 3)
-    assert_equals(len(unit1.blue_asg.ingress), 2)
-    assert_equals(len(unit1.green_asg.ingress), 2)
+    assert_equals(len(unit1.blue_asg.ingress), 3)
+    assert_equals(len(unit1.green_asg.ingress), 3)
     assert_equals(len(unit1.test_elb.ingress), 1)
     assert_equals(len(unit1.prod_elb.ingress), 1)
-    assert_equals(len(unit1.test_elb.egress), 1)
-    assert_equals(len(unit1.prod_elb.egress), 1)
+    assert_equals(len(unit1.test_elb.egress), 2)
+    assert_equals(len(unit1.prod_elb.egress), 2)
 
     assert_equals(len(unit2.blue_asg.egress), 1)
     assert_equals(len(unit2.green_asg.egress), 1)
-    assert_equals(len(unit2.blue_asg.ingress), 2)
-    assert_equals(len(unit2.green_asg.ingress), 2)
+    assert_equals(len(unit2.blue_asg.ingress), 3)
+    assert_equals(len(unit2.green_asg.ingress), 3)
     assert_equals(len(unit2.test_elb.ingress), 3)
     assert_equals(len(unit2.prod_elb.ingress), 3)
-    assert_equals(len(unit2.test_elb.egress), 1)
-    assert_equals(len(unit2.prod_elb.egress), 1)
-
-    assert_equals(len(unit3.blue_asg.egress), 1)
-    assert_equals(len(unit3.green_asg.egress), 1)
-    assert_equals(len(unit3.blue_asg.ingress), 3)
-    assert_equals(len(unit3.green_asg.ingress), 3)
-    assert_equals(len(unit3.test_elb.ingress), 1)
-    assert_equals(len(unit3.prod_elb.ingress), 1)
-    assert_equals(len(unit3.test_elb.egress), 2)
-    assert_equals(len(unit3.prod_elb.egress), 2)
+    assert_equals(len(unit2.test_elb.egress), 2)
+    assert_equals(len(unit2.prod_elb.egress), 2)
 
 
 def create_zdtd_autoscaling_unit(unit_title, zdtd_state, blue_asg_config, green_asg_config):

@@ -36,8 +36,8 @@ class ZdAutoscalingUnit(object):
             network_config=network_config,
             elb_config=elb_config
         )
-        if zd_state not in ['blue', 'green', 'both']:
-            raise InvalidZDTDStateError('zdtd_state must be blue, green or both')
+        if zd_state not in ['blue', 'green']:
+            raise InvalidZDTDStateError('zdtd_state must be blue or green')
 
         blue_load_balancers = []
         green_load_balancers = []
@@ -48,11 +48,6 @@ class ZdAutoscalingUnit(object):
         if zd_state == 'green':
             green_load_balancers.append(self.prod_elb.trop_elb)
             blue_load_balancers.append(self.test_elb.trop_elb)
-        if zd_state == 'both':
-            blue_load_balancers.append(self.prod_elb.trop_elb)
-            blue_load_balancers.append(self.test_elb.trop_elb)
-            green_load_balancers.append(self.prod_elb.trop_elb)
-            green_load_balancers.append(self.test_elb.trop_elb)
 
         blue_asg_config.define_undefined_values(common_asg_config)
         green_asg_config.define_undefined_values(common_asg_config)
@@ -71,25 +66,14 @@ class ZdAutoscalingUnit(object):
             asg_config=green_asg_config
         )
 
-        if zd_state == 'blue':
-            [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-            [self.test_elb.add_flow(receiver=self.green_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-        if zd_state == 'green':
-            [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-            [self.test_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-        if zd_state == 'both':
-            [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-            [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-            [self.test_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
-            [self.test_elb.add_flow(receiver=self.green_asg, port=instanceport)
-             for instanceport in elb_config.instanceports]
+        [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
+         for instanceport in elb_config.instanceports]
+        [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
+         for instanceport in elb_config.instanceports]
+        [self.test_elb.add_flow(receiver=self.blue_asg, port=instanceport)
+         for instanceport in elb_config.instanceports]
+        [self.test_elb.add_flow(receiver=self.green_asg, port=instanceport)
+         for instanceport in elb_config.instanceports]
 
         [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
          for loadbalancerport in elb_config.loadbalancerports]
