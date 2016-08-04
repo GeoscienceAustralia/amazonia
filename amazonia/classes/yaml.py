@@ -125,16 +125,19 @@ class Yaml(object):
             for unit_value in Yaml.unit_key_list[unit_type]:
                 if unit_value == 'database_config':
                     user_database_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
+                    user_database_config = {} if user_database_config is None else user_database_config
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
                         user_database_config, self.default_data['database_config'],
                         self.database_config_key_list)
                 elif unit_value == 'elb_config':
                     user_elb_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
+                    user_elb_config = {} if user_elb_config is None else user_elb_config
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
                         user_elb_config, self.default_data['elb_config'],
                         self.elb_config_key_list)
                 elif unit_value in ['asg_config', 'common_asg_config', 'blue_asg_config', 'green_asg_config']:
                     user_asg_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
+                    user_asg_config = {} if user_asg_config is None else user_asg_config
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
                         user_asg_config, self.default_data['asg_config'],
                         self.asg_config_key_list)
