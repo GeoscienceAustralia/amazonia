@@ -116,8 +116,8 @@ def test_autoscaling_unit():
                                         green_asg_config=green_asg_config)
     assert_equals(unit.green_asg.trop_asg.title, 'green' + title + 'Asg')
     assert_equals(unit.blue_asg.trop_asg.title, 'blue' + title + 'Asg')
-    assert_equals(unit.prod_elb.trop_elb.title, 'active' + title + 'Elb')
-    assert_equals(unit.test_elb.trop_elb.title, 'inactive' + title + 'Elb')
+    assert_equals(unit.prod_elb.trop_elb.title, 'prod' + title + 'Elb')
+    assert_equals(unit.pre_elb.trop_elb.title, 'pre' + title + 'Elb')
     [assert_is(type(lbn), Ref) for lbn in unit.green_asg.trop_asg.LoadBalancerNames]
     [assert_is(type(lbn), Ref) for lbn in unit.blue_asg.trop_asg.LoadBalancerNames]
 
@@ -126,9 +126,9 @@ def test_autoscaling_unit():
     assert_equals(len(unit.blue_asg.ingress), 3)
     assert_equals(len(unit.green_asg.ingress), 3)
     assert_equals(len(unit.prod_elb.ingress), 1)
-    assert_equals(len(unit.test_elb.ingress), 1)
+    assert_equals(len(unit.pre_elb.ingress), 1)
     assert_equals(len(unit.prod_elb.egress), 2)
-    assert_equals(len(unit.test_elb.egress), 2)
+    assert_equals(len(unit.pre_elb.egress), 2)
 
 
 @with_setup(setup_resources)
@@ -171,18 +171,18 @@ def test_unit_association():
     assert_equals(len(unit1.green_asg.egress), 3)
     assert_equals(len(unit1.blue_asg.ingress), 3)
     assert_equals(len(unit1.green_asg.ingress), 3)
-    assert_equals(len(unit1.test_elb.ingress), 1)
+    assert_equals(len(unit1.pre_elb.ingress), 1)
     assert_equals(len(unit1.prod_elb.ingress), 1)
-    assert_equals(len(unit1.test_elb.egress), 2)
+    assert_equals(len(unit1.pre_elb.egress), 2)
     assert_equals(len(unit1.prod_elb.egress), 2)
 
     assert_equals(len(unit2.blue_asg.egress), 1)
     assert_equals(len(unit2.green_asg.egress), 1)
     assert_equals(len(unit2.blue_asg.ingress), 3)
     assert_equals(len(unit2.green_asg.ingress), 3)
-    assert_equals(len(unit2.test_elb.ingress), 3)
+    assert_equals(len(unit2.pre_elb.ingress), 3)
     assert_equals(len(unit2.prod_elb.ingress), 3)
-    assert_equals(len(unit2.test_elb.egress), 2)
+    assert_equals(len(unit2.pre_elb.egress), 2)
     assert_equals(len(unit2.prod_elb.egress), 2)
 
 
