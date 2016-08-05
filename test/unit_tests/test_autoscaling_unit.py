@@ -58,7 +58,9 @@ def setup_resources():
         nat=nat,
         jump=jump,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
+        keypair='pipeline'
     )
     asg_config = AsgConfig(
         userdata="""
@@ -74,12 +76,10 @@ runcmd:
     """,
         health_check_grace_period=300,
         health_check_type='ELB',
-        cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
         hdd_size=None,
         iam_instance_profile_arn=None,
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
-        keypair='pipeline',
         maxsize=1,
         minsize=1,
         sns_topic_arn=None,

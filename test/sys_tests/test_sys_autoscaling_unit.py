@@ -79,7 +79,9 @@ runcmd:
         private_subnets=private_subnets,
         public_subnets=public_subnets,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        keypair='pipeline',
+        cd_service_role_arn=service_role_arn
     )
     elb_config = ElbConfig(
         protocols=['HTTP'],
@@ -95,12 +97,9 @@ runcmd:
         maxsize=1,
         health_check_grace_period=300,
         health_check_type='ELB',
-        keypair='pipeline',
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         userdata=userdata,
-        cd_service_role_arn=service_role_arn,
-
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,

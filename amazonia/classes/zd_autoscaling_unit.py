@@ -6,8 +6,7 @@ from amazonia.classes.elb import Elb
 
 
 class ZdAutoscalingUnit(object):
-    def __init__(self, unit_title, template, dependencies, network_config, elb_config, common_asg_config,
-                 blue_asg_config, green_asg_config):
+    def __init__(self, unit_title, template, dependencies, network_config, elb_config, blue_asg_config, green_asg_config):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',
@@ -16,7 +15,6 @@ class ZdAutoscalingUnit(object):
         :param dependencies: list of unit names this unit needs access to
         :param network_config: network related paramters including subnet, nat, jump, etc
         :param elb_config: shared elb configuration
-        :param common_asg_config: default asg configuration
         :param blue_asg_config: configuration specific to the blue asg
         :param green_asg_config: configuration specific to the green asg
         """
@@ -37,10 +35,6 @@ class ZdAutoscalingUnit(object):
             network_config=network_config,
             elb_config=elb_config
         )
-
-        #override any undefined asg config values from common settings
-        blue_asg_config.define_undefined_values(common_asg_config)
-        green_asg_config.define_undefined_values(common_asg_config)
 
         #create ASGs
         self.blue_asg = Asg(

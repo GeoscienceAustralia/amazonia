@@ -40,7 +40,9 @@ def main():
         jump=None,
         nat=None,
         public_cidr=None,
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        keypair=None,
+        cd_service_role_arn=None
     )
 
     database_config = DatabaseConfig(

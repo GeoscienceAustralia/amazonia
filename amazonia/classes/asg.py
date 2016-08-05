@@ -26,34 +26,34 @@ class Asg(SecurityEnabledObject):
         self.cd_deploygroup = None
         self.create_asg(
             title=self.title,
-            subnets=network_config.private_subnets,
+            network_config=network_config,
             load_balancers=load_balancers,
             asg_config=asg_config
         )
-        if asg_config.cd_service_role_arn is not None:
+        if network_config.cd_service_role_arn is not None:
             self.create_cd_deploygroup(
                 title=self.title,
-                cd_service_role_arn=asg_config.cd_service_role_arn
+                cd_service_role_arn=network_config.cd_service_role_arn
             )
 
-    def create_asg(self, title, subnets, load_balancers, asg_config):
+    def create_asg(self, title, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group object
         AWS Cloud Formation:
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-group.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         :param title: Title of the autoscaling application
-        :param subnets: subnets to create autoscaled instances in
         :param load_balancers: list of load balancers to associate autoscaling group with
         :param asg_config: object containing asg related variables
+        :param network_config: object containing network related variables
         """
 
-        availability_zones = [subnet.AvailabilityZone for subnet in subnets]
+        availability_zones = [subnet.AvailabilityZone for subnet in network_config.private_subnets]
         self.trop_asg = self.template.add_resource(AutoScalingGroup(
             title,
             MinSize=asg_config.minsize,
             MaxSize=asg_config.maxsize,
-            VPCZoneIdentifier=[Ref(subnet.title) for subnet in subnets],
+            VPCZoneIdentifier=[Ref(subnet.title) for subnet in network_config.private_subnets],
             AvailabilityZones=availability_zones,
             LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
@@ -71,12 +71,13 @@ class Asg(SecurityEnabledObject):
 
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
-            asg_config=asg_config
+            asg_config=asg_config,
+            network_config=network_config
         ))
         if asg_config.userdata is None:
             self.lc.UserData = ''
 
-    def create_launch_config(self, title, asg_config):
+    def create_launch_config(self, title, asg_config, network_config):
         """
         Method to add a launch configuration resource to a cloud formation document
         AWS Cloud Formation links:
@@ -87,6 +88,7 @@ class Asg(SecurityEnabledObject):
         https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         :param title: Title of the autoscaling application
         :param asg_config: object holding asg related variables
+        :param network_config: object holding network related variables
         :return string representing Launch Configuration name
         """
         launch_config_title = title + 'Lc'
@@ -97,7 +99,7 @@ class Asg(SecurityEnabledObject):
             ImageId=asg_config.image_id,
             InstanceMonitoring=False,
             InstanceType=asg_config.instance_type,
-            KeyName=asg_config.keypair,
+            KeyName=network_config.keypair,
             SecurityGroups=[Ref(self.security_group.name)],
         ))
         if asg_config.iam_instance_profile_arn is not None:

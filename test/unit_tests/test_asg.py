@@ -29,11 +29,9 @@ runcmd:
 """,
         health_check_grace_period=300,
         health_check_type='ELB',
-        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
         iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
         image_id='ami-dc361ebf',
         instance_type='t2.micro',
-        keypair='pipeline',
         sns_topic_arn='arn:aws:sns:ap-southeast-2:1234567890:test_service_status',
         sns_notification_types=['autoscaling:EC2_INSTANCE_LAUNCH', 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
@@ -56,7 +54,9 @@ runcmd:
         jump=None,
         nat=None,
         public_cidr=None,
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        keypair='pipeline',
+        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
     load_balancer = elb.LoadBalancer('testElb',
@@ -121,7 +121,7 @@ def test_no_cd_group_and_no_sns():
     Test that an asg is created without a CD and without an SNS topic
     """
     global template, load_balancer, network_config, asg_config
-    asg_config.cd_service_role_arn = None
+    network_config.cd_service_role_arn = None
     asg = Asg(
         title='noCdSns',
         template=template,

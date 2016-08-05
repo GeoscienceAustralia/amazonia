@@ -65,7 +65,9 @@ def main():
         private_subnets=None,
         jump=None,
         nat=nat,
-        public_cidr=None
+        public_cidr=None,
+        keypair=None,
+        cd_service_role_arn=None
     )
     elb_config = ElbConfig(
         instanceports=['80'],

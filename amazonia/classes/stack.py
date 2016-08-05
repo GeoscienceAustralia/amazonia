@@ -175,9 +175,16 @@ class Stack(object):
                                                                   DestinationCidrBlock=self.public_cidr['cidr']))
         self.private_route.DependsOn = self.gateway_attachment.title
 
-        self.network_config = NetworkConfig(vpc=self.vpc, public_subnets=self.public_subnets,
-                                            private_subnets=self.private_subnets, jump=self.jump, nat=self.nat,
-                                            public_cidr=self.public_cidr, stack_hosted_zone_name=self.hosted_zone_name)
+        self.network_config = NetworkConfig(vpc=self.vpc,
+                                            public_subnets=self.public_subnets,
+                                            private_subnets=self.private_subnets,
+                                            jump=self.jump,
+                                            nat=self.nat,
+                                            public_cidr=self.public_cidr,
+                                            stack_hosted_zone_name=self.hosted_zone_name,
+                                            keypair=self.keypair,
+                                            cd_service_role_arn=self.code_deploy_service_role
+                                            )
         # Add ZD Autoscaling Units
         for unit in self.zd_autoscaling_units:  # type: dict
             orig_unit_title = unit['unit_title']
@@ -187,24 +194,14 @@ class Stack(object):
             # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
             elb_config = ElbConfig(**unit['elb_config'])
-            common_asg_config = AsgConfig(keypair=self.keypair,
-                                          cd_service_role_arn=self.code_deploy_service_role,
-                                          **unit['common_asg_config']
-                                          )
-            blue_asg_config = AsgConfig(keypair=self.keypair,
-                                        cd_service_role_arn=self.code_deploy_service_role,
-                                        **unit['blue_asg_config']
-                                        )
-            green_asg_config = AsgConfig(keypair=self.keypair,
-                                         cd_service_role_arn=self.code_deploy_service_role,
-                                         **unit['green_asg_config']
-                                         )
+
+            blue_asg_config = AsgConfig(**unit['blue_asg_config'])
+            green_asg_config = AsgConfig(**unit['green_asg_config'])
             self.units[orig_unit_title] = ZdAutoscalingUnit(
                 unit_title=unit['unit_title'],
                 template=self.template,
                 network_config=self.network_config,
                 elb_config=elb_config,
-                common_asg_config=common_asg_config,
                 blue_asg_config=blue_asg_config,
                 green_asg_config=green_asg_config,
                 dependencies=unit['dependencies']
@@ -218,10 +215,7 @@ class Stack(object):
             # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
             elb_config = ElbConfig(**unit['elb_config'])
-            asg_config = AsgConfig(keypair=self.keypair,
-                                   cd_service_role_arn=self.code_deploy_service_role,
-                                   **unit['asg_config']
-                                   )
+            asg_config = AsgConfig(**unit['asg_config'])
             self.units[orig_unit_title] = AutoscalingUnit(
                 unit_title=unit['unit_title'],
                 template=self.template,

@@ -73,6 +73,10 @@ asg_config:
   hdd_size:
   sns_topic_arn:
   sns_notification_types:
+    - 'autoscaling:EC2_INSTANCE_LAUNCH'
+    - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+    - 'autoscaling:EC2_INSTANCE_TERMINATE'
+    - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
   userdata: |
     #cloud-config
     repo_update: true

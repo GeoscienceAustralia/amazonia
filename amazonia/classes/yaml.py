@@ -77,7 +77,6 @@ class Yaml(object):
     unit_key_list = {'zd_autoscaling_units': ['unit_title',
                                               'dependencies',
                                               'elb_config',
-                                              'common_asg_config',
                                               'blue_asg_config',
                                               'green_asg_config'
                                               ],

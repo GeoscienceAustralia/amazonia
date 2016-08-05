@@ -27,39 +27,6 @@ iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
 zd_autoscaling_units:
   -
     unit_title: 'zdapp1'
-    common_asg_config:
-      image_id: 'ami-dc361ebf'
-      instance_type: 't2.micro'
-      iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
-      minsize: '1'
-      maxsize: '1'
-      health_check_grace_period: '300'
-      health_check_type: 'ELB'
-      hdd_size: '8'
-      sns_topic_arn: 'sns_topic_arn'
-      sns_notification_types:
-        - 'autoscaling:EC2_INSTANCE_LAUNCH'
-        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
-      userdata: |
-        #cloud-config
-        repo_update: true
-        repo_upgrade: all
-        packages:
-         - httpd
-        write_files:
-         - content: |
-            <html>
-            <body>
-            <h1>Amazonia created this stack!</h1>
-            </body>
-            </html>
-           path: /var/www/html/index.html
-           permissions: '0644'
-           owner: root:root
-        runcmd:
-         - service httpd start
     blue_asg_config:
       image_id: 'ami-dc361ebf'
       instance_type: 't2.micro'

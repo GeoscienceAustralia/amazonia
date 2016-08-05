@@ -57,11 +57,13 @@ runcmd:
         jump=None,
         nat=None,
         public_cidr=None,
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        keypair='pipeline',
+        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
     asg_config = AsgConfig(
-        keypair='pipeline',
+
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         minsize=1,
@@ -69,7 +71,6 @@ runcmd:
         userdata=userdata,
         health_check_grace_period=300,
         health_check_type='ELB',
-        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
         iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
         sns_topic_arn='arn:aws:sns:ap-southeast-2:123456789:test_sns_arn',
         sns_notification_types=['autoscaling:EC2_INSTANCE_LAUNCH',

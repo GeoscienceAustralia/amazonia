@@ -70,9 +70,15 @@ runcmd:
 
     cd_service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
-    network_config = NetworkConfig(public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'}, vpc=vpc,
-                                   public_subnets=public_subnets, private_subnets=private_subnets, nat=nat,
-                                   jump=jump, stack_hosted_zone_name=None)
+    network_config = NetworkConfig(public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+                                   vpc=vpc,
+                                   public_subnets=public_subnets,
+                                   private_subnets=private_subnets,
+                                   nat=nat,
+                                   jump=jump,
+                                   stack_hosted_zone_name=None,
+                                   cd_service_role_arn=cd_service_role_arn,
+                                   keypair='pipeline')
     protocols = ['HTTP']
     instanceports = ['80']
     loadbalancerports = ['80']
@@ -81,33 +87,24 @@ runcmd:
     maxsize = 1
     health_check_grace_period = 300
     health_check_type = 'ELB'
-    keypair = 'pipeline'
+
     image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
 
     elb_config = ElbConfig(protocols=protocols, instanceports=instanceports, loadbalancerports=loadbalancerports,
                            elb_log_bucket=None, path2ping=path2ping, public_unit=True, unit_hosted_zone_name=None)
-    common_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
-                                  cd_service_role_arn=cd_service_role_arn,
-                                  health_check_grace_period=health_check_grace_period,
-                                  health_check_type=health_check_type, keypair=keypair, minsize=minsize,
-                                  maxsize=maxsize, image_id=image_id,
-                                  instance_type=instance_type, userdata=userdata,
-                                  iam_instance_profile_arn=None, hdd_size=8)
     blue_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
-                                cd_service_role_arn=None,
-                                health_check_grace_period=None,
-                                health_check_type=None, keypair=None, minsize=None,
-                                maxsize=None, image_id=None,
-                                instance_type=None, userdata=None,
-                                iam_instance_profile_arn=None, hdd_size=None)
+                                health_check_grace_period=health_check_grace_period,
+                                health_check_type=health_check_type, minsize=minsize,
+                                maxsize=maxsize, image_id=image_id,
+                                instance_type=instance_type, userdata=userdata,
+                                iam_instance_profile_arn=None, hdd_size=8)
     green_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
-                                 cd_service_role_arn=None,
-                                 health_check_grace_period=None,
-                                 health_check_type=None, keypair=None, minsize=None,
-                                 maxsize=None, image_id=None,
-                                 instance_type=None, userdata=None,
-                                 iam_instance_profile_arn=None, hdd_size=None)
+                                 health_check_grace_period=health_check_grace_period,
+                                 health_check_type=health_check_type, minsize=minsize,
+                                 maxsize=maxsize, image_id=image_id,
+                                 instance_type=instance_type, userdata=userdata,
+                                 iam_instance_profile_arn=None, hdd_size=8)
 
     unit1 = ZdAutoscalingUnit(
         unit_title='app1',
@@ -115,7 +112,6 @@ runcmd:
         dependencies=['app2'],
         network_config=network_config,
         elb_config=elb_config,
-        common_asg_config=common_asg_config,
         blue_asg_config=blue_asg_config,
         green_asg_config=green_asg_config
     )
@@ -126,7 +122,6 @@ runcmd:
         dependencies=['app1'],
         network_config=network_config,
         elb_config=elb_config,
-        common_asg_config=common_asg_config,
         blue_asg_config=blue_asg_config,
         green_asg_config=green_asg_config
     )

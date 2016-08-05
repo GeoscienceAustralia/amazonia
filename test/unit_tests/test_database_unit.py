@@ -41,7 +41,9 @@ def setup_resources():
         private_subnets=private_subnets,
         jump=None,
         nat=None,
-        stack_hosted_zone_name=None
+        stack_hosted_zone_name=None,
+        cd_service_role_arn=None,
+        keypair=None
     )
 
     database_config = DatabaseConfig(

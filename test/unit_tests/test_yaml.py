@@ -3,10 +3,9 @@
 import os
 
 import yaml
-from nose.tools import *
-
-from cerberus import ValidationError
 from amazonia.classes.yaml import Yaml, InsecureVariableError
+from cerberus import ValidationError
+from nose.tools import *
 
 default_data = None
 
