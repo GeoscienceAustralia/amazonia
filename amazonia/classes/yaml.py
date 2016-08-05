@@ -5,9 +5,7 @@ Overwrite defaults YAML with User YAML
 """
 import os
 import re
-
 import cerberus
-
 from amazonia.classes.util import read_yaml
 
 
