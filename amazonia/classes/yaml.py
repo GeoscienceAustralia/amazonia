@@ -18,8 +18,10 @@ class Yaml(object):
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
+    """ cerberus schema file location """
     cerberus_schema = read_yaml(os.path.join(__location__, '../schemas/cerberus_schema.yaml'))
 
+    """ elb_config field list"""
     elb_config_key_list = ['protocols',
                            'instanceports',
                            'loadbalancerports',
@@ -28,6 +30,8 @@ class Yaml(object):
                            'elb_log_bucket',
                            'unit_hosted_zone_name'
                            ]
+
+    """asg_config field list"""
     asg_config_key_list = ['sns_topic_arn',
                            'sns_notification_types',
                            'health_check_grace_period',
@@ -40,12 +44,16 @@ class Yaml(object):
                            'iam_instance_profile_arn',
                            'hdd_size'
                            ]
+
+    """database_config field list"""
     database_config_key_list = ['db_name',
                                 'db_instance_type',
                                 'db_engine',
                                 'db_port',
                                 'db_hdd_size',
                                 'db_snapshot_id']
+
+    """stack parameter field list"""
     stack_key_list = ['stack_title',
                       'code_deploy_service_role',
                       'keypair',
@@ -64,6 +72,8 @@ class Yaml(object):
                       'iam_instance_profile_arn',
                       'owner_emails',
                       'nat_alerting']
+
+    """unit structure and field list"""
     unit_key_list = {'zd_autoscaling_units': ['unit_title',
                                               'dependencies',
                                               'elb_config',
