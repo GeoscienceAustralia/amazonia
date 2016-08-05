@@ -87,11 +87,6 @@ dependencies: &dependencies # A list of strings with the titles of objects that 
   schema:
     type: 'string'
     nullable: True
-zd_state: &zd_state
-  type: 'string'
-  allowed:
-  - 'blue'
-  - 'green'
 iam_instance_profile_arn: &iam_instance_profile_arn # A string specifying an instance IAM role by its ARN
   type: 'string'
   nullable: True
@@ -290,7 +285,6 @@ zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers,
     schema:
       unit_title:  *unit_title # A string containing the title of this autoscaling unit.
       dependencies: *dependencies # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
-      zd_state: *zd_state
       elb_config: *elb_config #nested dictionary containing elb specific configuration
       common_asg_config: *asg_config #nested dictionary containing common asg specific configuration
       blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration

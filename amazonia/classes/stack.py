@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-from troposphere import Ref, Template, ec2, Tags, Join
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.subnet import Subnet
-from amazonia.classes.autoscaling_unit import AutoscalingUnit
-from amazonia.classes.database_unit import DatabaseUnit
-from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
-from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.database_config import DatabaseConfig
+from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.subnet import Subnet
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from troposphere import Ref, Template, ec2, Tags, Join
 
 
 class Stack(object):
@@ -207,7 +207,6 @@ class Stack(object):
                 common_asg_config=common_asg_config,
                 blue_asg_config=blue_asg_config,
                 green_asg_config=green_asg_config,
-                zd_state=unit['zd_state'],
                 dependencies=unit['dependencies']
             )
         # Add Autoscaling Units
@@ -238,7 +237,7 @@ class Stack(object):
                 raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             unit['unit_title'] = self.title + orig_unit_title
-            database_config = DatabaseConfig( **unit['database_config'])
+            database_config = DatabaseConfig(**unit['database_config'])
             self.units[orig_unit_title] = DatabaseUnit(
                 unit_title=unit['unit_title'],
                 template=self.template,

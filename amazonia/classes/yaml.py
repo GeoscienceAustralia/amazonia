@@ -71,8 +71,7 @@ class Yaml(object):
                                               'elb_config',
                                               'common_asg_config',
                                               'blue_asg_config',
-                                              'green_asg_config',
-                                              'zd_state'
+                                              'green_asg_config'
                                               ],
                      'autoscaling_units': ['unit_title',
                                            'dependencies',

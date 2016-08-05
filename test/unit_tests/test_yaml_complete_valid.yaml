@@ -27,7 +27,6 @@ iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
 zd_autoscaling_units:
   -
     unit_title: 'zdapp1'
-    zd_state: 'blue'
     common_asg_config:
       image_id: 'ami-dc361ebf'
       instance_type: 't2.micro'

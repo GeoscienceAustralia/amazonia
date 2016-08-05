@@ -38,9 +38,6 @@ database_units:
 unit_title: 'defaulttitle'
 dependencies:
 
-#ZD unit default values
-zd_state: 'blue'
-
 #Database unit default values
 database_config:
   db_instance_type: 'db.t2.small'

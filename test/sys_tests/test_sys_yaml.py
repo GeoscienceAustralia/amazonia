@@ -3,7 +3,6 @@
 import os
 
 import yaml
-
 from amazonia.classes.yaml import Yaml
 
 

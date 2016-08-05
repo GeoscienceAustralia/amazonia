@@ -113,8 +113,7 @@ def test_autoscaling_unit():
                                  sns_notification_types=None,
                                  hdd_size=None)
     unit = create_zdtd_autoscaling_unit(unit_title=title, blue_asg_config=blue_asg_config,
-                                        green_asg_config=green_asg_config,
-                                        zdtd_state='blue')
+                                        green_asg_config=green_asg_config)
     assert_equals(unit.green_asg.trop_asg.title, 'green' + title + 'Asg')
     assert_equals(unit.blue_asg.trop_asg.title, 'blue' + title + 'Asg')
     assert_equals(unit.prod_elb.trop_elb.title, 'active' + title + 'Elb')
@@ -162,9 +161,9 @@ def test_unit_association():
                                  sns_topic_arn=None,
                                  sns_notification_types=None,
                                  hdd_size=None)
-    unit1 = create_zdtd_autoscaling_unit(unit_title='app1', zdtd_state='green', blue_asg_config=blue_asg_config,
+    unit1 = create_zdtd_autoscaling_unit(unit_title='app1', blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
-    unit2 = create_zdtd_autoscaling_unit(unit_title='app2', zdtd_state='blue', blue_asg_config=blue_asg_config,
+    unit2 = create_zdtd_autoscaling_unit(unit_title='app2', blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
 
     unit1.add_unit_flow(receiver=unit2)
@@ -187,10 +186,9 @@ def test_unit_association():
     assert_equals(len(unit2.prod_elb.egress), 2)
 
 
-def create_zdtd_autoscaling_unit(unit_title, zdtd_state, blue_asg_config, green_asg_config):
+def create_zdtd_autoscaling_unit(unit_title, blue_asg_config, green_asg_config):
     """Helper function to create unit
     :param unit_title: title of unit
-    :param zdtd_state: zdtd_state of of zdtd autoscaling unit
     :param blue_asg_config: blue specific asg config
     :param green_asg_config: green specific asg config
     :return new zdtd_autoscaling unit
@@ -200,7 +198,6 @@ def create_zdtd_autoscaling_unit(unit_title, zdtd_state, blue_asg_config, green_
         unit_title=unit_title,
         template=template,
         dependencies=None,
-        zd_state=zdtd_state,
         common_asg_config=common_asg_config,
         blue_asg_config=blue_asg_config,
         green_asg_config=green_asg_config,

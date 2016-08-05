@@ -1,5 +1,6 @@
 import yaml
 
+
 def read_yaml(user_yaml):
     """
     Ingest user YAML

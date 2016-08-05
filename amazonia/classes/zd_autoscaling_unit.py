@@ -6,7 +6,7 @@ from amazonia.classes.elb import Elb
 
 
 class ZdAutoscalingUnit(object):
-    def __init__(self, unit_title, template, dependencies, zd_state, network_config, elb_config, common_asg_config,
+    def __init__(self, unit_title, template, dependencies, network_config, elb_config, common_asg_config,
                  blue_asg_config, green_asg_config):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
@@ -14,7 +14,6 @@ class ZdAutoscalingUnit(object):
          'MyStackApi2' or 'MyStackDataprocessing'
         :param template: Troposphere template to append resources to
         :param dependencies: list of unit names this unit needs access to
-        :param zd_state: blue, green, both
         :param network_config: network related paramters including subnet, nat, jump, etc
         :param elb_config: shared elb configuration
         :param common_asg_config: default asg configuration
@@ -36,18 +35,12 @@ class ZdAutoscalingUnit(object):
             network_config=network_config,
             elb_config=elb_config
         )
-        if zd_state not in ['blue', 'green']:
-            raise InvalidZDTDStateError('zdtd_state must be blue or green')
 
         blue_load_balancers = []
         green_load_balancers = []
 
-        if zd_state == 'blue':
-            blue_load_balancers.append(self.prod_elb.trop_elb)
-            green_load_balancers.append(self.test_elb.trop_elb)
-        if zd_state == 'green':
-            green_load_balancers.append(self.prod_elb.trop_elb)
-            blue_load_balancers.append(self.test_elb.trop_elb)
+        blue_load_balancers.append(self.prod_elb.trop_elb)
+        green_load_balancers.append(self.test_elb.trop_elb)
 
         blue_asg_config.define_undefined_values(common_asg_config)
         green_asg_config.define_undefined_values(common_asg_config)

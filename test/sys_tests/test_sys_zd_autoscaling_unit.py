@@ -112,7 +112,6 @@ runcmd:
     unit1 = ZdAutoscalingUnit(
         unit_title='app1',
         template=template,
-        zd_state='blue',
         dependencies=['app2'],
         network_config=network_config,
         elb_config=elb_config,
@@ -124,7 +123,6 @@ runcmd:
     unit2 = ZdAutoscalingUnit(
         unit_title='app2',
         template=template,
-        zd_state='green',
         dependencies=['app1'],
         network_config=network_config,
         elb_config=elb_config,

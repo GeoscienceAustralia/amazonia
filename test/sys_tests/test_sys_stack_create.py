@@ -4,10 +4,9 @@ import json
 import os
 import time
 
+import amazonia.amz as amz
 import boto3
 import yaml
-
-import amazonia.amz as amz
 
 """
 This Script will take a cloud formation template file and upload it to create a cloud formation stack in aws using boto3
@@ -148,10 +147,10 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--yaml',
-                        default=os.path.join(__location__, './application.yaml'),
+                        default=os.path.join(__location__, '../../amazonia/application.yaml'),
                         help="Path to the applications amazonia yaml file")
     parser.add_argument('-d', '--default',
-                        default=os.path.join(__location__, './defaults.yaml'),
+                        default=os.path.join(__location__, '../../amazonia/defaults.yaml'),
                         help='Path to the environmental defaults yaml file')
     parser.add_argument('-t', '--template',
                         default='stack.template',
