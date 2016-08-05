@@ -143,6 +143,12 @@ class Yaml(object):
                         self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])
 
     def set_nested_object_values(self, nested_object_user_data, nested_object_default, nested_object_type):
+        """
+        :param nested_object_user_data: user nested object
+        :param nested_object_default:  nested object default values
+        :param nested_object_type: nested object type (asg_config, elb_config, database_config etc)
+        :return: unified nested object
+        """
         unified_object = {}
         minsize = 0
         maxsize = 0
