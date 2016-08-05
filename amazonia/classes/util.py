@@ -8,7 +8,7 @@ logging.basicConfig(
 
 def read_yaml(user_yaml):
     """
-    Ingest user YAML
+    Load and return data from userdefined yaml file
     :param user_yaml: yaml file location
     :return: Json serialised version of Yaml
     """

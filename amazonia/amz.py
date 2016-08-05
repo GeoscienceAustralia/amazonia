@@ -26,8 +26,9 @@ def create_stack(united_data):
 
 def generate_template(yaml_data, default_data):
     """
-    :param yaml_data: User YAML data
-    :param default_data: default YAML data
+    Generate troposhere template from given yaml data
+    :param yaml_data: User yaml data
+    :param default_data: default yaml data
     :return: Troposphere generated cloud formation template
     """
     yaml_return = Yaml(yaml_data, default_data)

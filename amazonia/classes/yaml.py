@@ -154,6 +154,7 @@ class Yaml(object):
 
     def set_nested_object_values(self, nested_object_user_data, nested_object_default, nested_object_type):
         """
+        Set fields for a nested object (asg_config, elb_config, database_config etc)
         :param nested_object_user_data: user nested object
         :param nested_object_default:  nested object default values
         :param nested_object_type: nested object type (asg_config, elb_config, database_config etc)
@@ -182,6 +183,11 @@ class Yaml(object):
 
     @staticmethod
     def validate_yaml(data, schema):
+        """
+        Validates a given data structure against a cerberus schema and raises a validation error if there are any issues
+        :param data:  inbound data structure to validate
+        :param schema: cerberus schema to validate against
+        """
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):
