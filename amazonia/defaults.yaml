@@ -27,59 +27,71 @@ home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'
 stack_hosted_zone_name:
+owner_emails:
+nat_alerting: false
+iam_instance_profile_arn:
+zd_autoscaling_units:
 autoscaling_units:
 database_units:
 
 #Common unit default values
 unit_title: 'defaulttitle'
+dependencies:
 
 #Database unit default values
-db_instance_type: 'db.t2.small'
-db_engine: 'postgres'
-db_port: '5432'
-db_name: 'myDb'
-db_hdd_size: 5
-db_snapshot_id:
+database_config:
+  db_instance_type: 'db.t2.small'
+  db_engine: 'postgres'
+  db_port: '5432'
+  db_name: 'myDb'
+  db_hdd_size: 5
+  db_snapshot_id:
 
-#Autoscaling unit default values
-unit_hosted_zone_name:
-image_id: 'ami-dc361ebf'
-instance_type: 't2.micro'
-iam_instance_profile_arn:
-protocols:
-  - 'HTTP'
-instanceports:
-  - '80'
-loadbalancerports:
-  - '80'
-path2ping: '/index.html'
-minsize: '1'
-maxsize: '1'
-health_check_grace_period: '300'
-health_check_type: 'ELB'
-hdd_size:
-sns_topic_arn:
-sns_notification_types:
-elb_log_bucket:
-public_unit: true
-dependencies:
-owner_emails:
-nat_alerting: false
-userdata: |
-      #cloud-config
-      repo_update: true
-      repo_upgrade: all
-      packages:
-       - httpd
-      write_files:
-       - content: |
-          <html>
-          <body>
-          <h1>Amazonia created this stack!</h1>
-          </body>
-          </html>
-         path: /var/www/html/index.html
-         permissions: '0644'
-         owner: root:root
-      runcmd:
-       - service httpd start
+#(ZD) Autoscaling unit default values
+#ELB default values
+elb_config:
+  unit_hosted_zone_name:
+  protocols:
+    - 'HTTP'
+  instanceports:
+    - '80'
+  loadbalancerports:
+    - '80'
+  path2ping: '/index.html'
+  elb_log_bucket:
+  public_unit: true
+
+#Asg default values
+asg_config:
+  image_id: 'ami-dc361ebf'
+  instance_type: 't2.micro'
+  iam_instance_profile_arn:
+  minsize: '1'
+  maxsize: '1'
+  health_check_grace_period: '300'
+  health_check_type: 'ELB'
+  hdd_size:
+  sns_topic_arn:
+  sns_notification_types:
+    - 'autoscaling:EC2_INSTANCE_LAUNCH'
+    - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+    - 'autoscaling:EC2_INSTANCE_TERMINATE'
+    - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+  userdata: |
+    #cloud-config
+    repo_update: true
+    repo_upgrade: all
+    packages:
+     - httpd
+    write_files:
+     - content: |
+        <html>
+        <body>
+        <h1>Amazonia created this stack!</h1>
+        </body>
+        </html>
+       path: /var/www/html/index.html
+       permissions: '0644'
+       owner: root:root
+    runcmd:
+     - service httpd start

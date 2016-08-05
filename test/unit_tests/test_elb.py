@@ -2,10 +2,15 @@
 
 # noinspection PyUnresolvedReferences
 import re
-from nose.tools import *
-from troposphere import Template, Ref
 
+from nose.tools import *
+from troposphere import ec2, Ref, Template
+
+from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.elb import Elb
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 
 def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, path2ping='index.html',
@@ -21,20 +26,58 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
     :return: Troposphere object for Elb,
     """
-    vpc = 'vpc-12345'
-    pub_sub_list = ['subnet-123456', 'subnet-123496', 'subnet-123454']
+    template = Template()
+    vpc = ec2.VPC('MyVPC',
+                  CidrBlock='10.0.0.0/16')
+    private_subnets = [ec2.Subnet('MySubnet',
+                                  AvailabilityZone='ap-southeast-2a',
+                                  VpcId=Ref(vpc),
+                                  CidrBlock='10.0.1.0/24')]
+    public_subnets = [ec2.Subnet('MySubnet2',
+                                 AvailabilityZone='ap-southeast-2a',
+                                 VpcId=Ref(vpc),
+                                 CidrBlock='10.0.2.0/24')]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=vpc.title,
+        is_nat=True,
+        alert=None,
+        alert_emails=None,
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None
+    )
+    nat = SingleInstance(title='Nat',
+                         template=template,
+                         single_instance_config=single_instance_config)
+    network_config = NetworkConfig(
+        vpc=vpc,
+        public_subnets=public_subnets,
+        jump=None,
+        nat=nat,
+        private_subnets=private_subnets,
+        public_cidr=None,
+        stack_hosted_zone_name=None,
+        cd_service_role_arn=None,
+        keypair=None
+    )
+    elb_config = ElbConfig(
+        instanceports=[instanceport],
+        loadbalancerports=[loadbalancerport],
+        protocols=[protocol],
+        path2ping=path2ping,
+        elb_log_bucket=elb_log_bucket,
+        public_unit=public_unit,
+        unit_hosted_zone_name=hosted_zone_name
+    )
+
     elb = Elb(title='elb',
-              instanceports=[instanceport],
-              loadbalancerports=[loadbalancerport],
-              subnets=pub_sub_list,
-              protocols=[protocol],
-              vpc=vpc,
-              hosted_zone_name=hosted_zone_name,
-              path2ping=path2ping,
               template=Template(),
-              elb_log_bucket=elb_log_bucket,
-              gateway_attachment='testIgAtch',
-              public_unit=public_unit)
+              network_config=network_config,
+              elb_config=elb_config)
     return elb
 
 

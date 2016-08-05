@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import yaml
 import os
+
+import yaml
 from amazonia.classes.yaml import Yaml
 
 
@@ -16,11 +17,7 @@ def main():
         default_data = yaml.safe_load(default_yaml)
         print('\ndefault_data=\n{0}\n'.format(default_data))
 
-    with open(os.path.join(__location__, '../../amazonia/schema.yaml'), 'r') as schema_yaml:
-        schema = yaml.safe_load(schema_yaml)
-        print('\nschema=\n{0}\n'.format(schema))
-
-    yaml_return = Yaml(user_stack_data, default_data, schema)
+    yaml_return = Yaml(user_stack_data, default_data)
     stack_input = yaml_return.united_data
 
     print('\nstack_input=\n{0}\n'.format(stack_input))

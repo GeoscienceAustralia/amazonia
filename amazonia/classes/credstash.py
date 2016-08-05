@@ -11,7 +11,8 @@ class Credstash(object):
         CredStash - https://github.com/fugue/credstash
         Create Secret Server using DynamoDB and KMS Key
         :param ddb_title: Name of the DynamoDB Table
-        :param ddb_att_dict: Attributes for the DynamoDB object in the format [{ddb_name='name', ddb_atttype='S', ddb_keytype='HASH'},]
+        :param ddb_att_dict: Attributes for the DynamoDB object in the format
+        [{ddb_name='name', ddb_atttype='S', ddb_keytype='HASH'},]
         ddb_atttype valid_types = ["S", "N", "B"]
         ddb_keytype valid types = ["HASH", "RANGE"]
         :param key_title: String title of the key in AWS, not the alias name

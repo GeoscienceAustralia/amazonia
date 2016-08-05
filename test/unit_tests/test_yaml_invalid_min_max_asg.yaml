@@ -5,5 +5,6 @@
 stack_title: 'testStack'
 autoscaling_units:
   -
-    minsize: '2'
-    maxsize: '1'
+    asg_config:
+      minsize: '2'
+      maxsize: '1'

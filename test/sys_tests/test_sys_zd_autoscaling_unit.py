@@ -3,11 +3,11 @@
 from troposphere import ec2, Ref, Template, Join, Tags
 
 from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.autoscaling_unit import AutoscalingUnit
-from amazonia.classes.asg_config import AsgConfig
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
 
 
 def main():
@@ -52,76 +52,78 @@ runcmd:
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=internet_gateway.title,
+        is_nat=True,
         alert=None,
         alert_emails=None,
         hosted_zone_name=None,
-        iam_instance_profile_arn=None,
-        is_nat=True
+        iam_instance_profile_arn=None
     )
     nat = SingleInstance(title='nat',
                          template=template,
                          single_instance_config=single_instance_config
                          )
-
     single_instance_config.si_image_id = 'ami-dc361ebf'
     single_instance_config.is_nat = False
-
     jump = SingleInstance(title='jump',
                           template=template,
                           single_instance_config=single_instance_config)
 
-    service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
+    cd_service_role_arn = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
 
-    network_config = NetworkConfig(
-        vpc=vpc,
-        jump=jump,
-        nat=nat,
-        private_subnets=private_subnets,
-        public_subnets=public_subnets,
-        public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None,
-        keypair='pipeline',
-        cd_service_role_arn=service_role_arn
-    )
-    elb_config = ElbConfig(
-        protocols=['HTTP'],
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        path2ping='/index.html',
-        elb_log_bucket=None,
-        public_unit=True,
-        unit_hosted_zone_name=None
-    )
-    asg_conifg = AsgConfig(
-        minsize=1,
-        maxsize=1,
-        health_check_grace_period=300,
-        health_check_type='ELB',
-        image_id='ami-dc361ebf',
-        instance_type='t2.nano',
-        userdata=userdata,
-        iam_instance_profile_arn=None,
-        sns_topic_arn=None,
-        sns_notification_types=None,
-        hdd_size=None
-    )
+    network_config = NetworkConfig(public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+                                   vpc=vpc,
+                                   public_subnets=public_subnets,
+                                   private_subnets=private_subnets,
+                                   nat=nat,
+                                   jump=jump,
+                                   stack_hosted_zone_name=None,
+                                   cd_service_role_arn=cd_service_role_arn,
+                                   keypair='pipeline')
+    protocols = ['HTTP']
+    instanceports = ['80']
+    loadbalancerports = ['80']
+    path2ping = '/index.html'
+    minsize = 1
+    maxsize = 1
+    health_check_grace_period = 300
+    health_check_type = 'ELB'
 
-    unit1 = AutoscalingUnit(
+    image_id = 'ami-dc361ebf'
+    instance_type = 't2.nano'
+
+    elb_config = ElbConfig(protocols=protocols, instanceports=instanceports, loadbalancerports=loadbalancerports,
+                           elb_log_bucket=None, path2ping=path2ping, public_unit=True, unit_hosted_zone_name=None)
+    blue_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
+                                health_check_grace_period=health_check_grace_period,
+                                health_check_type=health_check_type, minsize=minsize,
+                                maxsize=maxsize, image_id=image_id,
+                                instance_type=instance_type, userdata=userdata,
+                                iam_instance_profile_arn=None, hdd_size=8)
+    green_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
+                                 health_check_grace_period=health_check_grace_period,
+                                 health_check_type=health_check_type, minsize=minsize,
+                                 maxsize=maxsize, image_id=image_id,
+                                 instance_type=instance_type, userdata=userdata,
+                                 iam_instance_profile_arn=None, hdd_size=8)
+
+    unit1 = ZdAutoscalingUnit(
         unit_title='app1',
         template=template,
-        dependencies='app2',
+        dependencies=['app2'],
         network_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_conifg
+        blue_asg_config=blue_asg_config,
+        green_asg_config=green_asg_config
     )
 
-    unit2 = AutoscalingUnit(
+    unit2 = ZdAutoscalingUnit(
         unit_title='app2',
-        network_config=network_config,
         template=template,
+        dependencies=['app1'],
+        network_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_conifg,
-        dependencies='app1'
+        blue_asg_config=blue_asg_config,
+        green_asg_config=green_asg_config
     )
 
     unit1.add_unit_flow(unit2)

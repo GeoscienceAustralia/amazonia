@@ -3,26 +3,18 @@ from troposphere import ec2, Ref, Template
 
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 
-userdata = template = vpc = private_subnets = public_subnets = nat = jump = health_check_grace_period = \
-    health_check_type = None
+template = network_config = elb_config = asg_config = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
-    global userdata, template, vpc, private_subnets, public_subnets, nat, jump, health_check_grace_period, \
-        health_check_type
-    userdata = """
-#cloud-config
-repo_update: true
-repo_upgrade: all
+    global template, network_config, elb_config, asg_config
 
-packages:
- - httpd
-
-runcmd:
- - service httpd start
-    """
     template = Template()
 
     vpc = ec2.VPC('MyVPC',
@@ -35,29 +27,73 @@ runcmd:
                                  AvailabilityZone='ap-southeast-2a',
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=vpc.title,
+        alert=False,
+        alert_emails=['some@email.com'],
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        is_nat=True
+    )
     nat = SingleInstance(title='Nat',
-                         keypair='pipeline',
-                         si_image_id='ami-53371f30',
-                         si_instance_type='t2.nano',
-                         vpc=vpc,
-                         subnet=public_subnets[0],
                          template=template,
-                         instance_dependencies=vpc.title,
-                         alert=False,
-                         alert_emails=['some@email.com'])
+                         single_instance_config=single_instance_config
+                         )
+    single_instance_config.is_nat = False
+    single_instance_config.si_image_id = 'ami-dc361ebf'
     jump = SingleInstance(title='Jump',
-                          keypair='pipeline',
-                          si_image_id='ami-dc361ebf',
-                          si_instance_type='t2.nano',
-                          vpc=vpc,
-                          subnet=public_subnets[0],
                           template=template,
-                          instance_dependencies=vpc.title,
-                          alert=False,
-                          alert_emails=['some@email.com'])
+                          single_instance_config=single_instance_config
+                          )
 
-    health_check_grace_period = 300
-    health_check_type = 'ELB'
+    network_config = NetworkConfig(
+        vpc=vpc,
+        private_subnets=private_subnets,
+        public_subnets=public_subnets,
+        nat=nat,
+        jump=jump,
+        public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+        stack_hosted_zone_name=None,
+        cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
+        keypair='pipeline'
+    )
+    asg_config = AsgConfig(
+        userdata="""
+#cloud-config
+repo_update: true
+repo_upgrade: all
+
+packages:
+ - httpd
+
+runcmd:
+ - service httpd start
+    """,
+        health_check_grace_period=300,
+        health_check_type='ELB',
+        hdd_size=None,
+        iam_instance_profile_arn=None,
+        image_id='ami-dc361ebf',
+        instance_type='t2.nano',
+        maxsize=1,
+        minsize=1,
+        sns_topic_arn=None,
+        sns_notification_types=None
+    )
+    elb_config = ElbConfig(
+        protocols=['HTTP'],
+        instanceports=['80'],
+        loadbalancerports=['80'],
+        path2ping='index.html',
+        elb_log_bucket=None,
+        public_unit=True,
+        unit_hosted_zone_name=None
+    )
 
 
 @with_setup(setup_resources())
@@ -96,37 +132,13 @@ def create_autoscaling_unit(unit_title):
     :param unit_title: title of unit
     :return new autoscaling unit
     """
-    global userdata, template, vpc, private_subnets, public_subnets, nat, jump, health_check_grace_period, \
-        health_check_type
+    global template, network_config, asg_config, elb_config
     unit = AutoscalingUnit(
         unit_title=unit_title,
-        vpc=vpc,
+        network_config=network_config,
+        asg_config=asg_config,
+        elb_config=elb_config,
         template=template,
-        protocols=['HTTP'],
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        path2ping='index.html',
-        public_subnets=public_subnets,
-        private_subnets=private_subnets,
-        public_cidr={'name': 'PublicIp','cidr': '0.0.0.0/0'},
-        minsize=1,
-        maxsize=1,
-        keypair='pipeline',
-        image_id='ami-dc361ebf',
-        instance_type='t2.nano',
-        health_check_grace_period=health_check_grace_period,
-        health_check_type=health_check_type,
-        userdata=userdata,
-        cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
-        iam_instance_profile_arn=None,
-        nat=nat,
-        jump=jump,
-        unit_hosted_zone_name=None,
-        gateway_attachment='testIgAtch',
-        elb_log_bucket=None,
-        public_unit=True,
-        sns_topic_arn=None,
-        sns_notification_types=None,
         dependencies=None
     )
     return unit

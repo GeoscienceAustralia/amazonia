@@ -1,16 +1,23 @@
 #!/usr/bin/python3
 
-from troposphere import Ref, Template, ec2, Tags, Join
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.subnet import Subnet
+from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
+from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.subnet import Subnet
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from troposphere import Ref, Template, ec2, Tags, Join
 
 
 class Stack(object):
     def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
-                 public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, autoscaling_units,
-                 database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_alerting):
+                 public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
+                 autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
+                 nat_alerting):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -29,6 +36,7 @@ class Stack(object):
         :param jump_instance_type: instance type for jumphost
         :param nat_image_id: AMI for nat
         :param nat_instance_type: instance type for nat
+        :param zd_autoscaling_units: list of zd_autosclaing_unit dicts
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
@@ -51,6 +59,7 @@ class Stack(object):
         self.hosted_zone_name = stack_hosted_zone_name
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
+        self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.units = {}
         self.private_subnets = []
@@ -109,38 +118,48 @@ class Stack(object):
                                               cidr=self.generate_subnet_cidr(is_public=True)
                                               ).trop_subnet)
 
-        # Add Jumpbox and NAT and associated security group ingress and egress rules
-        self.jump = SingleInstance(
-            title=self.title + 'Jump',
+        jump_config = SingleInstanceConfig(
             keypair=self.keypair,
             si_image_id=jump_image_id,
             si_instance_type=jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template,
             hosted_zone_name=self.hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
             alert_emails=owner_emails,
-            alert=nat_alerting
+            alert=nat_alerting,
+            is_nat=False
+        )
+
+        # Add Jumpbox and NAT and associated security group ingress and egress rules
+        self.jump = SingleInstance(
+            title=self.title + 'Jump',
+            template=self.template,
+            single_instance_config=jump_config
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
         self.jump.add_egress(receiver=self.public_cidr, port='-1')
 
-        self.nat = SingleInstance(
-            title=self.title + 'Nat',
+        nat_config = SingleInstanceConfig(
             keypair=self.keypair,
             si_image_id=nat_image_id,
             si_instance_type=nat_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            template=self.template,
             is_nat=True,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
             alert_emails=owner_emails,
-            alert=nat_alerting
+            alert=nat_alerting,
+            hosted_zone_name=None
+        )
+
+        self.nat = SingleInstance(
+            title=self.title + 'Nat',
+            template=self.template,
+            single_instance_config=nat_config
         )
 
         # Add Routes
@@ -156,39 +175,68 @@ class Stack(object):
                                                                   DestinationCidrBlock=self.public_cidr['cidr']))
         self.private_route.DependsOn = self.gateway_attachment.title
 
+        self.network_config = NetworkConfig(vpc=self.vpc,
+                                            public_subnets=self.public_subnets,
+                                            private_subnets=self.private_subnets,
+                                            jump=self.jump,
+                                            nat=self.nat,
+                                            public_cidr=self.public_cidr,
+                                            stack_hosted_zone_name=self.hosted_zone_name,
+                                            keypair=self.keypair,
+                                            cd_service_role_arn=self.code_deploy_service_role
+                                            )
+        # Add ZD Autoscaling Units
+        for unit in self.zd_autoscaling_units:  # type: dict
+            orig_unit_title = unit['unit_title']
+            if orig_unit_title in self.units:
+                raise DuplicateUnitNameError("Error: zd_autoscaling unit name '{0}' has already been specified, "
+                                             'it must be unique.'.format(orig_unit_title))
+            # Update unit title with stackname prefix
+            unit['unit_title'] = self.title + orig_unit_title
+            elb_config = ElbConfig(**unit['elb_config'])
+
+            blue_asg_config = AsgConfig(**unit['blue_asg_config'])
+            green_asg_config = AsgConfig(**unit['green_asg_config'])
+            self.units[orig_unit_title] = ZdAutoscalingUnit(
+                unit_title=unit['unit_title'],
+                template=self.template,
+                network_config=self.network_config,
+                elb_config=elb_config,
+                blue_asg_config=blue_asg_config,
+                green_asg_config=green_asg_config,
+                dependencies=unit['dependencies']
+            )
         # Add Autoscaling Units
-        for unit in self.autoscaling_units:
+        for unit in self.autoscaling_units:  # type: dict
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: autoscaling unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             # Update unit title with stackname prefix
             unit['unit_title'] = self.title + orig_unit_title
+            elb_config = ElbConfig(**unit['elb_config'])
+            asg_config = AsgConfig(**unit['asg_config'])
             self.units[orig_unit_title] = AutoscalingUnit(
-                vpc=self.vpc,
+                unit_title=unit['unit_title'],
                 template=self.template,
-                public_subnets=self.public_subnets,
-                private_subnets=self.private_subnets,
-                keypair=self.keypair,
-                cd_service_role_arn=self.code_deploy_service_role,
-                nat=self.nat,
-                jump=self.jump,
-                gateway_attachment=self.gateway_attachment,
-                public_cidr=self.public_cidr,
-                **unit
+                network_config=self.network_config,
+                elb_config=elb_config,
+                asg_config=asg_config,
+                dependencies=unit['dependencies']
             )
         # Add Database Units
-        for unit in self.database_units:
+        for unit in self.database_units:  # type: dict
             orig_unit_title = unit['unit_title']
             if orig_unit_title in self.units:
                 raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(orig_unit_title))
             unit['unit_title'] = self.title + orig_unit_title
+            database_config = DatabaseConfig(**unit['database_config'])
             self.units[orig_unit_title] = DatabaseUnit(
-                vpc=self.vpc,
+                unit_title=unit['unit_title'],
                 template=self.template,
-                subnets=self.private_subnets,
-                **unit
+                network_config=self.network_config,
+                database_config=database_config
             )
         # Add Unit flow
         for unit_name in self.units:

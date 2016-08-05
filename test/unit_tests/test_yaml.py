@@ -3,12 +3,11 @@
 import os
 
 import yaml
+from amazonia.classes.yaml import Yaml, InsecureVariableError
+from cerberus import ValidationError
 from nose.tools import *
 
-from cerberus import ValidationError
-from amazonia.classes.yaml import Yaml, InsecureVariableError
-
-default_data = schema = None
+default_data = None
 
 
 def setup_resources():
@@ -16,10 +15,8 @@ def setup_resources():
     Create default data yaml
     """
     global default_data
-    global schema
 
     default_data = open_yaml_file('../../amazonia/defaults.yaml')
-    schema = open_yaml_file('../../amazonia/schema.yaml')
 
 
 def open_yaml_file(file_path):
@@ -34,7 +31,7 @@ def open_yaml_file(file_path):
         return yaml.safe_load(input_yaml)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_complete_valid_values():
     """
     Validate stack yaml value is a list of dictionaries
@@ -42,7 +39,7 @@ def test_complete_valid_values():
     """
     global default_data
     valid_stack_data = open_yaml_file('test_yaml_complete_valid.yaml')
-    amz_yaml = Yaml(valid_stack_data, default_data, schema)
+    amz_yaml = Yaml(valid_stack_data, default_data)
 
     stack_input = amz_yaml.united_data
 
@@ -90,28 +87,31 @@ def test_complete_valid_values():
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
-    assert_equals(autoscaling_unit_input['image_id'], 'ami-dc361ebf')
-    assert_equals(autoscaling_unit_input['instance_type'], 't2.micro')
-    assert_equals(autoscaling_unit_input['path2ping'], '/index.html')
-    assert_list_equal(autoscaling_unit_input['protocols'], ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['loadbalancerports'], ['80'])
-    assert_list_equal(autoscaling_unit_input['instanceports'], ['80'])
-    assert_equals(autoscaling_unit_input['minsize'], '1')
-    assert_equals(autoscaling_unit_input['maxsize'], '1')
-    assert_equals(autoscaling_unit_input['health_check_grace_period'], '300')
-    assert_equals(autoscaling_unit_input['iam_instance_profile_arn'], 'arn:aws:iam::1234567890124:role/InstanceProfile')
-    assert_equals(autoscaling_unit_input['sns_topic_arn'], 'sns_topic_arn')
-    assert_equals(autoscaling_unit_input['sns_notification_types'], ['autoscaling:EC2_INSTANCE_LAUNCH',
-                                                                     'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                                                                     'autoscaling:EC2_INSTANCE_TERMINATE',
-                                                                     'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
-    assert_equals(autoscaling_unit_input['elb_log_bucket'], 'elb_log_bucket')
-    assert_equals(autoscaling_unit_input['health_check_type'], 'ELB')
+    assert_equals(autoscaling_unit_input['asg_config']['image_id'], 'ami-dc361ebf')
+    assert_equals(autoscaling_unit_input['asg_config']['instance_type'], 't2.micro')
+    assert_equals(autoscaling_unit_input['elb_config']['path2ping'], '/index.html')
+    assert_list_equal(autoscaling_unit_input['elb_config']['protocols'], ['HTTP'])
+    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancerports'], ['80'])
+    assert_list_equal(autoscaling_unit_input['elb_config']['instanceports'], ['80'])
+    assert_equals(autoscaling_unit_input['asg_config']['minsize'], '1')
+    assert_equals(autoscaling_unit_input['asg_config']['maxsize'], '1')
+    assert_equals(autoscaling_unit_input['asg_config']['health_check_grace_period'], '300')
+    assert_equals(autoscaling_unit_input['asg_config']['iam_instance_profile_arn'],
+                  'arn:aws:iam::1234567890124:role/InstanceProfile')
+    assert_equals(autoscaling_unit_input['asg_config']['sns_topic_arn'], 'sns_topic_arn')
+    assert_equals(autoscaling_unit_input['asg_config']['sns_notification_types'],
+                  ['autoscaling:EC2_INSTANCE_LAUNCH',
+                   'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
+                   'autoscaling:EC2_INSTANCE_TERMINATE',
+                   'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
+    assert_equals(autoscaling_unit_input['elb_config']['elb_log_bucket'], 'elb_log_bucket')
+    assert_equals(autoscaling_unit_input['asg_config']['health_check_type'], 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])
-    assert_equals(autoscaling_unit_input['unit_hosted_zone_name'], 'test.org.')
+    assert_equals(autoscaling_unit_input['elb_config']['unit_hosted_zone_name'], 'test.org.')
 
     # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
-    assert_equals(stack_input['autoscaling_units'][0]['unit_hosted_zone_name'], stack_input['stack_hosted_zone_name'])
+    assert_equals(stack_input['autoscaling_units'][0]['elb_config']['unit_hosted_zone_name'],
+                  stack_input['stack_hosted_zone_name'])
 
     database_unit_input = stack_input['database_units'][0]
 
@@ -127,13 +127,13 @@ def test_complete_valid_values():
     assert_equals(len(expected_database_unit_set.difference(database_unit_input_set)), 0)
 
     assert_equals(database_unit_input['unit_title'], 'db1')
-    assert_equals(database_unit_input['db_instance_type'], 'db.m1.small')
-    assert_equals(database_unit_input['db_engine'], 'postgres')
-    assert_equals(database_unit_input['db_port'], '5432')
-    assert_equals(database_unit_input['db_name'], 'myDb')
+    assert_equals(database_unit_input['database_config']['db_instance_type'], 'db.m1.small')
+    assert_equals(database_unit_input['database_config']['db_engine'], 'postgres')
+    assert_equals(database_unit_input['database_config']['db_port'], '5432')
+    assert_equals(database_unit_input['database_config']['db_name'], 'myDb')
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_validate_cidr_yaml():
     """
     Test the detection of invalid CIDRs
@@ -144,17 +144,14 @@ def test_validate_cidr_yaml():
     invalid_home_cidrs_data = open_yaml_file('test_yaml_invalid_home_cidrs.yaml')
     invalid_home_cidr_title_data = open_yaml_file('test_yaml_invalid_home_cidr_title.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_get_invalid_values_yaml():
     """
     Test the detection of unrecognized or invalid keys within YAML files
@@ -165,17 +162,14 @@ def test_get_invalid_values_yaml():
     invalid_autoscaling_unit_data = open_yaml_file('test_yaml_invalid_key_autoscaling_unit.yaml')
     invalid_database_unit_data = open_yaml_file('test_yaml_invalid_key_database_unit.yaml')
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_database_unit_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_insecure_variables_yaml():
     """
     Test the detection of insecure variables within YAML files
@@ -185,14 +179,12 @@ def test_insecure_variables_yaml():
     insecure_access_id = open_yaml_file('test_yaml_insecure_access_id.yaml')
     insecure_secret_key = open_yaml_file('test_yaml_insecure_secret_key.yaml')
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_access_id,
-                                                  'default_data': default_data,
-                                                  'schema': schema})
+                                                  'default_data': default_data})
     assert_raises(InsecureVariableError, Yaml, **{'user_stack_data': insecure_secret_key,
-                                                  'default_data': default_data,
-                                                  'schema': schema})
+                                                  'default_data': default_data})
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_invalid_min_max_asg():
     """
     Test the detection of a larger minimum that the provided maximum for an auto scaling unit
@@ -201,8 +193,7 @@ def test_invalid_min_max_asg():
     invalid_min_max_stack_data = open_yaml_file('test_yaml_invalid_min_max_asg.yaml')
 
     assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_min_max_stack_data,
-                                            'default_data': default_data,
-                                            'schema': schema})
+                                            'default_data': default_data})
 
 
 def test_detect_unencrypted_access_keys():

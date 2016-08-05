@@ -7,32 +7,16 @@ from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
 
 class Asg(SecurityEnabledObject):
-    def __init__(self, title, vpc, template, minsize, maxsize, subnets, load_balancer,
-                 keypair, image_id, instance_type, health_check_grace_period, health_check_type,
-                 iam_instance_profile_arn, userdata, sns_topic_arn, sns_notification_types, cd_service_role_arn,
-                 hdd_size=None):
+    def __init__(self, title, template, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group and codedeploy definition
         :param title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
-        :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
         :param template: Troposphere stack to append resources to
-        :param minsize: minimum size of autoscaling group
-        :param maxsize: maximum size of autoscaling group
-        :param subnets: subnets to create autoscaled instances in
-        :param load_balancer: load balancer to associate autoscaling group with
-        :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
-        :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
-        :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
-        :param health_check_grace_period: Time given to an instance before asg attempts to test it
-        :param health_check_type: either test health according to ELB or EC2 instance status check
-        :param iam_instance_profile_arn: Iam instance profile ARN to allow isntance access to services like S3
-        :param userdata: Instance boot script
-        :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
-        :param sns_notification_types: list of SNS autoscale notification types
-        :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
-        :param hdd_size: the size of the hard drive on the instances.
+        :param network_config: object containing network related config
+        :param asg_config: object containing asg related config
+        :param load_balancers: list of load balancers to associate autoscaling group with
         """
-        super(Asg, self).__init__(vpc=vpc, title=title, template=template)
+        super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
 
         self.template = template
         self.title = title + 'Asg'
@@ -42,89 +26,58 @@ class Asg(SecurityEnabledObject):
         self.cd_deploygroup = None
         self.create_asg(
             title=self.title,
-            minsize=minsize,
-            maxsize=maxsize,
-            subnets=subnets,
-            load_balancer=load_balancer,
-            keypair=keypair,
-            image_id=image_id,
-            instance_type=instance_type,
-            health_check_grace_period=health_check_grace_period,
-            health_check_type=health_check_type,
-            iam_instance_profile_arn=iam_instance_profile_arn,
-            sns_topic_arn=sns_topic_arn,
-            sns_notification_types=sns_notification_types,
-            userdata=userdata,
-            hdd_size=hdd_size
+            network_config=network_config,
+            load_balancers=load_balancers,
+            asg_config=asg_config
         )
-        if cd_service_role_arn is not None:
+        if network_config.cd_service_role_arn is not None:
             self.create_cd_deploygroup(
                 title=self.title,
-                cd_service_role_arn=cd_service_role_arn
+                cd_service_role_arn=network_config.cd_service_role_arn
             )
 
-    def create_asg(self, title, minsize, maxsize, subnets, load_balancer, keypair, image_id, instance_type,
-                   health_check_grace_period, health_check_type, iam_instance_profile_arn, userdata, sns_topic_arn,
-                   sns_notification_types, hdd_size):
+    def create_asg(self, title, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group object
         AWS Cloud Formation:
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-group.html
         Troposphere link: https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         :param title: Title of the autoscaling application
-        :param minsize: minimum size of autoscaling group
-        :param maxsize: maximum size of autoscaling group
-        :param subnets: subnets to create autoscaled instances in
-        :param load_balancer: load balancer to associate autoscaling group with
-        :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
-        :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
-        :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
-        :param health_check_grace_period: Time given to an instance before asg attempts to test it
-        :param health_check_type: either test health according to ELB or EC2 instance status check
-        :param iam_instance_profile_arn: Iam instance profile ARN to allow isntance access to services like S3
-        :param userdata: Instance boot script
-        :param sns_topic_arn: ARN for sns topic to notify regarding autoscale events
-        :param sns_notification_types: list of SNS autoscale notification types
-        :param hdd_size: the size of the hard drive on the instances.
-        :return string representing Auto Scaling Group name
+        :param load_balancers: list of load balancers to associate autoscaling group with
+        :param asg_config: object containing asg related variables
+        :param network_config: object containing network related variables
         """
 
-        availability_zones = [subnet.AvailabilityZone for subnet in subnets]
+        availability_zones = [subnet.AvailabilityZone for subnet in network_config.private_subnets]
         self.trop_asg = self.template.add_resource(AutoScalingGroup(
             title,
-            MinSize=minsize,
-            MaxSize=maxsize,
-            VPCZoneIdentifier=[Ref(subnet.title) for subnet in subnets],
+            MinSize=asg_config.minsize,
+            MaxSize=asg_config.maxsize,
+            VPCZoneIdentifier=[Ref(subnet.title) for subnet in network_config.private_subnets],
             AvailabilityZones=availability_zones,
-            LoadBalancerNames=[Ref(load_balancer)],
-            HealthCheckGracePeriod=health_check_grace_period,
-            HealthCheckType=health_check_type,
+            LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
+            HealthCheckGracePeriod=asg_config.health_check_grace_period,
+            HealthCheckType=asg_config.health_check_type,
             Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)])
         )
 
-        if sns_topic_arn is not None:
-            if sns_notification_types is not None and isinstance(sns_notification_types, list):
+        if asg_config.sns_topic_arn is not None:
+            if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
                 self.trop_asg.NotificationConfigurations = [
-                    NotificationConfigurations(TopicARN=sns_topic_arn,
-                                               NotificationTypes=sns_notification_types)]
+                    NotificationConfigurations(TopicARN=asg_config.sns_topic_arn,
+                                               NotificationTypes=asg_config.sns_notification_types)]
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
-            keypair=keypair,
-            image_id=image_id,
-            instance_type=instance_type,
-            iam_instance_profile_arn=iam_instance_profile_arn,
-            userdata=userdata,
-            hdd_size=hdd_size
+            asg_config=asg_config,
+            network_config=network_config
         ))
-        if userdata is None:
+        if asg_config.userdata is None:
             self.lc.UserData = ''
-        return title
 
-    def create_launch_config(self, title, keypair, image_id, instance_type, iam_instance_profile_arn, userdata,
-                             hdd_size):
+    def create_launch_config(self, title, asg_config, network_config):
         """
         Method to add a launch configuration resource to a cloud formation document
         AWS Cloud Formation links:
@@ -134,12 +87,8 @@ class Asg(SecurityEnabledObject):
         https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         :param title: Title of the autoscaling application
-        :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
-        :param image_id: AWS ami id to create instances from, e.g. 'ami-12345'
-        :param instance_type: Instance type to create instances of e.g. 't2.micro' or 't2.nano'
-        :param iam_instance_profile_arn: Iam instance profile ARN to allow isntance access to services like S3
-        :param userdata: Instance boot script
-        :param hdd_size: the size of the hard drive on the instances.
+        :param asg_config: object holding asg related variables
+        :param network_config: object holding network related variables
         :return string representing Launch Configuration name
         """
         launch_config_title = title + 'Lc'
@@ -147,23 +96,23 @@ class Asg(SecurityEnabledObject):
         self.lc = self.template.add_resource(LaunchConfiguration(
             launch_config_title,
             AssociatePublicIpAddress=False,
-            ImageId=image_id,
+            ImageId=asg_config.image_id,
             InstanceMonitoring=False,
-            InstanceType=instance_type,
-            KeyName=keypair,
+            InstanceType=asg_config.instance_type,
+            KeyName=network_config.keypair,
             SecurityGroups=[Ref(self.security_group.name)],
         ))
-        if iam_instance_profile_arn is not None:
-            self.lc.IamInstanceProfile = iam_instance_profile_arn
-        self.lc.UserData = Base64(userdata)
+        if asg_config.iam_instance_profile_arn is not None:
+            self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
+        self.lc.UserData = Base64(asg_config.userdata)
 
         # TODO: Work out how to avoid the assumption here of an amazon linux OS.
-        if hdd_size is not None:
+        if asg_config.hdd_size is not None:
             self.lc.BlockDeviceMappings = [
                 ec2.BlockDeviceMapping(
                     DeviceName="/dev/xvda",
                     Ebs=ec2.EBSBlockDevice(
-                        VolumeSize=hdd_size,
+                        VolumeSize=asg_config.hdd_size,
                         VolumeType='gp2'
                     )
                 ),

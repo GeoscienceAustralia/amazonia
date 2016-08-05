@@ -38,7 +38,7 @@ def setup_resources():
                                                         SubnetId='subnet-12345')],
         SourceDestCheck=True,
         DependsOn='igw-12345'
-        ))
+    ))
 
     my_elb = template.add_resource(elb.LoadBalancer('myLoadBalancer',
                                                     CrossZone=True,
@@ -104,7 +104,7 @@ def test_private_hosted_zone():
     assert_equals(hz.trop_hosted_zone.Name, domain)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_add_record_sets():
     """
     Tests the addition of record sets with various configurations.
