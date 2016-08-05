@@ -1,4 +1,9 @@
+import logging
 import yaml
+
+logging.basicConfig(
+    level=logging.INFO
+)
 
 
 def read_yaml(user_yaml):
