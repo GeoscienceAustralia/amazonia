@@ -23,57 +23,62 @@ class ZdAutoscalingUnit(object):
         self.template = template
         self.dependencies = dependencies if dependencies else []
         self.elb_config = elb_config
+
+        #Create prod and pre elb's
         self.prod_elb = Elb(
-            title='active' + unit_title,
+            title='prod' + unit_title,
             template=self.template,
             network_config=network_config,
             elb_config=elb_config
         )
-        self.test_elb = Elb(
-            title='inactive' + unit_title,
+        self.pre_elb = Elb(
+            title='pre' + unit_title,
             template=self.template,
             network_config=network_config,
             elb_config=elb_config
         )
 
-        blue_load_balancers = []
-        green_load_balancers = []
-
-        blue_load_balancers.append(self.prod_elb.trop_elb)
-        green_load_balancers.append(self.test_elb.trop_elb)
-
+        #override any undefined asg config values from common settings
         blue_asg_config.define_undefined_values(common_asg_config)
         green_asg_config.define_undefined_values(common_asg_config)
+
+        #create ASGs
         self.blue_asg = Asg(
             title='blue' + unit_title,
             template=self.template,
             network_config=network_config,
-            load_balancers=blue_load_balancers,
+            load_balancers=[self.prod_elb.trop_elb],
             asg_config=blue_asg_config
         )
         self.green_asg = Asg(
             title='green' + unit_title,
             template=self.template,
-            load_balancers=green_load_balancers,
             network_config=network_config,
+            load_balancers=[self.pre_elb.trop_elb],
             asg_config=green_asg_config
         )
 
+        #create security group rules to allow communication between the two ELBS to the two ASGs
         [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
          for instanceport in elb_config.instanceports]
         [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
          for instanceport in elb_config.instanceports]
-        [self.test_elb.add_flow(receiver=self.blue_asg, port=instanceport)
+        [self.pre_elb.add_flow(receiver=self.blue_asg, port=instanceport)
          for instanceport in elb_config.instanceports]
-        [self.test_elb.add_flow(receiver=self.green_asg, port=instanceport)
+        [self.pre_elb.add_flow(receiver=self.green_asg, port=instanceport)
          for instanceport in elb_config.instanceports]
 
+        #create security group rules to allow traffic from the public to the loadbalancer
         [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
          for loadbalancerport in elb_config.loadbalancerports]
-        [self.test_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
+        [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
          for loadbalancerport in elb_config.loadbalancerports]
+
+        #allow outbound traffic to the NAT
         self.green_asg.add_flow(receiver=network_config.nat, port='-1')
         self.blue_asg.add_flow(receiver=network_config.nat, port='-1')
+
+        #allow inbound traffic from the jumphost
         network_config.jump.add_flow(receiver=self.blue_asg, port='22')
         network_config.jump.add_flow(receiver=self.green_asg, port='22')
 
@@ -90,7 +95,7 @@ class ZdAutoscalingUnit(object):
         """
         :return: return the local ELB for destination of other unit's traffic
         """
-        return [self.prod_elb, self.test_elb]
+        return [self.prod_elb, self.pre_elb]
 
     def get_inbound_ports(self):
         """

@@ -32,26 +32,26 @@ class AsgConfig(object):
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.hdd_size = hdd_size
 
-    def define_undefined_values(self, other_asg_conifg):
+    def define_undefined_values(self, other_asg_config):
         """
         Method to override undefined values with values from another ASGConfig class
-        :param other_asg_conifg:
+        :param other_asg_config:
         """
-        self.sns_topic_arn = other_asg_conifg.sns_topic_arn if self.sns_topic_arn is None else self.sns_topic_arn
-        self.sns_notification_types = other_asg_conifg.sns_notification_types \
+        self.sns_topic_arn = other_asg_config.sns_topic_arn if self.sns_topic_arn is None else self.sns_topic_arn
+        self.sns_notification_types = other_asg_config.sns_notification_types \
             if self.sns_notification_types is None else self.sns_notification_types
-        self.cd_service_role_arn = other_asg_conifg.cd_service_role_arn \
+        self.cd_service_role_arn = other_asg_config.cd_service_role_arn \
             if self.cd_service_role_arn is None else self.cd_service_role_arn
-        self.health_check_grace_period = other_asg_conifg.health_check_grace_period \
+        self.health_check_grace_period = other_asg_config.health_check_grace_period \
             if self.health_check_grace_period is None else self.health_check_grace_period
-        self.health_check_type = other_asg_conifg.health_check_type \
+        self.health_check_type = other_asg_config.health_check_type \
             if self.health_check_type is None else self.health_check_type
-        self.keypair = other_asg_conifg.keypair if self.keypair is None else self.keypair
-        self.minsize = other_asg_conifg.minsize if self.minsize is None else self.minsize
-        self.maxsize = other_asg_conifg.maxsize if self.maxsize is None else self.maxsize
-        self.image_id = other_asg_conifg.image_id if self.image_id is None else self.image_id
-        self.instance_type = other_asg_conifg.instance_type if self.instance_type is None else self.instance_type
-        self.userdata = other_asg_conifg.userdata if self.userdata is None else self.userdata
-        self.iam_instance_profile_arn = other_asg_conifg.iam_instance_profile_arn \
+        self.keypair = other_asg_config.keypair if self.keypair is None else self.keypair
+        self.minsize = other_asg_config.minsize if self.minsize is None else self.minsize
+        self.maxsize = other_asg_config.maxsize if self.maxsize is None else self.maxsize
+        self.image_id = other_asg_config.image_id if self.image_id is None else self.image_id
+        self.instance_type = other_asg_config.instance_type if self.instance_type is None else self.instance_type
+        self.userdata = other_asg_config.userdata if self.userdata is None else self.userdata
+        self.iam_instance_profile_arn = other_asg_config.iam_instance_profile_arn \
             if self.iam_instance_profile_arn is None else self.iam_instance_profile_arn
-        self.hdd_size = other_asg_conifg.hdd_size if self.hdd_size is None else self.hdd_size
+        self.hdd_size = other_asg_config.hdd_size if self.hdd_size is None else self.hdd_size
