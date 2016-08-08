@@ -50,7 +50,7 @@ def main():
         db_engine='postgres',
         db_port='5432',
         db_name='myDb',
-        db_hdd_size=5,
+        db_hdd_size='5',
         db_snapshot_id=None,
         db_backup_window='17:00-17:30',
         db_backup_retention='4',
@@ -58,12 +58,14 @@ def main():
         db_storage_type='gp2'
     )
 
+    # Test RDS
     DatabaseUnit(unit_title='MyDb',
                  network_config=network_config,
                  template=template,
                  database_config=database_config
                  )
 
+    # Test RDS with SnapshotID
     database_config.db_snapshot_id = 'amazonia-verbose-snapshot'
 
     DatabaseUnit(unit_title='MyDb2',
