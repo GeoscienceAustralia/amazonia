@@ -52,7 +52,11 @@ def setup_resources():
         db_port='5432',
         db_name='MyDb',
         db_snapshot_id=None,
-        db_hdd_size=5
+        db_hdd_size=5,
+        db_backup_window='17:00-17:30',
+        db_backup_retention='4',
+        db_maintenance_window='Mon:01:00-Mon:01:30',
+        db_storage_type='gp2'
     )
 
 
@@ -74,6 +78,10 @@ def test_database():
     assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 2)
     assert_equals(db.trop_db.AllocatedStorage, 5)
+    assert_equals(db.trop_db.PreferredBackupWindow, '17:00-17:30'),
+    assert_equals(db.trop_db.BackupRetentionPeriod, '4'),
+    assert_equals(db.trop_db.PreferredMaintenanceWindow, 'Mon:01:00-Mon:01:30'),
+    assert_equals(db.trop_db.StorageType, 'gp2')
 
     assert_raises(InvalidFlowError, db.add_unit_flow, **{'receiver': db})
 

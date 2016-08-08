@@ -51,7 +51,11 @@ class Yaml(object):
                                 'db_engine',
                                 'db_port',
                                 'db_hdd_size',
-                                'db_snapshot_id']
+                                'db_snapshot_id',
+                                'db_backup_window',
+                                'db_backup_retention',
+                                'db_maintenance_window',
+                                'db_storage_type']
 
     """stack parameter field list"""
     stack_key_list = ['stack_title',

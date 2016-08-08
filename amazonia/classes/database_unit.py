@@ -37,6 +37,10 @@ class DatabaseUnit(SecurityEnabledObject):
             'Engine': database_config.db_engine,
             'Port': self.port,
             'VPCSecurityGroups': [Ref(self.security_group)],
+            'PreferredBackupWindow': database_config.db_backup_window,
+            'BackupRetentionPeriod': database_config.db_backup_retention,
+            'PreferredMaintenanceWindow': database_config.db_maintenance_window,
+            'StorageType': database_config.db_storage_type,
             'Tags': Tags(Name=Join('', [Ref('AWS::StackName'), '-', self.title]))
         }
         if database_config.db_snapshot_id is None:
@@ -52,7 +56,8 @@ class DatabaseUnit(SecurityEnabledObject):
         else:
             rds_params['DBSnapshotIdentifier'] = database_config.db_snapshot_id
             rds_params['DBName'] = ''
-        self.trop_db = template.add_resource(rds.DBInstance(self.title, **rds_params))
+        self.trop_db = template.add_resource(rds.DBInstance(self.title,
+                                                            **rds_params))
 
         self.template.add_output(Output(
             self.trop_db.title + 'Endpoint',

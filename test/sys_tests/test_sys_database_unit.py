@@ -51,7 +51,11 @@ def main():
         db_port='5432',
         db_name='myDb',
         db_hdd_size=5,
-        db_snapshot_id=None
+        db_snapshot_id=None,
+        db_backup_window='17:00-17:30',
+        db_backup_retention='4',
+        db_maintenance_window='Mon:01:00-Mon:01:30',
+        db_storage_type='gp2'
     )
 
     DatabaseUnit(unit_title='MyDb',
