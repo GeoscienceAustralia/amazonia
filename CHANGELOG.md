@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - 05/08/2016
+- Added zd_autoscaling_unit, a single object that provides zero downtime deployments to autoscaling compute instances.
+- Refactored the passing of multiple parameters into config objects (network, elb, asg and database) - this is a breaking change as the input yaml structure and cerberus validation rules have changed.
+- Updated tests to reflect changes
+
 ## [1.0.40] - 29/07/2016
 - Updated DB unit tests with working instance type, fixed styling issues
 - Added Angelo Pace to .pullapprove.yml
