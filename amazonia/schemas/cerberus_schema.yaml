@@ -211,7 +211,7 @@ database_config: &database_config
       nullable: True
     db_maintenance_window:
       type: 'string'
-      regex: '^\w{3}\d{2}:\d{2}-\w{3}\d{2}:\d{2}'
+      regex: '^\w{3}:\d{2}:\d{2}-\w{3}:\d{2}:\d{2}'
       nullable: True
     db_storage_type:
       type: 'string'
