@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1] - 08/08/2016
+- Adding new properties to database unit:db_snapshot_id, db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type
+
 ## [1.1.0] - 05/08/2016
 - Added zd_autoscaling_unit, a single object that provides zero downtime deployments to autoscaling compute instances.
 - Refactored the passing of multiple parameters into config objects (network, elb, asg and database) - this is a breaking change as the input yaml structure and cerberus validation rules have changed.

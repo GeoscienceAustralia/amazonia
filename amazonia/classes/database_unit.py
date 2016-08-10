@@ -39,6 +39,20 @@ class DatabaseUnit(SecurityEnabledObject):
             'VPCSecurityGroups': [Ref(self.security_group)],
             'Tags': Tags(Name=Join('', [Ref('AWS::StackName'), '-', self.title]))
         }
+
+        # Optional RDS Params
+        opt_rds_params = {
+            'PreferredBackupWindow': database_config.db_backup_window,
+            'BackupRetentionPeriod': database_config.db_backup_retention,
+            'PreferredMaintenanceWindow': database_config.db_maintenance_window,
+            'StorageType': database_config.db_storage_type,
+        }
+
+        for k, v in opt_rds_params.items():
+            if v is not None:
+                rds_params[k] = v
+
+        # Remove username and password if SnapshotID present
         if database_config.db_snapshot_id is None:
             self.username = self.template.add_parameter(Parameter(
                 self.title + 'Username', Type='String', Description='Master username of {0} RDS'.format(self.title),
@@ -52,7 +66,10 @@ class DatabaseUnit(SecurityEnabledObject):
         else:
             rds_params['DBSnapshotIdentifier'] = database_config.db_snapshot_id
             rds_params['DBName'] = ''
-        self.trop_db = template.add_resource(rds.DBInstance(self.title, **rds_params))
+
+        # Create RDS
+        self.trop_db = template.add_resource(rds.DBInstance(self.title,
+                                                            **rds_params))
 
         self.template.add_output(Output(
             self.trop_db.title + 'Endpoint',

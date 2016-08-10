@@ -17,7 +17,8 @@ def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, db_hdd_size, owner_emails, nat_alerting
+        db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, db_backup_window, db_backup_retention, \
+        db_maintenance_window, db_storage_type
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -53,6 +54,10 @@ runcmd:
     db_engine = 'postgres'
     db_port = '5432'
     db_hdd_size = 5
+    db_backup_window = '17:00-17:30'
+    db_backup_retention = '4'
+    db_maintenance_window = 'Mon:01:00-Mon:01:30'
+    db_storage_type = 'gp2'
 
 
 @with_setup(setup_resources)
@@ -201,7 +206,11 @@ def test_duplicate_unit_names():
                                 'db_port': db_port,
                                 'db_hdd_size': db_hdd_size,
                                 'db_snapshot_id': None,
-                                'db_name': 'MyDb1'
+                                'db_name': 'MyDb1',
+                                'db_backup_window': db_backup_window,
+                                'db_backup_retention': db_backup_retention,
+                                'db_maintenance_window': db_maintenance_window,
+                                'db_storage_type': db_storage_type
                             }
                             },
                            {'unit_title': 'db1',
@@ -211,7 +220,11 @@ def test_duplicate_unit_names():
                                 'db_port': db_port,
                                 'db_hdd_size': db_hdd_size,
                                 'db_snapshot_id': None,
-                                'db_name': 'MyDb2'
+                                'db_name': 'MyDb2',
+                                'db_backup_window': db_backup_window,
+                                'db_backup_retention': db_backup_retention,
+                                'db_maintenance_window': db_maintenance_window,
+                                'db_storage_type': db_storage_type
                             }
                             }]
     })
@@ -265,7 +278,11 @@ def test_duplicate_unit_names():
                                 'db_port': db_port,
                                 'db_hdd_size': db_hdd_size,
                                 'db_snapshot_id': None,
-                                'db_name': 'MyDb'
+                                'db_name': 'MyDb',
+                                'db_backup_window': db_backup_window,
+                                'db_backup_retention': db_backup_retention,
+                                'db_maintenance_window': db_maintenance_window,
+                                'db_storage_type': db_storage_type
                             }
                             }]
     })
@@ -280,7 +297,9 @@ def create_stack(stack_title):
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, owner_emails, nat_alerting
+        db_engine, db_port, owner_emails, nat_alerting, db_backup_window, db_backup_retention, db_maintenance_window, \
+        db_storage_type
+
     stack = Stack(
         stack_title=stack_title,
         code_deploy_service_role=code_deploy_service_role,
@@ -406,7 +425,12 @@ def create_stack(stack_title):
                              'db_port': db_port,
                              'db_hdd_size': db_hdd_size,
                              'db_snapshot_id': None,
-                             'db_name': 'MyDb'}
+                             'db_name': 'MyDb',
+                             'db_backup_window': db_backup_window,
+                             'db_backup_retention': db_backup_retention,
+                             'db_maintenance_window': db_maintenance_window,
+                             'db_storage_type': db_storage_type
+                         }
                          }
                         ]
     )

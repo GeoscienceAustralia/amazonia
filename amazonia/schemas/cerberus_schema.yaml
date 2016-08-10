@@ -195,11 +195,28 @@ database_config: &database_config
     db_snapshot_id: # A string with the identifier of an RDS snapshot to use to provision DB
       type: 'string'
       nullable: True
-    db_hdd_size: # the size for the rds hard drive/allocated storage
+    db_hdd_size: # The size for the rds hard drive/allocated storage
       type:
         - 'number'
         - 'string'
       nullable: False
+    db_backup_window: # The daily time range during which automated backups are created if automated backups are enabled
+      type: 'string'
+      nullable: True
+      regex: '^\d{2}:\d{2}-\d{2}:\d{2}$'
+    db_backup_retention:
+      type:
+        - 'number'
+        - 'string'
+      nullable: True
+    db_maintenance_window:
+      type: 'string'
+      regex: '^\w{3}:\d{2}:\d{2}-\w{3}:\d{2}:\d{2}$'
+      nullable: True
+    db_storage_type:
+      type: 'string'
+      nullable: True
+      regex: '^(standard|gp2)$'
 
 stack_title: # A string containing the name of the cloud formation stack.
   type: 'string'
