@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.3] - 10/08/2016
+- Removing unused zd state exception
+- Minor fixes to stack unit tests and stack system to reflect changes to zd and db config
+
 ## [1.1.1] - 08/08/2016
 - Adding new properties to database unit:db_snapshot_id, db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type
 
