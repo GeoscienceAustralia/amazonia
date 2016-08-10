@@ -1,11 +1,11 @@
+from amazonia.classes.stack import Stack, DuplicateUnitNameError
 from nose.tools import *
 from troposphere import Tags, Ref
 
-from amazonia.classes.stack import Stack, DuplicateUnitNameError
-
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = path2ping = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
-    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = None
+    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = \
+    db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = None
 availability_zones = []
 home_cidrs = []
 instanceports = []
@@ -287,6 +287,105 @@ def test_duplicate_unit_names():
                             }]
     })
 
+    assert_raises(DuplicateUnitNameError, Stack, **{
+        'stack_title': 'TestStack',
+        'code_deploy_service_role': code_deploy_service_role,
+        'keypair': keypair,
+        'availability_zones': availability_zones,
+        'vpc_cidr': vpc_cidr,
+        'public_cidr': public_cidr,
+        'home_cidrs': home_cidrs,
+        'jump_image_id': jump_image_id,
+        'jump_instance_type': instance_type,
+        'nat_image_id': nat_image_id,
+        'nat_instance_type': instance_type,
+        'stack_hosted_zone_name': None,
+        'iam_instance_profile_arn': None,
+        'owner_emails': owner_emails,
+        'nat_alerting': nat_alerting,
+        'zd_autoscaling_units': [{'unit_title': 'zdapp1',
+                                  'elb_config': {
+                                      'protocols': protocols,
+                                      'instanceports': instanceports,
+                                      'loadbalancerports': loadbalancerports,
+                                      'path2ping': path2ping,
+                                      'unit_hosted_zone_name': None,
+                                      'elb_log_bucket': None,
+                                      'public_unit': True,
+                                  },
+                                  'blue_asg_config': {
+                                      'minsize': minsize,
+                                      'maxsize': maxsize,
+                                      'image_id': unit_image_id,
+                                      'instance_type': instance_type,
+                                      'health_check_grace_period': health_check_grace_period,
+                                      'health_check_type': health_check_type,
+                                      'userdata': userdata,
+                                      'iam_instance_profile_arn': None,
+                                      'sns_topic_arn': None,
+                                      'sns_notification_types': None,
+                                      'hdd_size': None
+                                  },
+                                  'green_asg_config': {
+                                      'minsize': minsize,
+                                      'maxsize': maxsize,
+                                      'image_id': unit_image_id,
+                                      'instance_type': instance_type,
+                                      'health_check_grace_period': health_check_grace_period,
+                                      'health_check_type': health_check_type,
+                                      'userdata': userdata,
+                                      'iam_instance_profile_arn': None,
+                                      'sns_topic_arn': None,
+                                      'sns_notification_types': None,
+                                      'hdd_size': None
+                                  },
+                                  'zd_state': 'blue',
+                                  'dependencies': ['app2', 'db1'],
+                                  },
+                                 {'unit_title': 'zdapp1',
+                                  'elb_config': {
+                                      'protocols': protocols,
+                                      'instanceports': instanceports,
+                                      'loadbalancerports': loadbalancerports,
+                                      'path2ping': path2ping,
+                                      'unit_hosted_zone_name': None,
+                                      'elb_log_bucket': None,
+                                      'public_unit': True,
+                                  },
+                                  'blue_asg_config': {
+                                      'minsize': minsize,
+                                      'maxsize': maxsize,
+                                      'image_id': unit_image_id,
+                                      'instance_type': instance_type,
+                                      'health_check_grace_period': health_check_grace_period,
+                                      'health_check_type': health_check_type,
+                                      'userdata': userdata,
+                                      'iam_instance_profile_arn': None,
+                                      'sns_topic_arn': None,
+                                      'sns_notification_types': None,
+                                      'hdd_size': None
+                                  },
+                                  'green_asg_config': {
+                                      'minsize': minsize,
+                                      'maxsize': maxsize,
+                                      'image_id': unit_image_id,
+                                      'instance_type': instance_type,
+                                      'health_check_grace_period': health_check_grace_period,
+                                      'health_check_type': health_check_type,
+                                      'userdata': userdata,
+                                      'iam_instance_profile_arn': None,
+                                      'sns_topic_arn': None,
+                                      'sns_notification_types': None,
+                                      'hdd_size': None
+                                  },
+                                  'zd_state': 'blue',
+                                  'dependencies': ['app2', 'db1'],
+                                  }
+                                 ],
+        'autoscaling_units': [],
+        'database_units': []
+    })
+
 
 def create_stack(stack_title):
     """
@@ -325,19 +424,6 @@ def create_stack(stack_title):
                                    'unit_hosted_zone_name': None,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
-                               },
-                               'common_asg_config': {
-                                   'minsize': minsize,
-                                   'maxsize': maxsize,
-                                   'image_id': unit_image_id,
-                                   'instance_type': instance_type,
-                                   'health_check_grace_period': health_check_grace_period,
-                                   'health_check_type': health_check_type,
-                                   'userdata': userdata,
-                                   'iam_instance_profile_arn': None,
-                                   'sns_topic_arn': None,
-                                   'sns_notification_types': None,
-                                   'hdd_size': None
                                },
                                'blue_asg_config': {
                                    'minsize': minsize,

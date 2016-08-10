@@ -172,7 +172,11 @@ runcmd:
                              'db_port': '5432',
                              'db_name': 'myDb',
                              'db_hdd_size': 5,
-                             'db_snapshot_id': None
+                             'db_snapshot_id': None,
+                             'db_backup_window': None,
+                             'db_backup_retention': None,
+                             'db_maintenance_window': None,
+                             'db_storage_type': None
                          }
                          }]
 
