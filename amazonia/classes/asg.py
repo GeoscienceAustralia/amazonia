@@ -8,7 +8,7 @@ from amazonia.classes.block_devices import Bdm
 
 
 class Asg(SecurityEnabledObject):
-    def __init__(self, title, template, network_config, load_balancers, asg_config, block_devices_config):
+    def __init__(self, title, template, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group and codedeploy definition
         :param title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
@@ -30,8 +30,7 @@ class Asg(SecurityEnabledObject):
             title=self.title,
             network_config=network_config,
             load_balancers=load_balancers,
-            asg_config=asg_config,
-            block_devices_config=block_devices_config
+            asg_config=asg_config
         )
         if network_config.cd_service_role_arn is not None:
             self.create_cd_deploygroup(
@@ -39,7 +38,7 @@ class Asg(SecurityEnabledObject):
                 cd_service_role_arn=network_config.cd_service_role_arn
             )
 
-    def create_asg(self, title, network_config, load_balancers, asg_config, block_devices_config):
+    def create_asg(self, title, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group object
         AWS Cloud Formation:
@@ -49,7 +48,6 @@ class Asg(SecurityEnabledObject):
         :param load_balancers: list of load balancers to associate autoscaling group with
         :param asg_config: object containing asg related variables
         :param network_config: object containing network related variables
-        :param block_devices_config: object containing block device mappings
         """
 
         availability_zones = [subnet.AvailabilityZone for subnet in network_config.private_subnets]
@@ -76,13 +74,12 @@ class Asg(SecurityEnabledObject):
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
             asg_config=asg_config,
-            network_config=network_config,
-            block_devices_config=block_devices_config
+            network_config=network_config
         ))
         if asg_config.userdata is None:
             self.lc.UserData = ''
 
-    def create_launch_config(self, title, asg_config, network_config, block_devices_config):
+    def create_launch_config(self, title, asg_config, network_config):
         """
         Method to add a launch configuration resource to a cloud formation document
         AWS Cloud Formation links:
@@ -94,7 +91,6 @@ class Asg(SecurityEnabledObject):
         :param title: Title of the autoscaling application
         :param asg_config: object holding asg related variables
         :param network_config: object holding network related variables
-        :param block_devices_config: object containing block device mappings
         :return string representing Launch Configuration name
         """
         launch_config_title = title + 'Lc'
@@ -112,8 +108,7 @@ class Asg(SecurityEnabledObject):
             self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
         self.lc.UserData = Base64(asg_config.userdata)
 
-        # TODO: Work out how to avoid the assumption here of an amazon linux OS.
-        self.lc.BlockDeviceMappings = Bdm(launch_config_title, block_devices_config).bdm
+        self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
         return launch_config_title
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):

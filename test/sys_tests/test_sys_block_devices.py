@@ -85,8 +85,9 @@ def main():
             virtual_name=False)
     ]
 
-    asg_config = AsgConfig(
+    print('block_config={0}'.format(block_devices_config))
 
+    asg_config = AsgConfig(
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         minsize=1,
@@ -100,15 +101,17 @@ def main():
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        hdd_size=None
+        hdd_size=None,
+        block_devices_config=block_devices_config
     )
+
+    print('asg_config.block_devices_config={0}'.format(asg_config.block_devices_config))
 
     Asg(title='simple',
         network_config=network_config,
         load_balancers=[load_balancer],
         template=template,
-        asg_config=asg_config,
-        block_devices_config=block_devices_config
+        asg_config=asg_config
         )
 
     print(template.to_json(indent=2, separators=(',', ': ')))

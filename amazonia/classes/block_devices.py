@@ -13,7 +13,7 @@ class Bdm(object):
         Troposphere links:
         https://github.com/cloudtools/troposphere/blob/master/troposphere/autoscaling.py
         https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
-        :param template: Troposphere stack to append resources to
+        :param title: Title to append to device names in template
         :param block_devices_config: List of config for devices to add ot the instance/asg
         :return Block Devices Mapping for ecc instances or autoscaling groups
         """

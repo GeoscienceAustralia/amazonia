@@ -63,8 +63,16 @@ runcmd:
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
-    asg_config = AsgConfig(
+    block_devices_config = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False)]
 
+    asg_config = AsgConfig(
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         minsize=1,
@@ -78,24 +86,14 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        hdd_size=None
+        block_devices_config=block_devices_config
     )
-
-    block_devices_config = [
-        BlockDevicesConfig(
-            device_name='/dev/xvda',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False)]
 
     Asg(title='simple',
         network_config=network_config,
         load_balancers=[load_balancer],
         template=template,
-        asg_config=asg_config,
-        block_devices_config=block_devices_config
+        asg_config=asg_config
         )
 
     print(template.to_json(indent=2, separators=(',', ': ')))
