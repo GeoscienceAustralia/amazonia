@@ -126,6 +126,29 @@ elb_config: &elb_config
       nullable: True
       empty: False
 
+block_devices_config: &block_devices_config
+  -
+    device_name:  # Device name of disk
+      type: 'string'
+      nullable: True
+    ebs_volume_size:  # Size of disk
+      type: 'string'
+      nullable: True
+    ebs_volume_type:  # type of disk
+      type:
+        - 'number'
+        - 'string'
+      nullable: True
+    ebs_encrypted:  # Encryption enabled True or false
+      type: 'boolean'
+      nullable: True
+    ebs_snapshot_id:
+      type: 'string'
+      nullable: True
+    virtual_name:
+      type: 'boolean'
+      nullable: True
+
 asg_config: &asg_config
   type: 'dict'
   nullable: True
@@ -165,10 +188,9 @@ asg_config: &asg_config
       type: 'string'
       nullable: True
     iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
-    hdd_size: # the size for the hard drive of the instances on this autocaling unit
+    block_devices_config: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
       type:
-        - 'number'
-        - 'string'
+        - 'list'
       nullable: True
 
 database_config: &database_config

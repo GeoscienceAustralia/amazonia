@@ -42,8 +42,17 @@ class Yaml(object):
                            'instance_type',
                            'userdata',
                            'iam_instance_profile_arn',
-                           'hdd_size'
+                           'block_devices_config'
                            ]
+
+    """asg_config field list"""
+    block_devices_config_key_list = ['device_name',
+                                     'ebs_volume_size',
+                                     'ebs_volume_type',
+                                     'ebs_encrypted',
+                                     'ebs_snapshot_id',
+                                     'virtual_name',
+                                     ]
 
     """database_config field list"""
     database_config_key_list = ['db_name',
@@ -151,6 +160,12 @@ class Yaml(object):
                     self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
                         user_asg_config, self.default_data['asg_config'],
                         self.asg_config_key_list)
+                elif unit_value == 'block_devices_config':
+                    user_block_devices_config = self.user_stack_data[unit_type][unit].get(unit_value, {})
+                    user_block_devices_config = {} if user_block_devices_config is None else user_block_devices_config
+                    self.united_data[unit_type][unit][unit_value] = self.set_nested_object_values(
+                        user_block_devices_config, self.default_data['block_devices_config'],
+                        self.block_devices_config_key_list)
                 else:
                     self.united_data[unit_type][unit][unit_value] = \
                         self.user_stack_data[unit_type][unit].get(unit_value, self.default_data[unit_value])

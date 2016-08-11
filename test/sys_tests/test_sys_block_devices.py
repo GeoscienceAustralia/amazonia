@@ -101,7 +101,6 @@ def main():
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        hdd_size=None,
         block_devices_config=block_devices_config
     )
 

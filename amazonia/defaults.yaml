@@ -34,11 +34,11 @@ zd_autoscaling_units:
 autoscaling_units:
 database_units:
 
-#Common unit default values
+# Common unit default values
 unit_title: 'defaulttitle'
 dependencies:
 
-#Database unit default values
+# Database unit default values
 database_config:
   db_instance_type: 'db.t2.small'
   db_engine: 'postgres'
@@ -51,8 +51,8 @@ database_config:
   db_maintenance_window:
   db_storage_type:
 
-#(ZD) Autoscaling unit default values
-#ELB default values
+# (ZD) Autoscaling unit default values
+# ELB default values
 elb_config:
   unit_hosted_zone_name:
   protocols:
@@ -65,7 +65,17 @@ elb_config:
   elb_log_bucket:
   public_unit: true
 
-#Asg default values
+# Block device configs
+block_devices_config: &block_devices_config
+  -
+    device_name: '/dev/xvda'
+    ebs_volume_size: '15'
+    ebs_volume_type: 'standard'
+    ebs_encrypted: False
+    ebs_snapshot_id:
+    virtual_name: True
+
+# Asg default values
 asg_config:
   image_id: 'ami-dc361ebf'
   instance_type: 't2.micro'
@@ -74,7 +84,7 @@ asg_config:
   maxsize: '1'
   health_check_grace_period: '300'
   health_check_type: 'ELB'
-  hdd_size:
+  block_devices_config: *database_config
   sns_topic_arn:
   sns_notification_types:
     - 'autoscaling:EC2_INSTANCE_LAUNCH'
@@ -99,3 +109,5 @@ asg_config:
        owner: root:root
     runcmd:
      - service httpd start
+
+

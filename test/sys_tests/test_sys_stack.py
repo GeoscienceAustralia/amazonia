@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.stack import Stack
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 
 def main():
@@ -47,6 +48,15 @@ runcmd:
     jump_image_id = 'ami-dc361ebf'
     app_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
+    block_devices_config = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False)]
+
     stack = Stack(
         stack_title='test',
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
@@ -75,19 +85,6 @@ runcmd:
                  'elb_log_bucket': None,
                  'public_unit': True,
              },
-             'common_asg_config': {
-                 'minsize': 1,
-                 'maxsize': 1,
-                 'health_check_grace_period': 300,
-                 'health_check_type': 'ELB',
-                 'image_id': app_image_id,
-                 'instance_type': instance_type,
-                 'iam_instance_profile_arn': None,
-                 'sns_topic_arn': None,
-                 'sns_notification_types': None,
-                 'userdata': userdata1,
-                 'hdd_size': None,
-             },
              'blue_asg_config': {
                  'minsize': 1,
                  'maxsize': 1,
@@ -99,7 +96,7 @@ runcmd:
                  'sns_topic_arn': None,
                  'sns_notification_types': None,
                  'userdata': userdata1,
-                 'hdd_size': None,
+                 'block_devices_config': block_devices_config
              },
              'green_asg_config': {
                  'minsize': 1,
@@ -112,7 +109,7 @@ runcmd:
                  'sns_topic_arn': None,
                  'sns_notification_types': None,
                  'userdata': userdata1,
-                 'hdd_size': None,
+                 'block_devices_config': block_devices_config
              },
              'dependencies': ['app2', 'db1']}
         ],
@@ -128,7 +125,7 @@ runcmd:
                                 'sns_topic_arn': None,
                                 'sns_notification_types': None,
                                 'userdata': userdata1,
-                                'hdd_size': None,
+                                'block_devices_config': block_devices_config
                             },
                             'elb_config': {
                                 'protocols': ['HTTP'],
@@ -151,8 +148,8 @@ runcmd:
                                 'iam_instance_profile_arn': None,
                                 'sns_topic_arn': None,
                                 'sns_notification_types': None,
-                                'hdd_size': None,
                                 'userdata': userdata2,
+                                'block_devices_config': block_devices_config
                             },
                             'elb_config': {
                                 'protocols': ['HTTP'],

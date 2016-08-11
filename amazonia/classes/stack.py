@@ -6,7 +6,6 @@ from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
@@ -218,15 +217,13 @@ class Stack(object):
             unit['unit_title'] = self.title + orig_unit_title
             elb_config = ElbConfig(**unit['elb_config'])
             asg_config = AsgConfig(**unit['asg_config'])
-            block_devices_config = BlockDevicesConfig(**unit['block_device_config'])
             self.units[orig_unit_title] = AutoscalingUnit(
                 unit_title=unit['unit_title'],
                 template=self.template,
                 network_config=self.network_config,
                 elb_config=elb_config,
                 asg_config=asg_config,
-                dependencies=unit['dependencies'],
-                block_devices_config=block_devices_config
+                dependencies=unit['dependencies']
             )
         # Add Database Units
         for unit in self.database_units:  # type: dict
