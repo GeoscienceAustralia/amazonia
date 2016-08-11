@@ -5,7 +5,7 @@ from amazonia.classes.elb import Elb
 
 
 class AutoscalingUnit(object):
-    def __init__(self, unit_title, template, dependencies, network_config, elb_config, asg_config):
+    def __init__(self, unit_title, template, dependencies, network_config, elb_config, asg_config, block_devices_config):
         """
         Create an Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',
@@ -29,7 +29,8 @@ class AutoscalingUnit(object):
             template=self.template,
             network_config=network_config,
             asg_config=asg_config,
-            load_balancers=[self.elb.trop_elb]
+            load_balancers=[self.elb.trop_elb],
+            block_devices_config=block_devices_config
         )
         [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
          self.loadbalancerports]

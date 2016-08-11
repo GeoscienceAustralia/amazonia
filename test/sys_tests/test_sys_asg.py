@@ -6,6 +6,7 @@ from troposphere import ec2, Ref, Template
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 
 def main():
@@ -80,11 +81,21 @@ runcmd:
         hdd_size=None
     )
 
+    block_devices_config = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False)]
+
     Asg(title='simple',
         network_config=network_config,
         load_balancers=[load_balancer],
         template=template,
-        asg_config=asg_config
+        asg_config=asg_config,
+        block_devices_config=block_devices_config
         )
 
     print(template.to_json(indent=2, separators=(',', ': ')))

@@ -7,13 +7,14 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
-template = network_config = elb_config = asg_config = None
+template = network_config = elb_config = asg_config = block_devices_config = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
-    global template, network_config, elb_config, asg_config
+    global template, network_config, elb_config, asg_config, block_devices_config
 
     template = Template()
 
@@ -95,6 +96,15 @@ runcmd:
         unit_hosted_zone_name=None
     )
 
+    block_devices_config = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False)]
+
 
 @with_setup(setup_resources())
 def test_autoscaling_unit():
@@ -132,13 +142,14 @@ def create_autoscaling_unit(unit_title):
     :param unit_title: title of unit
     :return new autoscaling unit
     """
-    global template, network_config, asg_config, elb_config
+    global template, network_config, asg_config, elb_config, block_devices_config
     unit = AutoscalingUnit(
         unit_title=unit_title,
         network_config=network_config,
         asg_config=asg_config,
         elb_config=elb_config,
         template=template,
-        dependencies=None
+        dependencies=None,
+        block_devices_config=block_devices_config
     )
     return unit

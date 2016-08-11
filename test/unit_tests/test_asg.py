@@ -5,15 +5,16 @@ from troposphere import ec2, Ref, Template, Join, Base64
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
-template = asg_config = elb_config = network_config = load_balancer = None
+template = asg_config = elb_config = network_config = load_balancer = block_devices_config = None
 
 
 def setup_resources():
     """
     Initialise resources before each test
     """
-    global template, asg_config, elb_config, network_config, load_balancer
+    global template, asg_config, elb_config, network_config, load_balancer, block_devices_config
     template = Template()
     asg_config = AsgConfig(
         userdata="""
@@ -58,6 +59,15 @@ runcmd:
         keypair='pipeline',
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
+
+    block_devices_config = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False)]
 
     load_balancer = elb.LoadBalancer('testElb',
                                      CrossZone=True,
@@ -120,14 +130,15 @@ def test_no_cd_group_and_no_sns():
     """
     Test that an asg is created without a CD and without an SNS topic
     """
-    global template, load_balancer, network_config, asg_config
+    global template, load_balancer, network_config, asg_config, block_devices_config
     network_config.cd_service_role_arn = None
     asg = Asg(
         title='noCdSns',
         template=template,
         load_balancers=[load_balancer],
         asg_config=asg_config,
-        network_config=network_config
+        network_config=network_config,
+        block_devices_config=block_devices_config
     )
     assert_is_none(asg.cd_app)
     assert_is_none(asg.cd_deploygroup)
@@ -148,30 +159,19 @@ def test_no_userdata():
 
 
 @with_setup(setup_resources)
-def test_change_hdd_size():
-    """
-    Tests that the EBS volumesize can be confirgured correctly using hdd_size
-    """
-    global asg_config
-    asg_config.hdd_size = '50'
-    asg = create_asg('hddsize')
-
-    assert_equals(asg.lc.BlockDeviceMappings[0].Ebs.VolumeSize, '50')
-
-
-@with_setup(setup_resources)
 def test_malformed_sns():
     """
     Test that an asg raises an error if SNS parameters are passed in malformed
     """
-    global template, network_config, asg_config
+    global template, network_config, asg_config, block_devices_config
 
     asg_config.sns_notification_types = None
     assert_raises(MalformedSNSError, Asg, **{'title': 'testsns',
                                              'template': template,
                                              'load_balancers': [load_balancer],
                                              'network_config': network_config,
-                                             'asg_config': asg_config
+                                             'asg_config': asg_config,
+                                             'block_devices_config': block_devices_config
                                              })
 
 
@@ -187,7 +187,8 @@ def create_asg(title):
         template=template,
         load_balancers=[load_balancer],
         network_config=network_config,
-        asg_config=asg_config
+        asg_config=asg_config,
+        block_devices_config=block_devices_config
     )
 
     return asg

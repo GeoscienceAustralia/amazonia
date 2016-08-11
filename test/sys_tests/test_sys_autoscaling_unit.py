@@ -8,7 +8,7 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 def main():
     userdata = """
@@ -106,13 +106,34 @@ runcmd:
         hdd_size=None
     )
 
+    block_devices_config1 = [
+        BlockDevicesConfig(
+            device_name='/dev/xvda',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False),
+        ]
+
+    block_devices_config2 = [
+        BlockDevicesConfig(
+            device_name='/dev/sda1',
+            ebs_volume_size='15',
+            ebs_volume_type='gp2',
+            ebs_encrypted=False,
+            ebs_snapshot_id='',
+            virtual_name=False),
+        ]
+
     unit1 = AutoscalingUnit(
         unit_title='app1',
         template=template,
         dependencies='app2',
         network_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_conifg
+        asg_config=asg_conifg,
+        block_devices_config=block_devices_config1
     )
 
     unit2 = AutoscalingUnit(
@@ -121,7 +142,8 @@ runcmd:
         template=template,
         elb_config=elb_config,
         asg_config=asg_conifg,
-        dependencies='app1'
+        dependencies='app1',
+        block_devices_config=block_devices_config2
     )
 
     unit1.add_unit_flow(unit2)
