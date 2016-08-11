@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-class BlockDeviceConfig(object):
+class BlockDevicesConfig(object):
     def __init__(self, device_name, ebs_volume_size, ebs_volume_type, ebs_encrypted, ebs_snapshot_id, virtual_name):
         """
         Simple config class for block device mappings for multiple disks

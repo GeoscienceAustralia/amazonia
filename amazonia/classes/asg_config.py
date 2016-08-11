@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 class AsgConfig(object):
     def __init__(self, sns_topic_arn, sns_notification_types, health_check_grace_period,
                  health_check_type, minsize, maxsize, image_id, instance_type, userdata,
