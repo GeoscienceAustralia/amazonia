@@ -7,7 +7,7 @@
 #   Strings: do not need to be enclosed in quotes or double quotes
 #   Multi line strings: can be used by establishing a literal block '|'
 
-#stack values
+# Stack values
 stack_title: 'myStack'
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 code_deploy_service_role:
@@ -72,8 +72,8 @@ block_devices_config: &block_devices_config
     ebs_volume_size: '15'
     ebs_volume_type: 'standard'
     ebs_encrypted: False
-    ebs_snapshot_id:
-    virtual_name: True
+    ebs_snapshot_id: ''
+    virtual_name: False
 
 # Asg default values
 asg_config:
@@ -84,7 +84,7 @@ asg_config:
   maxsize: '1'
   health_check_grace_period: '300'
   health_check_type: 'ELB'
-  block_devices_config: *database_config
+  block_devices_config: *block_devices_config
   sns_topic_arn:
   sns_notification_types:
     - 'autoscaling:EC2_INSTANCE_LAUNCH'

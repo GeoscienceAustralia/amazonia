@@ -55,37 +55,31 @@ def main():
     )
 
     block_devices_config = [
-        BlockDevicesConfig(
-            device_name='/dev/xvda',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False),
-        BlockDevicesConfig(
-            device_name='/dev/xvda2',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='snapshot_123',
-            virtual_name=False),
-        BlockDevicesConfig(
-            device_name='/dev/sda1',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=True),
-        BlockDevicesConfig(
-            device_name='/dev/sda2',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False)
+        {'device_name': '/dev/xvda',
+         'ebs_volume_size': '15',
+         'ebs_volume_type': 'gp2',
+         'ebs_encrypted': False,
+         'ebs_snapshot_id': '',
+         'virtual_name': False},
+        {'device_name': '/dev/xvda2',
+         'ebs_volume_size': '15',
+         'ebs_volume_type': 'gp2',
+         'ebs_encrypted': False,
+         'ebs_snapshot_id': 'snapshot_123',
+         'virtual_name': False},
+        {'device_name': '/dev/sda1',
+         'ebs_volume_size': '15',
+         'ebs_volume_type': 'gp2',
+         'ebs_encrypted': False,
+         'ebs_snapshot_id': '',
+         'virtual_name': True},
+        {'device_name': '/dev/sda2',
+         'ebs_volume_size': '15',
+         'ebs_volume_type': 'gp2',
+         'ebs_encrypted': False,
+         'ebs_snapshot_id': '',
+         'virtual_name': False}
     ]
-
-    print('block_config={0}'.format(block_devices_config))
 
     asg_config = AsgConfig(
         image_id='ami-dc361ebf',
@@ -103,8 +97,6 @@ def main():
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         block_devices_config=block_devices_config
     )
-
-    print('asg_config.block_devices_config={0}'.format(asg_config.block_devices_config))
 
     Asg(title='simple',
         network_config=network_config,

@@ -23,20 +23,19 @@ class Bdm(object):
     def block_device_mappings(self, title, block_devices_config):
         virtual_count = 0
         for n, block_device in enumerate(block_devices_config):
-            bdm = BlockDeviceMapping(
-                '{0}BlockDevice{1}'.format(title, n),
-                DeviceName=block_devices_config[n].device_name)
+            bdm = BlockDeviceMapping('{0}BlockDevice{1}'.format(title, n),
+                                     DeviceName=block_device['device_name'])
 
-            if block_devices_config[n].virtual_name:
+            if block_devices_config[n]['virtual_name']:
                 bdm.VirtualName = 'ephemeral{0}'.format(virtual_count)
                 virtual_count += 1
             else:
                 bdm.Ebs = EBSBlockDevice(
-                    VolumeSize=block_devices_config[n].ebs_volume_size,
-                    VolumeType=block_devices_config[n].ebs_volume_type,
-                    Encrypted=block_devices_config[n].ebs_encrypted,
-                    SnapshotId=block_devices_config[n].ebs_snapshot_id
+                    VolumeSize=block_device['ebs_volume_size'],
+                    VolumeType=block_device['ebs_volume_type'],
+                    Encrypted=block_device['ebs_encrypted'],
+                    SnapshotId=block_device['ebs_snapshot_id']
                 )
-                self.trop_bdm.append(bdm)
+            self.trop_bdm.append(bdm)
 
         return self.trop_bdm

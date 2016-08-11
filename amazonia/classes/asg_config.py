@@ -17,7 +17,6 @@ class AsgConfig(object):
         :param sns_notification_types: list of SNS autoscale notification types
         :param health_check_grace_period: The amount of time to wait for an instance to start before checking health
         :param health_check_type: The type of health check. currently 'ELB' or 'EC2' are the only valid types.
-        :param hdd_size: the size of the hard drive on the instances.
         """
         self.sns_topic_arn = sns_topic_arn
         self.sns_notification_types = sns_notification_types
@@ -30,4 +29,3 @@ class AsgConfig(object):
         self.userdata = userdata
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.block_devices_config = block_devices_config
-

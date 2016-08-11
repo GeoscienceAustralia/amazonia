@@ -66,7 +66,7 @@
 #                                            'public_unit',
 #                                            'health_check_type',
 #                                            'dependencies',
-#                                            'hdd_size'],
+#                                            'block_devices_config'],
 #                      'database_units': ['unit_title',
 #                                         'db_name',
 #                                         'db_instance_type',
@@ -127,27 +127,24 @@ elb_config: &elb_config
       empty: False
 
 block_devices_config: &block_devices_config
-  -
-    device_name:  # Device name of disk
-      type: 'string'
-      nullable: True
-    ebs_volume_size:  # Size of disk
-      type: 'string'
-      nullable: True
-    ebs_volume_type:  # type of disk
-      type:
-        - 'number'
-        - 'string'
-      nullable: True
-    ebs_encrypted:  # Encryption enabled True or false
-      type: 'boolean'
-      nullable: True
-    ebs_snapshot_id:
-      type: 'string'
-      nullable: True
-    virtual_name:
-      type: 'boolean'
-      nullable: True
+  type: 'list'
+  schema:
+    type: 'dict'
+    schema:
+      device_name:  # Device name of disk
+        type: 'string'
+      ebs_volume_size:  # Size of disk
+        type: 'string'
+      ebs_volume_type:  # type of disk
+        type:
+          - 'number'
+          - 'string'
+      ebs_encrypted:  # Encryption enabled True or false
+        type: 'boolean'
+      ebs_snapshot_id:  # Snapshot ID
+        type: 'string'
+      virtual_name:  # Virual disk enabled True or False
+        type: 'boolean'
 
 asg_config: &asg_config
   type: 'dict'
@@ -189,9 +186,6 @@ asg_config: &asg_config
       nullable: True
     iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
     block_devices_config: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
-      type:
-        - 'list'
-      nullable: True
 
 database_config: &database_config
   type: 'dict'
