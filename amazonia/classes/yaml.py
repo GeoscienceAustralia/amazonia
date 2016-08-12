@@ -7,7 +7,6 @@ import os
 import re
 import cerberus
 from amazonia.classes.util import read_yaml
-from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 
 class Yaml(object):
