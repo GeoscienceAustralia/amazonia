@@ -65,7 +65,7 @@ def main():
          'ebs_volume_size': '15',
          'ebs_volume_type': 'gp2',
          'ebs_encrypted': False,
-         'ebs_snapshot_id': 'snapshot_123',
+         'ebs_snapshot_id': 'ami-ce0531ad',
          'virtual_name': False},
         {'device_name': '/dev/sda1',
          'ebs_volume_size': '15',
@@ -76,7 +76,7 @@ def main():
         {'device_name': '/dev/sda2',
          'ebs_volume_size': '15',
          'ebs_volume_type': 'gp2',
-         'ebs_encrypted': False,
+         'ebs_encrypted': True,
          'ebs_snapshot_id': '',
          'virtual_name': False}
     ]

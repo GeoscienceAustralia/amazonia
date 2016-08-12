@@ -32,10 +32,11 @@ class Bdm(object):
             else:
                 bdm.Ebs = EBSBlockDevice(
                     VolumeSize=block_device['ebs_volume_size'],
-                    VolumeType=block_device['ebs_volume_type'],
-                    Encrypted=block_device['ebs_encrypted'],
-                    SnapshotId=block_device['ebs_snapshot_id']
-                )
+                    VolumeType=block_device['ebs_volume_type'])
+                if block_devices_config[n]['ebs_encrypted']:
+                    bdm.Ebs.Encrypted = block_device['ebs_encrypted']
+                if block_devices_config[n]['ebs_snapshot_id']:
+                    bdm.Ebs.SnapshotId = block_device['ebs_snapshot_id']
             self.trop_bdm.append(bdm)
 
         return self.trop_bdm
