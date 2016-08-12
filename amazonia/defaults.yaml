@@ -69,7 +69,7 @@ elb_config:
 block_devices_config: &block_devices_config
   -
     device_name: '/dev/xvda'
-    ebs_volume_size: '15'
+    ebs_volume_size: '8'
     ebs_volume_type: 'standard'
     ebs_encrypted: False
     ebs_snapshot_id: ''
