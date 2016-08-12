@@ -12,7 +12,6 @@ from amazonia.classes.block_devices_config import BlockDevicesConfig
 def main():
 
     template = Template()
-    title = 'stackASG'
 
     vpc = template.add_resource(ec2.VPC('MyVPC',
                                         CidrBlock='10.0.0.0/16'))
