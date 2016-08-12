@@ -48,14 +48,13 @@ runcmd:
     jump_image_id = 'ami-dc361ebf'
     app_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
-    block_devices_config = [
-        BlockDevicesConfig(
-            device_name='/dev/xvda',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False)]
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
 
     stack = Stack(
         stack_title='test',

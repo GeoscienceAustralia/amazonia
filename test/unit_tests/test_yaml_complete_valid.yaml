@@ -35,7 +35,6 @@ zd_autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      hdd_size: '8'
       sns_topic_arn: 'sns_topic_arn'
       sns_notification_types:
         - 'autoscaling:EC2_INSTANCE_LAUNCH'
@@ -68,7 +67,6 @@ zd_autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      hdd_size: '8'
       sns_topic_arn: 'sns_topic_arn'
       sns_notification_types:
         - 'autoscaling:EC2_INSTANCE_LAUNCH'
@@ -118,7 +116,6 @@ autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      hdd_size: '8'
       sns_topic_arn: 'sns_topic_arn'
       sns_notification_types:
         - 'autoscaling:EC2_INSTANCE_LAUNCH'
@@ -166,13 +163,20 @@ autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      hdd_size: '8'
       sns_topic_arn: 'sns_topic_arn'
       sns_notification_types:
         - 'autoscaling:EC2_INSTANCE_LAUNCH'
         - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
         - 'autoscaling:EC2_INSTANCE_TERMINATE'
         - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+      block_devices_config:
+        -
+          device_name: '/dev/xvda'
+          ebs_volume_size: '15'
+          ebs_volume_type: 'standard'
+          ebs_encrypted: False
+          ebs_snapshot_id: ''
+          virtual_name: False
       userdata: |
         #cloud-config
         repo_update: true

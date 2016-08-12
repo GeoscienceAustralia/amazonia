@@ -94,14 +94,13 @@ runcmd:
         unit_hosted_zone_name=None
     )
 
-    block_devices_config = [
-        BlockDevicesConfig(
-            device_name='/dev/xvda',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False),
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False},
     ]
 
     asg_config = AsgConfig(

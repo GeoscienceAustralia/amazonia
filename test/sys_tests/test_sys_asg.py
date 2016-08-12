@@ -63,14 +63,13 @@ runcmd:
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
-    block_devices_config = [
-        BlockDevicesConfig(
-            device_name='/dev/xvda',
-            ebs_volume_size='15',
-            ebs_volume_type='gp2',
-            ebs_encrypted=False,
-            ebs_snapshot_id='',
-            virtual_name=False)]
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
 
     asg_config = AsgConfig(
         image_id='ami-dc361ebf',
