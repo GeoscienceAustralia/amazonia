@@ -16,7 +16,7 @@ class Asg(SecurityEnabledObject):
         :param network_config: object containing network related config
         :param asg_config: object containing asg related config
         :param load_balancers: list of load balancers to associate autoscaling group with
-        :param block_devices_config: object containing block device mappings
+        :param block_devices_config: List containing block device mappings
         """
         super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
 
