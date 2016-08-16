@@ -6,7 +6,6 @@ from troposphere import ec2, Ref, Template
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 
 def main():
