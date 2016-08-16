@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.0] - 17/08/2016
+- Introducing block device mappings for autoscaling groups, removing hdd_size as a config
+
 ## [1.1.3] - 10/08/2016
 - Removing unused zd state exception
 - Minor fixes to stack unit tests and stack system to reflect changes to zd and db config
