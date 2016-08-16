@@ -8,12 +8,20 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 
-template = elb_config = network_config = common_asg_config = None
+template = elb_config = network_config = common_asg_config = block_devices_config = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
-    global template, elb_config, network_config, common_asg_config
+    global template, elb_config, network_config, common_asg_config, block_devices_config
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
+
     userdata = """
 #cloud-config
 repo_update: true
@@ -79,7 +87,7 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        hdd_size=8)
+        block_devices_config=block_devices_config)
 
 
 @with_setup(setup_resources)

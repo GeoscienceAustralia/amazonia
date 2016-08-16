@@ -4,6 +4,7 @@ from troposphere import Base64, codedeploy, Ref, Join, Output, ec2
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.block_devices import Bdm
 
 
 class Asg(SecurityEnabledObject):
@@ -15,6 +16,7 @@ class Asg(SecurityEnabledObject):
         :param network_config: object containing network related config
         :param asg_config: object containing asg related config
         :param load_balancers: list of load balancers to associate autoscaling group with
+        :param block_devices_config: List containing block device mappings
         """
         super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
 
@@ -106,18 +108,7 @@ class Asg(SecurityEnabledObject):
             self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
         self.lc.UserData = Base64(asg_config.userdata)
 
-        # TODO: Work out how to avoid the assumption here of an amazon linux OS.
-        if asg_config.hdd_size is not None:
-            self.lc.BlockDeviceMappings = [
-                ec2.BlockDeviceMapping(
-                    DeviceName="/dev/xvda",
-                    Ebs=ec2.EBSBlockDevice(
-                        VolumeSize=asg_config.hdd_size,
-                        VolumeType='gp2'
-                    )
-                ),
-            ]
-
+        self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
         return launch_config_title
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):

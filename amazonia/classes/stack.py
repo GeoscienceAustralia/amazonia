@@ -10,6 +10,7 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+
 from troposphere import Ref, Template, ec2, Tags, Join
 
 

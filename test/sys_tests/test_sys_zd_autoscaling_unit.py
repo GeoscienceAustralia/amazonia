@@ -91,6 +91,14 @@ runcmd:
     image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
 
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
+
     elb_config = ElbConfig(protocols=protocols, instanceports=instanceports, loadbalancerports=loadbalancerports,
                            elb_log_bucket=None, path2ping=path2ping, public_unit=True, unit_hosted_zone_name=None)
     blue_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
@@ -98,13 +106,13 @@ runcmd:
                                 health_check_type=health_check_type, minsize=minsize,
                                 maxsize=maxsize, image_id=image_id,
                                 instance_type=instance_type, userdata=userdata,
-                                iam_instance_profile_arn=None, hdd_size=8)
+                                iam_instance_profile_arn=None, block_devices_config=block_devices_config)
     green_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
                                  health_check_grace_period=health_check_grace_period,
                                  health_check_type=health_check_type, minsize=minsize,
                                  maxsize=maxsize, image_id=image_id,
                                  instance_type=instance_type, userdata=userdata,
-                                 iam_instance_profile_arn=None, hdd_size=8)
+                                 iam_instance_profile_arn=None, block_devices_config=block_devices_config)
 
     unit1 = ZdAutoscalingUnit(
         unit_title='app1',

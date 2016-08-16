@@ -5,6 +5,7 @@ from troposphere import ec2, Ref, Template, Join, Base64
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 template = asg_config = elb_config = network_config = load_balancer = None
 
@@ -15,6 +16,15 @@ def setup_resources():
     """
     global template, asg_config, elb_config, network_config, load_balancer
     template = Template()
+
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
+
     asg_config = AsgConfig(
         userdata="""
 #cloud-config
@@ -37,8 +47,9 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         maxsize=1,
         minsize=1,
-        hdd_size=None
+        block_devices_config=block_devices_config
     )
+
     vpc = ec2.VPC('MyVPC',
                   CidrBlock='10.0.0.0/16')
 
@@ -145,18 +156,6 @@ def test_no_userdata():
     asg = create_asg('nouserdata')
 
     assert_equals(asg.lc.UserData, '')
-
-
-@with_setup(setup_resources)
-def test_change_hdd_size():
-    """
-    Tests that the EBS volumesize can be confirgured correctly using hdd_size
-    """
-    global asg_config
-    asg_config.hdd_size = '50'
-    asg = create_asg('hddsize')
-
-    assert_equals(asg.lc.BlockDeviceMappings[0].Ebs.VolumeSize, '50')
 
 
 @with_setup(setup_resources)

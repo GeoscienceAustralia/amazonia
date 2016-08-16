@@ -5,7 +5,7 @@ from troposphere import Tags, Ref
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = path2ping = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
     health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = \
-    db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = None
+    db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = None
 availability_zones = []
 home_cidrs = []
 instanceports = []
@@ -18,7 +18,7 @@ def setup_resources():
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
         db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, db_backup_window, db_backup_retention, \
-        db_maintenance_window, db_storage_type
+        db_maintenance_window, db_storage_type, block_devices_config
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -58,6 +58,21 @@ runcmd:
     db_backup_retention = '4'
     db_maintenance_window = 'Mon:01:00-Mon:01:30'
     db_storage_type = 'gp2'
+
+    block_devices_config = [{
+        'device_name': '/dev/xvda',
+        'ebs_volume_size': '15',
+        'ebs_volume_type': 'gp2',
+        'ebs_encrypted': False,
+        'ebs_snapshot_id': '',
+        'virtual_name': False},{
+        'device_name': '/dev/sda2',
+        'ebs_volume_size': '',
+        'ebs_volume_type': '',
+        'ebs_encrypted': False,
+        'ebs_snapshot_id': '',
+        'virtual_name': True
+    }]
 
 
 @with_setup(setup_resources)
@@ -139,7 +154,7 @@ def test_duplicate_unit_names():
                                    'iam_instance_profile_arn': None,
                                    'sns_topic_arn': None,
                                    'sns_notification_types': None,
-                                   'hdd_size': None
+                                   'block_devices_config': block_devices_config
                                },
                                'elb_config': {
                                    'protocols': protocols,
@@ -267,7 +282,7 @@ def test_duplicate_unit_names():
                                    'iam_instance_profile_arn': None,
                                    'sns_topic_arn': None,
                                    'sns_notification_types': None,
-                                   'hdd_size': None
+                                   'block_devices_config': block_devices_config
                                },
                                'dependencies': ['app2', 'db1'],
                                }],
@@ -324,7 +339,7 @@ def test_duplicate_unit_names():
                                       'iam_instance_profile_arn': None,
                                       'sns_topic_arn': None,
                                       'sns_notification_types': None,
-                                      'hdd_size': None
+                                      'block_devices_config': block_devices_config
                                   },
                                   'green_asg_config': {
                                       'minsize': minsize,
@@ -337,7 +352,7 @@ def test_duplicate_unit_names():
                                       'iam_instance_profile_arn': None,
                                       'sns_topic_arn': None,
                                       'sns_notification_types': None,
-                                      'hdd_size': None
+                                      'block_devices_config': block_devices_config
                                   },
                                   'zd_state': 'blue',
                                   'dependencies': ['app2', 'db1'],
@@ -363,7 +378,7 @@ def test_duplicate_unit_names():
                                       'iam_instance_profile_arn': None,
                                       'sns_topic_arn': None,
                                       'sns_notification_types': None,
-                                      'hdd_size': None
+                                      'block_devices_config': block_devices_config
                                   },
                                   'green_asg_config': {
                                       'minsize': minsize,
@@ -376,7 +391,7 @@ def test_duplicate_unit_names():
                                       'iam_instance_profile_arn': None,
                                       'sns_topic_arn': None,
                                       'sns_notification_types': None,
-                                      'hdd_size': None
+                                      'block_devices_config': block_devices_config
                                   },
                                   'zd_state': 'blue',
                                   'dependencies': ['app2', 'db1'],
@@ -397,7 +412,7 @@ def create_stack(stack_title):
         public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
         nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
         db_engine, db_port, owner_emails, nat_alerting, db_backup_window, db_backup_retention, db_maintenance_window, \
-        db_storage_type
+        db_storage_type, block_devices_config
 
     stack = Stack(
         stack_title=stack_title,
@@ -436,7 +451,7 @@ def create_stack(stack_title):
                                    'iam_instance_profile_arn': None,
                                    'sns_topic_arn': None,
                                    'sns_notification_types': None,
-                                   'hdd_size': None
+                                   'block_devices_config': block_devices_config
                                },
                                'green_asg_config': {
                                    'minsize': minsize,
@@ -449,7 +464,7 @@ def create_stack(stack_title):
                                    'iam_instance_profile_arn': None,
                                    'sns_topic_arn': None,
                                    'sns_notification_types': None,
-                                   'hdd_size': None
+                                   'block_devices_config': block_devices_config
                                },
                                'zd_state': 'blue',
                                'dependencies': ['app2', 'db1'],
@@ -475,7 +490,7 @@ def create_stack(stack_title):
                                 'iam_instance_profile_arn': None,
                                 'sns_topic_arn': None,
                                 'sns_notification_types': None,
-                                'hdd_size': None
+                                'block_devices_config': block_devices_config
                             },
                             'dependencies': ['app2', 'db1'],
                             },
@@ -500,7 +515,7 @@ def create_stack(stack_title):
                                 'iam_instance_profile_arn': None,
                                 'sns_topic_arn': None,
                                 'sns_notification_types': None,
-                                'hdd_size': None
+                                'block_devices_config': block_devices_config
                             },
                             'dependencies': []
                             }],

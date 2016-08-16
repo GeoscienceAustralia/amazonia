@@ -42,8 +42,17 @@ class Yaml(object):
                            'instance_type',
                            'userdata',
                            'iam_instance_profile_arn',
-                           'hdd_size'
+                           'block_devices_config'
                            ]
+
+    """asg_config field list"""
+    block_devices_config_key_list = ['device_name',
+                                     'ebs_volume_size',
+                                     'ebs_volume_type',
+                                     'ebs_encrypted',
+                                     'ebs_snapshot_id',
+                                     'virtual_name',
+                                     ]
 
     """database_config field list"""
     database_config_key_list = ['db_name',
@@ -172,15 +181,16 @@ class Yaml(object):
                                                                          self.united_data['stack_hosted_zone_name'])
             else:
                 unified_object[object_key] = nested_object_user_data.get(object_key, nested_object_default[object_key])
+
             # Validate for unecrypted aws access ids and aws secret keys
             if object_key == 'userdata' and unified_object['userdata'] is not None:
                 self.detect_unencrypted_access_keys(unified_object['userdata'])
-                # Validate that minsize is less than maxsize
+            # Validate that minsize is less than maxsize
             if object_key == 'minsize':
                 minsize = unified_object[object_key]
                 maxsize = nested_object_user_data.get('maxsize', nested_object_default['maxsize'])
             if minsize > maxsize:
-                raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be ' \
+                raise cerberus.ValidationError('Autoscaling unit minsize ({0}) cannot be '
                                                'larger than maxsize ({1})'.format(minsize, maxsize))
         return unified_object
 

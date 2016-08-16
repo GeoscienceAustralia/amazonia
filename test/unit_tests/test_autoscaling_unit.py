@@ -7,6 +7,7 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 template = network_config = elb_config = asg_config = None
 
@@ -62,6 +63,15 @@ def setup_resources():
         cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
         keypair='pipeline'
     )
+
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False}]
+
     asg_config = AsgConfig(
         userdata="""
 #cloud-config
@@ -76,14 +86,14 @@ runcmd:
     """,
         health_check_grace_period=300,
         health_check_type='ELB',
-        hdd_size=None,
         iam_instance_profile_arn=None,
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         maxsize=1,
         minsize=1,
         sns_topic_arn=None,
-        sns_notification_types=None
+        sns_notification_types=None,
+        block_devices_config=block_devices_config
     )
     elb_config = ElbConfig(
         protocols=['HTTP'],

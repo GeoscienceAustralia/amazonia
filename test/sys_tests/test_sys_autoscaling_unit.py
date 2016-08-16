@@ -8,6 +8,7 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 
 def main():
@@ -92,7 +93,17 @@ runcmd:
         public_unit=True,
         unit_hosted_zone_name=None
     )
-    asg_conifg = AsgConfig(
+
+    block_devices_config = [{
+            'device_name': '/dev/xvda',
+            'ebs_volume_size': '15',
+            'ebs_volume_type': 'gp2',
+            'ebs_encrypted': False,
+            'ebs_snapshot_id': '',
+            'virtual_name': False},
+    ]
+
+    asg_config = AsgConfig(
         minsize=1,
         maxsize=1,
         health_check_grace_period=300,
@@ -103,7 +114,7 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        hdd_size=None
+        block_devices_config=block_devices_config
     )
 
     unit1 = AutoscalingUnit(
@@ -112,7 +123,7 @@ runcmd:
         dependencies='app2',
         network_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_conifg
+        asg_config=asg_config
     )
 
     unit2 = AutoscalingUnit(
@@ -120,7 +131,7 @@ runcmd:
         network_config=network_config,
         template=template,
         elb_config=elb_config,
-        asg_config=asg_conifg,
+        asg_config=asg_config,
         dependencies='app1'
     )
 
