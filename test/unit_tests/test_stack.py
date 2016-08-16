@@ -65,7 +65,14 @@ runcmd:
         'ebs_volume_type': 'gp2',
         'ebs_encrypted': False,
         'ebs_snapshot_id': '',
-        'virtual_name': False}]
+        'virtual_name': False},{
+        'device_name': '/dev/sda2',
+        'ebs_volume_size': '',
+        'ebs_volume_type': '',
+        'ebs_encrypted': False,
+        'ebs_snapshot_id': '',
+        'virtual_name': True
+    }]
 
 
 @with_setup(setup_resources)

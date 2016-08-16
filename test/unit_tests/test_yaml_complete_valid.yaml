@@ -177,6 +177,13 @@ autoscaling_units:
           ebs_encrypted: False
           ebs_snapshot_id: ''
           virtual_name: False
+        -
+          device_name: ''
+          ebs_volume_size: ''
+          ebs_volume_type: ''
+          ebs_encrypted: False
+          ebs_snapshot_id: ''
+          virtual_name: True
       userdata: |
         #cloud-config
         repo_update: true
