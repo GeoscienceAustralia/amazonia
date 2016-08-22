@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.6] - 23/08/2016
+- Creating DBINstance parameter for database unit
+- Removing Dbname was passing in a RDS snapshot id
+
 ## [1.2.0] - 17/08/2016
 - Introducing block device mappings for autoscaling groups, removing hdd_size as a config
 
