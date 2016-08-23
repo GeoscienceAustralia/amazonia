@@ -2,10 +2,3 @@ keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 autoscaling_units:
   -
     unit_title: 'app1'
-    dependencies:
-      - 'db3'
-database_units:
-  -
-    unit_title: 'db3'
-    database_config:
-      db_snapshot_id: 'amazonia-verbose-snapshot'

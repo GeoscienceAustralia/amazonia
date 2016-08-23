@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.7] - 23/08/2016
+- Restoring application.yaml
+- Updating DBInstanceIdentifer to use unit title without 'Rds'
+- Adding test for DBInstanceIdentifer in test_database_unit.py
+
 ## [1.2.6] - 23/08/2016
 - Creating DBINstance parameter for database unit
 - Removing Dbname was passing in a RDS snapshot id
