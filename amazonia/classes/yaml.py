@@ -28,7 +28,8 @@ class Yaml(object):
                            'path2ping',
                            'public_unit',
                            'elb_log_bucket',
-                           'unit_hosted_zone_name'
+                           'unit_hosted_zone_name',
+                           'ssl_certificate_id'
                            ]
 
     """asg_config field list"""

@@ -1,6 +1,6 @@
 class ElbConfig(object):
     def __init__(self, protocols, instanceports, loadbalancerports, path2ping, public_unit, elb_log_bucket,
-                 unit_hosted_zone_name):
+                 unit_hosted_zone_name, ssl_certificate_id):
         """
         Simple config class to contain elb related parameters
         :param protocols: protocols for ELB and webserver to communicate via
@@ -18,3 +18,4 @@ class ElbConfig(object):
         self.public_unit = public_unit
         self.elb_log_bucket = elb_log_bucket
         self.unit_hosted_zone_name = unit_hosted_zone_name
+        self.ssl_certificate_id = ssl_certificate_id

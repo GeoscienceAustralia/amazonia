@@ -64,6 +64,7 @@ elb_config:
   path2ping: '/index.html'
   elb_log_bucket:
   public_unit: true
+  ssl_certificate_id:
 
 # Block device configs
 block_devices_config: &block_devices_config

@@ -43,6 +43,10 @@ class Elb(SecurityEnabledObject):
                              Tags=Tags(Name=self.title)))
         self.trop_elb.DependsOn = network_config.nat.single.title
 
+        for listener in self.trop_elb.Listeners:
+            if elb_config.ssl_certificate_id:
+                listener.SSLCertificateId = elb_config.ssl_certificate_id
+
         if elb_config.elb_log_bucket:
             self.trop_elb.AccessLoggingPolicy = elb.AccessLoggingPolicy(
                 EmitInterval='60',

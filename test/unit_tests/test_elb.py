@@ -14,7 +14,7 @@ from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 
 def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, path2ping='index.html',
-               elb_log_bucket=None, public_unit=True):
+               elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
@@ -24,7 +24,8 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
     :param elb_log_bucket: S3 bucket to log access log to
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
-    :return: Troposphere object for Elb,
+    :param ssl_certificate_id: SSL Certificate to attach to elb for https using AWS Certificate Manager
+    :return: Troposphere object for Elb
     """
     template = Template()
     vpc = ec2.VPC('MyVPC',
@@ -71,7 +72,8 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
         path2ping=path2ping,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
-        unit_hosted_zone_name=hosted_zone_name
+        unit_hosted_zone_name=hosted_zone_name,
+        ssl_certificate_id=ssl_certificate_id
     )
 
     elb = Elb(title='elb',
@@ -183,3 +185,22 @@ def test_public_unit():
     assert_equals(helper_elb.trop_elb.Scheme, 'internal')
     helper_elb = create_elb(public_unit=True)
     assert_equals(helper_elb.trop_elb.Scheme, 'internet-facing')
+
+
+@AttributeError
+def test_ssl_none():
+    """
+    # Test to determine that the ssl certificate is being passed into the elb listners
+    """
+    helper_elb = create_elb(ssl_certificate_id=None)
+    for listener in helper_elb.trop_elb.Listeners:
+        assert_raises(listener.SSLCertificateId, AttributeError)
+
+
+def test_ssl_certificate():
+    """
+    # Test to determine that the ssl certificate is being passed into the elb listners
+    """
+    helper_elb = create_elb(ssl_certificate_id='arn:aws:acm::tester')
+    for listener in helper_elb.trop_elb.Listeners:
+        assert_equals(listener.SSLCertificateId, 'arn:aws:acm::tester')
