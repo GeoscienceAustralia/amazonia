@@ -34,7 +34,7 @@ class DatabaseUnit(SecurityEnabledObject):
             'DBInstanceClass': database_config.db_instance_type,
             'DBSubnetGroupName': Ref(self.trop_db_subnet_group),
             'DBName': database_config.db_name,
-            'DBInstanceIdentifier': self.title,
+            'DBInstanceIdentifier': self.title[:-3],
             'Engine': database_config.db_engine,
             'Port': self.port,
             'VPCSecurityGroups': [Ref(self.security_group)],
