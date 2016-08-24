@@ -24,7 +24,7 @@ class Yaml(object):
     """ elb_config field list"""
     elb_config_key_list = ['instance_protocol',
                            'loadbalancer_protocol',
-                           'instanceports',
+                           'instance_ports',
                            'loadbalancerports',
                            'elb_health_check',
                            'public_unit',

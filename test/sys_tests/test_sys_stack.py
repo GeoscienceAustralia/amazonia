@@ -78,7 +78,7 @@ runcmd:
              'elb_config': {
                  'loadbalancer_protocol': ['HTTP'],
                  'instance_protocol': ['HTTP'],
-                 'instanceports': ['80'],
+                 'instance_ports': ['80'],
                  'loadbalancerports': ['80'],
                  'elb_health_check': 'HTTP:80/index.html',
                  'unit_hosted_zone_name': 'gadevs.ga.',
@@ -131,7 +131,7 @@ runcmd:
                             'elb_config': {
                                 'loadbalancer_protocol': ['HTTP'],
                                 'instance_protocol': ['HTTP'],
-                                'instanceports': ['80'],
+                                'instance_ports': ['80'],
                                 'loadbalancerports': ['80'],
                                 'elb_health_check': 'HTTP:80/index.html',
                                 'unit_hosted_zone_name': 'gadevs.ga.',
@@ -157,7 +157,7 @@ runcmd:
                             'elb_config': {
                                 'loadbalancer_protocol': ['HTTP'],
                                 'instance_protocol': ['HTTP'],
-                                'instanceports': ['80'],
+                                'instance_ports': ['80'],
                                 'loadbalancerports': ['80'],
                                 'elb_health_check': 'HTTP:80/index.html',
                                 'unit_hosted_zone_name': 'gadevs.ga.',

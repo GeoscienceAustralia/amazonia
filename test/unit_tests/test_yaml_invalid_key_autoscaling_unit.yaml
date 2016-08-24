@@ -15,7 +15,7 @@ autoscaling_units:
        - 'HTTP'
       loadbalancerports:
        - '80'
-      instanceports:
+      instance_ports:
        - '80'
       elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'

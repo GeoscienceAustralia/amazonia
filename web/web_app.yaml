@@ -9,7 +9,7 @@ autoscaling_units:
     image_id: 'ami-dc361ebf'
     protocols:
       - 'HTTP'
-    instanceports:
+    instance_ports:
       - '80'
     loadbalancerports:
       - '80'

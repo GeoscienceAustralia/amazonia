@@ -87,7 +87,7 @@ runcmd:
     elb_config = ElbConfig(
         instance_protocol=['HTTP'],
         loadbalancer_protocol=['HTTP'],
-        instanceports=['80'],
+        instance_ports=['80'],
         loadbalancerports=['80'],
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,

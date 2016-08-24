@@ -81,7 +81,7 @@ runcmd:
                                    keypair='pipeline')
     loadbalancer_protocol = ['HTTP']
     instance_protocol = ['HTTP']
-    instanceports = ['80']
+    instance_ports = ['80']
     loadbalancerports = ['80']
     elb_health_check = 'HTTP:80/index.html'
     minsize = 1
@@ -102,7 +102,7 @@ runcmd:
 
     elb_config = ElbConfig(loadbalancer_protocol=loadbalancer_protocol,
                            instance_protocol=instance_protocol,
-                           instanceports=instanceports,
+                           instance_ports=instance_ports,
                            loadbalancerports=loadbalancerports,
                            elb_log_bucket=None,
                            elb_health_check=elb_health_check,

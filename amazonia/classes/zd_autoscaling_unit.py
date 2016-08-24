@@ -55,13 +55,13 @@ class ZdAutoscalingUnit(object):
 
         # create security group rules to allow communication between the two ELBS to the two ASGs
         [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_ports]
         [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_ports]
         [self.pre_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_ports]
         [self.pre_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_ports]
 
         # create security group rules to allow traffic from the public to the loadbalancer
         [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)

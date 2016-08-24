@@ -68,7 +68,7 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         keypair=None
     )
     elb_config = ElbConfig(
-        instanceports=[instanceport],
+        instance_ports=[instanceport],
         loadbalancerports=[loadbalancerport],
         loadbalancer_protocol=[loadbalancer_protocol],
         instance_protocol=[instance_protocol],

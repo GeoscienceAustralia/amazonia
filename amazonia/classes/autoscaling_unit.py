@@ -33,7 +33,7 @@ class AutoscalingUnit(object):
         )
         [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
          self.loadbalancerports]
-        [self.elb.add_flow(receiver=self.asg, port=instanceport) for instanceport in elb_config.instanceports]
+        [self.elb.add_flow(receiver=self.asg, port=instanceport) for instanceport in elb_config.instance_ports]
         self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic between autoscaling groups and Nats
         network_config.jump.add_flow(receiver=self.asg, port='22')
 

@@ -59,7 +59,7 @@ elb_config:
     - 'HTTP'
   instance_protocol:
     - 'HTTP'
-  instanceports:
+  instance_ports:
     - '80'
   loadbalancerports:
     - '80'
