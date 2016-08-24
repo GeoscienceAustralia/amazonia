@@ -46,7 +46,7 @@ class Elb(SecurityEnabledObject):
         self.trop_elb.DependsOn = network_config.nat.single.title
 
         for listener in self.trop_elb.Listeners:
-            if elb_config.ssl_certificate_id:
+            if elb_config.ssl_certificate_id and listener.Protocol == 'HTTPS':
                 listener.SSLCertificateId = elb_config.ssl_certificate_id
 
         if elb_config.elb_log_bucket:
