@@ -99,10 +99,11 @@ runcmd:
         protocols=['HTTP'],
         instanceports=['80'],
         loadbalancerports=['80'],
-        path2ping='index.html',
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
     )
 
 

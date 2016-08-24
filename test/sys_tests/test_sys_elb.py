@@ -73,7 +73,7 @@ def main():
         instanceports=['80'],
         loadbalancerports=['80'],
         protocols=['HTTP'],
-        path2ping='/index.html',
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
         unit_hosted_zone_name=None,
@@ -81,9 +81,9 @@ def main():
     )
     elb_config2 = ElbConfig(
         instanceports=['80'],
-        loadbalancerports=['80'],
-        protocols=['HTTP'],
-        path2ping='/index.html',
+        loadbalancerports=['443'],
+        protocols=['HTTPS'],
+        elb_health_check='HTTPS:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
         unit_hosted_zone_name=None,

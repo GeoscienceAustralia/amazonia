@@ -13,14 +13,14 @@ from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 
 
-def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, path2ping='index.html',
+def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
     :param loadbalancerport - port for traffic to the load balancer from public
     :param protocol: protocol for traffic
-    :param path2ping: path to test page
+    :param elb_health_check: path to test page
     :param elb_log_bucket: S3 bucket to log access log to
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
@@ -69,7 +69,7 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
         instanceports=[instanceport],
         loadbalancerports=[loadbalancerport],
         protocols=[protocol],
-        path2ping=path2ping,
+        elb_health_check=elb_health_check,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
         unit_hosted_zone_name=hosted_zone_name,
@@ -94,7 +94,6 @@ def test_protocol():
     def helper_test_protocol(protocol_list):
         for protocol in protocol_list:
             helper_elb = create_elb(protocol=protocol)
-            assert_true(re.match(protocol, helper_elb.trop_elb.HealthCheck.Target))
             for listener in helper_elb.trop_elb.Listeners:
                 assert_equal(protocol, listener.Protocol)
                 assert_equal(protocol, listener.InstanceProtocol)
@@ -102,13 +101,28 @@ def test_protocol():
     helper_test_protocol(protocols)
 
 
+def test_health_check_target():
+    """
+    Test to check that chealth check target inputs match the Target Address
+    e.g. HTTP:80/index.html matches HTTP:80/index.html
+    """
+    elb_health_check_list = ['HTTP:80/index.html', 'HTTPS:443/index.html', 'HTTPS:443/index.html']
+
+    def helper_test_protocol(elb_health_checks):
+        for elb_health_check in elb_health_checks:
+            helper_elb = create_elb(elb_health_check=elb_health_check)
+            assert_equals(elb_health_check, helper_elb.trop_elb.HealthCheck.Target)
+
+    helper_test_protocol(elb_health_check_list)
+
+
 def test_target():
     """
-    Tests to make sure that inputs of 'protocol', 'instanceport' and 'path2ping' correctly forms target healthcheck url
+    Tests to make sure that inputs of 'protocol', 'instanceport' and 'elb_health_check' correctly forms target healthcheck url
     """
     helper_elb = create_elb(protocol='HTTPS',
                             instanceport='443',
-                            path2ping='/test/index.html')
+                            elb_health_check='HTTPS:443/test/index.html')
     assert_equals('HTTPS:443/test/index.html', helper_elb.trop_elb.HealthCheck.Target)
 
 
@@ -122,7 +136,6 @@ def test_instance_ports():
 
     for port in ports:
         helper_elb = create_elb(instanceport=port)
-        assert_in(port, helper_elb.trop_elb.HealthCheck.Target)
         for listener in helper_elb.trop_elb.Listeners:
             assert_equal(port, listener.InstancePort)
 

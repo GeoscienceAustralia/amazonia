@@ -67,15 +67,23 @@ runcmd:
     jump = SingleInstance(title='Jump',
                           template=template,
                           single_instance_config=single_instance_config)
-    network_config = NetworkConfig(jump=jump, nat=nat, private_subnets=private_subnets, public_subnets=public_subnets,
-                                   vpc=vpc, public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+    network_config = NetworkConfig(jump=jump,
+                                   nat=nat,
+                                   private_subnets=private_subnets,
+                                   public_subnets=public_subnets,
+                                   vpc=vpc,
+                                   public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
                                    stack_hosted_zone_name=None,
                                    keypair='pipeline',
                                    cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK')
-    elb_config = ElbConfig(elb_log_bucket=None, protocols=['HTTP'],
+    elb_config = ElbConfig(elb_log_bucket=None,
+                           protocols=['HTTP'],
                            instanceports=['80'],
-                           loadbalancerports=['80'], path2ping='index.html', public_unit=True,
-                           unit_hosted_zone_name=None)
+                           loadbalancerports=['80'],
+                           elb_health_check='HTTP:80/index.html',
+                           public_unit=True,
+                           unit_hosted_zone_name=None,
+                           ssl_certificate_id=None)
     common_asg_config = AsgConfig(
         minsize=1,
         maxsize=1,
@@ -97,7 +105,8 @@ def test_autoscaling_unit():
     title = 'app'
     blue_asg_config = common_asg_config
     green_asg_config = common_asg_config
-    unit = create_zdtd_autoscaling_unit(unit_title=title, blue_asg_config=blue_asg_config,
+    unit = create_zdtd_autoscaling_unit(unit_title=title,
+                                        blue_asg_config=blue_asg_config,
                                         green_asg_config=green_asg_config)
     assert_equals(unit.green_asg.trop_asg.title, 'green' + title + 'Asg')
     assert_equals(unit.blue_asg.trop_asg.title, 'blue' + title + 'Asg')
@@ -123,9 +132,11 @@ def test_unit_association():
     blue_asg_config = common_asg_config
 
     green_asg_config = common_asg_config
-    unit1 = create_zdtd_autoscaling_unit(unit_title='app1', blue_asg_config=blue_asg_config,
+    unit1 = create_zdtd_autoscaling_unit(unit_title='app1',
+                                         blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
-    unit2 = create_zdtd_autoscaling_unit(unit_title='app2', blue_asg_config=blue_asg_config,
+    unit2 = create_zdtd_autoscaling_unit(unit_title='app2',
+                                         blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
 
     unit1.add_unit_flow(receiver=unit2)

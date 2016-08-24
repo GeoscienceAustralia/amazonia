@@ -2,8 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.2.8] - 24/08/2016
+## [1.3.0] - 24/08/2016
 - Introducing SSLCertificateId for ELBs
+- Changing path2ping to elb_health_check and making it an explicit health check e.g. /index.html --> HTTP:80/index.html
+- Updated relavant unit tests
+- Updated relavant systems tests
 
 ## [1.2.7] - 23/08/2016
 - Restoring application.yaml

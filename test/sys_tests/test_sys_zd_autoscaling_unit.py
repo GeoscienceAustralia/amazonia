@@ -82,7 +82,7 @@ runcmd:
     protocols = ['HTTP']
     instanceports = ['80']
     loadbalancerports = ['80']
-    path2ping = '/index.html'
+    elb_health_check = 'HTTP:80/index.html'
     minsize = 1
     maxsize = 1
     health_check_grace_period = 300
@@ -99,20 +99,36 @@ runcmd:
             'ebs_snapshot_id': '',
             'virtual_name': False}]
 
-    elb_config = ElbConfig(protocols=protocols, instanceports=instanceports, loadbalancerports=loadbalancerports,
-                           elb_log_bucket=None, path2ping=path2ping, public_unit=True, unit_hosted_zone_name=None)
-    blue_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
+    elb_config = ElbConfig(protocols=protocols,
+                           instanceports=instanceports,
+                           loadbalancerports=loadbalancerports,
+                           elb_log_bucket=None,
+                           elb_health_check=elb_health_check,
+                           public_unit=True,
+                           unit_hosted_zone_name=None,
+                           ssl_certificate_id=None)
+    blue_asg_config = AsgConfig(sns_topic_arn=None,
+                                sns_notification_types=None,
                                 health_check_grace_period=health_check_grace_period,
-                                health_check_type=health_check_type, minsize=minsize,
-                                maxsize=maxsize, image_id=image_id,
-                                instance_type=instance_type, userdata=userdata,
-                                iam_instance_profile_arn=None, block_devices_config=block_devices_config)
-    green_asg_config = AsgConfig(sns_topic_arn=None, sns_notification_types=None,
+                                health_check_type=health_check_type,
+                                minsize=minsize,
+                                maxsize=maxsize,
+                                image_id=image_id,
+                                instance_type=instance_type,
+                                userdata=userdata,
+                                iam_instance_profile_arn=None,
+                                block_devices_config=block_devices_config)
+    green_asg_config = AsgConfig(sns_topic_arn=None,
+                                 sns_notification_types=None,
                                  health_check_grace_period=health_check_grace_period,
-                                 health_check_type=health_check_type, minsize=minsize,
-                                 maxsize=maxsize, image_id=image_id,
-                                 instance_type=instance_type, userdata=userdata,
-                                 iam_instance_profile_arn=None, block_devices_config=block_devices_config)
+                                 health_check_type=health_check_type,
+                                 minsize=minsize,
+                                 maxsize=maxsize,
+                                 image_id=image_id,
+                                 instance_type=instance_type,
+                                 userdata=userdata,
+                                 iam_instance_profile_arn=None,
+                                 block_devices_config=block_devices_config)
 
     unit1 = ZdAutoscalingUnit(
         unit_title='app1',

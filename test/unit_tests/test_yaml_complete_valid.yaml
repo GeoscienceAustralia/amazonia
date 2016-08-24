@@ -98,7 +98,7 @@ zd_autoscaling_units:
        - '80'
       instanceports:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
     dependencies:
@@ -147,7 +147,7 @@ autoscaling_units:
        - '80'
       instanceports:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
     dependencies:
@@ -210,7 +210,7 @@ autoscaling_units:
        - '80'
       instanceports:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: false
 

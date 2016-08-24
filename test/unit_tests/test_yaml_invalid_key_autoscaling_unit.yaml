@@ -15,7 +15,7 @@ autoscaling_units:
        - '80'
       instanceports:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
     asg_config:
       image_id: 'ami-dc361ebf'
