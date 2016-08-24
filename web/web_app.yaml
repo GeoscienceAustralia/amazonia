@@ -9,11 +9,11 @@ autoscaling_units:
     image_id: 'ami-dc361ebf'
     protocols:
       - 'HTTP'
-    instanceports:
+    instance_port:
       - '80'
-    loadbalancerports:
+    loadbalancer_port:
       - '80'
-    path2ping: '/amazonia/web/index.html'
+    elb_health_check: 'HTTP:80/amazonia/web/index.html'
     userdata: |
       #cloud-config
       repo_update: true

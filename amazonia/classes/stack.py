@@ -38,7 +38,7 @@ class Stack(object):
         :param nat_image_id: AMI for nat
         :param nat_instance_type: instance type for nat
         :param zd_autoscaling_units: list of zd_autosclaing_unit dicts
-        :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
+        :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, elb_health_check, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
         :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record

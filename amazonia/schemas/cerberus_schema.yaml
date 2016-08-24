@@ -51,11 +51,12 @@
 #                                            'userdata',
 #                                            'image_id',
 #                                            'instance_type',
-#                                            'path2ping',
-#                                            'protocols',
+#                                            'elb_health_check',
+#                                            'instance_protocol',
+#                                            'loadbalancer_protocol',
 #                                            'unit_hosted_zone_name',
-#                                            'loadbalancerports',
-#                                            'instanceports',
+#                                            'loadbalancer_port',
+#                                            'instance_port',
 #                                            'minsize',
 #                                            'maxsize',
 #                                            'health_check_grace_period',
@@ -96,22 +97,27 @@ elb_config: &elb_config
   type: 'dict'
   nullable: True
   schema:
-    protocols: # a list of strings specifying the protocols to allow access through load balancers into this specific autoscaling group.
+    instance_protocol: # a list of strings specifying the instance protocols load balancers will connect to this specific autoscaling group.
       type: 'list'
       nullable: True
       schema:
         type: 'string'
-    instanceports: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
+    loadbalancer_protocol: # a list of strings specifying the load balancer protocols to allow connections from.
       type: 'list'
       nullable: True
       schema:
         type: 'string'
-    loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+    instance_port: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
       type: 'list'
       nullable: True
       schema:
         type: 'string'
-    path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
+    loadbalancer_port: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    elb_health_check: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
       type: 'string'
       nullable: True
     public_unit: # a boolean value that determines the internet-facing scheme for the elb and the subnets it lives on in the asg class
@@ -125,6 +131,10 @@ elb_config: &elb_config
       type: 'string'
       nullable: True
       empty: False
+    ssl_certificate_id: # A string containing the arn of the ssl certificate id
+      type: 'string'
+      nullable: True
+      regex: '^arn:aws:'
 
 block_devices_config: &block_devices_config
   type: 'list'

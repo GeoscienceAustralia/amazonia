@@ -69,19 +69,38 @@ def main():
         keypair=None,
         cd_service_role_arn=None
     )
-    elb_config = ElbConfig(
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        protocols=['HTTP'],
-        path2ping='/index.html',
+    elb_config1 = ElbConfig(
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        loadbalancer_protocol=['HTTP'],
+        instance_protocol=['HTTP'],
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
+    )
+    elb_config2 = ElbConfig(
+        instance_port=['80'],
+        loadbalancer_port=['443'],
+        loadbalancer_protocol=['HTTPS'],
+        instance_protocol=['HTTP'],
+        elb_health_check='HTTP:80/index.html',
+        elb_log_bucket='my-s3-bucket',
+        public_unit=True,
+        unit_hosted_zone_name=None,
+        ssl_certificate_id='arn:aws:acm::tester'
     )
 
-    Elb(title='MyUnit',
+    Elb(title='MyUnit1',
         network_config=network_config,
-        elb_config=elb_config,
+        elb_config=elb_config1,
+        template=template
+        )
+
+    Elb(title='MyUnit2',
+        network_config=network_config,
+        elb_config=elb_config2,
         template=template
         )
 

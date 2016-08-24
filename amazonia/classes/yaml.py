@@ -22,13 +22,15 @@ class Yaml(object):
     cerberus_schema = read_yaml(os.path.join(__location__, '../schemas/cerberus_schema.yaml'))
 
     """ elb_config field list"""
-    elb_config_key_list = ['protocols',
-                           'instanceports',
-                           'loadbalancerports',
-                           'path2ping',
+    elb_config_key_list = ['instance_protocol',
+                           'loadbalancer_protocol',
+                           'instance_port',
+                           'loadbalancer_port',
+                           'elb_health_check',
                            'public_unit',
                            'elb_log_bucket',
-                           'unit_hosted_zone_name'
+                           'unit_hosted_zone_name',
+                           'ssl_certificate_id'
                            ]
 
     """asg_config field list"""
