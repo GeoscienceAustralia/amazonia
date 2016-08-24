@@ -219,6 +219,6 @@ def test_ssl_certificate():
     """
     # Test to determine that the ssl certificate is being passed into the elb listners
     """
-    helper_elb = create_elb(ssl_certificate_id='arn:aws:acm::tester')
+    helper_elb = create_elb(ssl_certificate_id='arn:aws:acm::tester', loadbalancer_protocol='HTTPS')
     for listener in helper_elb.trop_elb.Listeners:
         assert_equals(listener.SSLCertificateId, 'arn:aws:acm::tester')
