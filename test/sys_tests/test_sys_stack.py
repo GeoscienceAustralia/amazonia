@@ -76,7 +76,8 @@ runcmd:
             {'unit_title': 'zdapp1',
              'zd_state': 'blue',
              'elb_config': {
-                 'protocols': ['HTTP'],
+                 'loadbalancer_protocol': ['HTTP'],
+                 'instance_protocol': ['HTTP'],
                  'instanceports': ['80'],
                  'loadbalancerports': ['80'],
                  'elb_health_check': 'HTTP:80/index.html',
@@ -128,7 +129,8 @@ runcmd:
                                 'block_devices_config': block_devices_config
                             },
                             'elb_config': {
-                                'protocols': ['HTTP'],
+                                'loadbalancer_protocol': ['HTTP'],
+                                'instance_protocol': ['HTTP'],
                                 'instanceports': ['80'],
                                 'loadbalancerports': ['80'],
                                 'elb_health_check': 'HTTP:80/index.html',
@@ -153,7 +155,8 @@ runcmd:
                                 'block_devices_config': block_devices_config
                             },
                             'elb_config': {
-                                'protocols': ['HTTP'],
+                                'loadbalancer_protocol': ['HTTP'],
+                                'instance_protocol': ['HTTP'],
                                 'instanceports': ['80'],
                                 'loadbalancerports': ['80'],
                                 'elb_health_check': 'HTTP:80/index.html',

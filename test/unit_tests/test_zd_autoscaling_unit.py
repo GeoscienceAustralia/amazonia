@@ -77,7 +77,8 @@ runcmd:
                                    keypair='pipeline',
                                    cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK')
     elb_config = ElbConfig(elb_log_bucket=None,
-                           protocols=['HTTP'],
+                           loadbalancer_protocol=['HTTP'],
+                           instance_protocol=['HTTP'],
                            instanceports=['80'],
                            loadbalancerports=['80'],
                            elb_health_check='HTTP:80/index.html',

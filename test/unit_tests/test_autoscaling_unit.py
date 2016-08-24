@@ -96,7 +96,8 @@ runcmd:
         block_devices_config=block_devices_config
     )
     elb_config = ElbConfig(
-        protocols=['HTTP'],
+        loadbalancer_protocol=['HTTP'],
+        instance_protocol=['HTTP'],
         instanceports=['80'],
         loadbalancerports=['80'],
         elb_health_check='HTTP:80/index.html',

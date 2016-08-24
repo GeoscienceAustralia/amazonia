@@ -1,9 +1,10 @@
 class ElbConfig(object):
-    def __init__(self, protocols, instanceports, loadbalancerports, elb_health_check, public_unit, elb_log_bucket,
-                 unit_hosted_zone_name, ssl_certificate_id):
+    def __init__(self, instance_protocol, instanceports, loadbalancer_protocol, loadbalancerports, elb_health_check,
+                 public_unit, elb_log_bucket, unit_hosted_zone_name, ssl_certificate_id):
         """
         Simple config class to contain elb related parameters
-        :param protocols: protocols for ELB and webserver to communicate via
+        :param instance_protocol: instance_protocol for ELB to communicate with webserver
+        :param loadbalancer_protocol: loadbalancer_protocol for world to communicate with ELB
         :param instanceports: ports for ELB and webserver to communicate via
         :param loadbalancerports: ports for public and ELB to communicate via
         :param elb_health_check: path for ELB healthcheck
@@ -11,7 +12,8 @@ class ElbConfig(object):
         :param elb_log_bucket: S3 bucket to log access log to
         :param unit_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
         """
-        self.protocols = protocols
+        self.instance_protocol = instance_protocol
+        self.loadbalancer_protocol = loadbalancer_protocol
         self.instanceports = instanceports
         self.loadbalancerports = loadbalancerports
         self.elb_health_check = elb_health_check

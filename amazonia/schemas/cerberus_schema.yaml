@@ -52,7 +52,8 @@
 #                                            'image_id',
 #                                            'instance_type',
 #                                            'elb_health_check',
-#                                            'protocols',
+#                                            'instance_protocol',
+#                                            'loadbalancer_protocol',
 #                                            'unit_hosted_zone_name',
 #                                            'loadbalancerports',
 #                                            'instanceports',
@@ -96,7 +97,12 @@ elb_config: &elb_config
   type: 'dict'
   nullable: True
   schema:
-    protocols: # a list of strings specifying the protocols to allow access through load balancers into this specific autoscaling group.
+    instance_protocol: # a list of strings specifying the instance protocols load balancers will connect to this specific autoscaling group.
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    loadbalancer_protocol: # a list of strings specifying the load balancer protocols to allow connections from.
       type: 'list'
       nullable: True
       schema:

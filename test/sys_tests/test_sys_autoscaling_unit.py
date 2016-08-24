@@ -85,7 +85,8 @@ runcmd:
         cd_service_role_arn=service_role_arn
     )
     elb_config = ElbConfig(
-        protocols=['HTTP'],
+        instance_protocol=['HTTP'],
+        loadbalancer_protocol=['HTTP'],
         instanceports=['80'],
         loadbalancerports=['80'],
         elb_health_check='HTTP:80/index.html',

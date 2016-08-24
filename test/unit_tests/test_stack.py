@@ -10,15 +10,16 @@ availability_zones = []
 home_cidrs = []
 instanceports = []
 loadbalancerports = []
-protocols = []
+instance_protocol = []
+loadbalancer_protocol = []
 
 
 def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, elb_health_check, home_cidrs, \
-        nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, db_backup_window, db_backup_retention, \
-        db_maintenance_window, db_storage_type, block_devices_config
+        public_cidr, instanceports, loadbalancerports, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
+        unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
+        db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -40,7 +41,8 @@ runcmd:
     home_cidrs = [{'name': 'GA', 'cidr': '123.123.12.34/32'}, {'name': 'home', 'cidr': '192.168.0.1/16'}]
     instanceports = ['80']
     loadbalancerports = ['80']
-    protocols = ['HTTP']
+    instance_protocol = ['HTTP']
+    loadbalancer_protocol = ['HTTP']
     minsize = 1
     maxsize = 1
     elb_health_check = 'HTTP:80/index.html'
@@ -157,7 +159,8 @@ def test_duplicate_unit_names():
                                    'block_devices_config': block_devices_config
                                },
                                'elb_config': {
-                                   'protocols': protocols,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
                                    'instanceports': instanceports,
                                    'loadbalancerports': loadbalancerports,
                                    'elb_health_check': elb_health_check,
@@ -170,7 +173,8 @@ def test_duplicate_unit_names():
                                },
                               {'unit_title': 'app1',
                                'elb_config': {
-                                   'protocols': protocols,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
                                    'instanceports': instanceports,
                                    'loadbalancerports': loadbalancerports,
                                    'elb_health_check': elb_health_check,
@@ -265,7 +269,8 @@ def test_duplicate_unit_names():
         'zd_autoscaling_units': [],
         'autoscaling_units': [{'unit_title': 'app1',
                                'elb_config': {
-                                   'protocols': protocols,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
                                    'instanceports': instanceports,
                                    'loadbalancerports': loadbalancerports,
                                    'elb_health_check': elb_health_check,
@@ -323,7 +328,8 @@ def test_duplicate_unit_names():
         'nat_alerting': nat_alerting,
         'zd_autoscaling_units': [{'unit_title': 'zdapp1',
                                   'elb_config': {
-                                      'protocols': protocols,
+                                      'loadbalancer_protocol': loadbalancer_protocol,
+                                      'instance_protocol': instance_protocol,
                                       'instanceports': instanceports,
                                       'loadbalancerports': loadbalancerports,
                                       'elb_health_check': elb_health_check,
@@ -363,7 +369,8 @@ def test_duplicate_unit_names():
                                   },
                                  {'unit_title': 'zdapp1',
                                   'elb_config': {
-                                      'protocols': protocols,
+                                      'loadbalancer_protocol': loadbalancer_protocol,
+                                      'instance_protocol': instance_protocol,
                                       'instanceports': instanceports,
                                       'loadbalancerports': loadbalancerports,
                                       'elb_health_check': elb_health_check,
@@ -414,10 +421,10 @@ def create_stack(stack_title):
     :return new stack
     """
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, elb_health_check, home_cidrs, \
-        nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, owner_emails, nat_alerting, db_backup_window, db_backup_retention, db_maintenance_window, \
-        db_storage_type, block_devices_config
+        public_cidr, instanceports, loadbalancerports, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type,  \
+        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window,  \
+        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
 
     stack = Stack(
         stack_title=stack_title,
@@ -437,7 +444,8 @@ def create_stack(stack_title):
         nat_alerting=nat_alerting,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': {
-                                   'protocols': protocols,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
                                    'instanceports': instanceports,
                                    'loadbalancerports': loadbalancerports,
                                    'elb_health_check': elb_health_check,
@@ -477,7 +485,8 @@ def create_stack(stack_title):
                                }],
         autoscaling_units=[{'unit_title': 'app1',
                             'elb_config': {
-                                'protocols': protocols,
+                                'loadbalancer_protocol': loadbalancer_protocol,
+                                'instance_protocol': instance_protocol,
                                 'instanceports': instanceports,
                                 'loadbalancerports': loadbalancerports,
                                 'elb_health_check': elb_health_check,
@@ -503,7 +512,8 @@ def create_stack(stack_title):
                             },
                            {'unit_title': 'app2',
                             'elb_config': {
-                                'protocols': protocols,
+                                'loadbalancer_protocol': loadbalancer_protocol,
+                                'instance_protocol': instance_protocol,
                                 'instanceports': instanceports,
                                 'loadbalancerports': loadbalancerports,
                                 'elb_health_check': elb_health_check,

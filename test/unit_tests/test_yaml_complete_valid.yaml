@@ -92,7 +92,9 @@ zd_autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      protocols:
+      loadbalancer_protocol:
+       - 'HTTP'
+      instance_protocol:
        - 'HTTP'
       loadbalancerports:
        - '80'
@@ -141,7 +143,9 @@ autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      protocols:
+      loadbalancer_protocol:
+       - 'HTTP'
+      instance_protocol:
        - 'HTTP'
       loadbalancerports:
        - '80'
@@ -204,7 +208,9 @@ autoscaling_units:
          - service httpd start
     elb_config:
       unit_hosted_zone_name: 'test.lan.'
-      protocols:
+      loadbalancer_protocol:
+       - 'HTTP'
+      instance_protocol:
        - 'HTTP'
       loadbalancerports:
        - '80'

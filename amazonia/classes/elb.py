@@ -19,7 +19,10 @@ class Elb(SecurityEnabledObject):
         """
         self.title = title + 'Elb'
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
-        listener_tuples = zip(elb_config.loadbalancerports, elb_config.instanceports, elb_config.protocols)
+        listener_tuples = zip(elb_config.loadbalancerports,
+                              elb_config.instanceports,
+                              elb_config.loadbalancer_protocol,
+                              elb_config.instance_protocol)
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets
         self.trop_elb = self.template.add_resource(
             elb.LoadBalancer(self.title,
@@ -34,7 +37,7 @@ class Elb(SecurityEnabledObject):
                              Listeners=[elb.Listener(LoadBalancerPort=listener_tuple[0],
                                                      Protocol=listener_tuple[2],
                                                      InstancePort=listener_tuple[1],
-                                                     InstanceProtocol=listener_tuple[2]) for listener_tuple
+                                                     InstanceProtocol=listener_tuple[3]) for listener_tuple
                                         in listener_tuples],
                              Scheme='internet-facing' if elb_config.public_unit is True else 'internal',
                              SecurityGroups=[Ref(self.security_group)],

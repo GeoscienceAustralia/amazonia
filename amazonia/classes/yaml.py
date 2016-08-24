@@ -22,7 +22,8 @@ class Yaml(object):
     cerberus_schema = read_yaml(os.path.join(__location__, '../schemas/cerberus_schema.yaml'))
 
     """ elb_config field list"""
-    elb_config_key_list = ['protocols',
+    elb_config_key_list = ['instance_protocol',
+                           'loadbalancer_protocol',
                            'instanceports',
                            'loadbalancerports',
                            'elb_health_check',

@@ -9,7 +9,9 @@ autoscaling_units:
     unit_title: 'app1'
     elb_config:
       unit_hosted_zone_name: '.test.lan'
-      protocols:
+      loadbalancer_protocol:
+       - 'HTTP'
+      instance_protocol:
        - 'HTTP'
       loadbalancerports:
        - '80'

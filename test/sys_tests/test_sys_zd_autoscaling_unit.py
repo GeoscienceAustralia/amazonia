@@ -79,7 +79,8 @@ runcmd:
                                    stack_hosted_zone_name=None,
                                    cd_service_role_arn=cd_service_role_arn,
                                    keypair='pipeline')
-    protocols = ['HTTP']
+    loadbalancer_protocol = ['HTTP']
+    instance_protocol = ['HTTP']
     instanceports = ['80']
     loadbalancerports = ['80']
     elb_health_check = 'HTTP:80/index.html'
@@ -99,7 +100,8 @@ runcmd:
             'ebs_snapshot_id': '',
             'virtual_name': False}]
 
-    elb_config = ElbConfig(protocols=protocols,
+    elb_config = ElbConfig(loadbalancer_protocol=loadbalancer_protocol,
+                           instance_protocol=instance_protocol,
                            instanceports=instanceports,
                            loadbalancerports=loadbalancerports,
                            elb_log_bucket=None,
