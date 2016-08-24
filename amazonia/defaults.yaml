@@ -59,9 +59,9 @@ elb_config:
     - 'HTTP'
   instance_protocol:
     - 'HTTP'
-  instance_ports:
+  instance_port:
     - '80'
-  loadbalancer_ports:
+  loadbalancer_port:
     - '80'
   elb_health_check: 'HTTP:80/index.html'
   elb_log_bucket:

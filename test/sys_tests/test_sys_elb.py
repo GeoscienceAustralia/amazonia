@@ -70,8 +70,8 @@ def main():
         cd_service_role_arn=None
     )
     elb_config1 = ElbConfig(
-        instance_ports=['80'],
-        loadbalancer_ports=['80'],
+        instance_port=['80'],
+        loadbalancer_port=['80'],
         loadbalancer_protocol=['HTTP'],
         instance_protocol=['HTTP'],
         elb_health_check='HTTP:80/index.html',
@@ -81,8 +81,8 @@ def main():
         ssl_certificate_id=None
     )
     elb_config2 = ElbConfig(
-        instance_ports=['80'],
-        loadbalancer_ports=['443'],
+        instance_port=['80'],
+        loadbalancer_port=['443'],
         loadbalancer_protocol=['HTTPS'],
         instance_protocol=['HTTP'],
         elb_health_check='HTTP:80/index.html',

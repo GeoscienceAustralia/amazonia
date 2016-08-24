@@ -19,8 +19,8 @@ class Elb(SecurityEnabledObject):
         """
         self.title = title + 'Elb'
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
-        listener_tuples = zip(elb_config.loadbalancer_ports,
-                              elb_config.instance_ports,
+        listener_tuples = zip(elb_config.loadbalancer_port,
+                              elb_config.instance_port,
                               elb_config.loadbalancer_protocol,
                               elb_config.instance_protocol)
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets

@@ -6,8 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introducing SSLCertificateId for ELBs
 - Changing path2ping to elb_health_check and making it an explicit health check e.g. /index.html --> HTTP:80/index.html. Updates to app and default yamls required 
 - Changing instance_protocol and loadbalancer_protocol to replace protocols. Updates to app and default yamls required 
-- Changing loadbalancerports to loadbalancer_ports. Updates to app and default yamls required 
-- Changing instanceports to instance_ports. Updates to app and default yamls required 
+- Changing loadbalancerports to loadbalancer_port. Updates to app and default yamls required 
+- Changing instanceports to instance_port. Updates to app and default yamls required 
 - Updated relavant unit tests
 - Updated relavant systems tests
 

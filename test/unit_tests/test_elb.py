@@ -68,8 +68,8 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         keypair=None
     )
     elb_config = ElbConfig(
-        instance_ports=[instanceport],
-        loadbalancer_ports=[loadbalancerport],
+        instance_port=[instanceport],
+        loadbalancer_port=[loadbalancerport],
         loadbalancer_protocol=[loadbalancer_protocol],
         instance_protocol=[instance_protocol],
         elb_health_check=elb_health_check,
@@ -131,7 +131,7 @@ def test_target():
     assert_equals('HTTPS:443/test/index.html', helper_elb.trop_elb.HealthCheck.Target)
 
 
-def test_instance_ports():
+def test_instance_port():
     """
     Tests to validate that passing 'instanceport' correctly sets the instanceport in the Listener object of the ELB
     as well as the Health check target.
@@ -145,7 +145,7 @@ def test_instance_ports():
             assert_equal(port, listener.InstancePort)
 
 
-def test_loadbalancer_ports():
+def test_loadbalancer_port():
     """
     Tests to validate that passing 'loadbalancerport' correctly sets the loadbalancer port for the Listener on the ELB
     'Listener.LoadBalancerPort'

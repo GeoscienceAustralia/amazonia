@@ -8,15 +8,15 @@ userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = publi
     db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = None
 availability_zones = []
 home_cidrs = []
-instance_ports = []
-loadbalancer_ports = []
+instance_port = []
+loadbalancer_port = []
 instance_protocol = []
 loadbalancer_protocol = []
 
 
 def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instance_ports, loadbalancer_ports, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
         db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
@@ -39,8 +39,8 @@ runcmd:
     code_deploy_service_role = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
     vpc_cidr = '10.0.0.0/16'
     home_cidrs = [{'name': 'GA', 'cidr': '123.123.12.34/32'}, {'name': 'home', 'cidr': '192.168.0.1/16'}]
-    instance_ports = ['80']
-    loadbalancer_ports = ['80']
+    instance_port = ['80']
+    loadbalancer_port = ['80']
     instance_protocol = ['HTTP']
     loadbalancer_protocol = ['HTTP']
     minsize = 1
@@ -161,8 +161,8 @@ def test_duplicate_unit_names():
                                'elb_config': {
                                    'loadbalancer_protocol': loadbalancer_protocol,
                                    'instance_protocol': instance_protocol,
-                                   'instance_ports': instance_ports,
-                                   'loadbalancer_ports': loadbalancer_ports,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
                                    'elb_health_check': elb_health_check,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
@@ -175,8 +175,8 @@ def test_duplicate_unit_names():
                                'elb_config': {
                                    'loadbalancer_protocol': loadbalancer_protocol,
                                    'instance_protocol': instance_protocol,
-                                   'instance_ports': instance_ports,
-                                   'loadbalancer_ports': loadbalancer_ports,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
                                    'elb_health_check': elb_health_check,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
@@ -271,8 +271,8 @@ def test_duplicate_unit_names():
                                'elb_config': {
                                    'loadbalancer_protocol': loadbalancer_protocol,
                                    'instance_protocol': instance_protocol,
-                                   'instance_ports': instance_ports,
-                                   'loadbalancer_ports': loadbalancer_ports,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
                                    'elb_health_check': elb_health_check,
                                    'unit_hosted_zone_name': None,
                                    'elb_log_bucket': None,
@@ -330,8 +330,8 @@ def test_duplicate_unit_names():
                                   'elb_config': {
                                       'loadbalancer_protocol': loadbalancer_protocol,
                                       'instance_protocol': instance_protocol,
-                                      'instance_ports': instance_ports,
-                                      'loadbalancer_ports': loadbalancer_ports,
+                                      'instance_port': instance_port,
+                                      'loadbalancer_port': loadbalancer_port,
                                       'elb_health_check': elb_health_check,
                                       'unit_hosted_zone_name': None,
                                       'elb_log_bucket': None,
@@ -371,8 +371,8 @@ def test_duplicate_unit_names():
                                   'elb_config': {
                                       'loadbalancer_protocol': loadbalancer_protocol,
                                       'instance_protocol': instance_protocol,
-                                      'instance_ports': instance_ports,
-                                      'loadbalancer_ports': loadbalancer_ports,
+                                      'instance_port': instance_port,
+                                      'loadbalancer_port': loadbalancer_port,
                                       'elb_health_check': elb_health_check,
                                       'unit_hosted_zone_name': None,
                                       'elb_log_bucket': None,
@@ -421,7 +421,7 @@ def create_stack(stack_title):
     :return new stack
     """
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instance_ports, loadbalancer_ports, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type,  \
         unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window,  \
         db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
@@ -446,8 +446,8 @@ def create_stack(stack_title):
                                'elb_config': {
                                    'loadbalancer_protocol': loadbalancer_protocol,
                                    'instance_protocol': instance_protocol,
-                                   'instance_ports': instance_ports,
-                                   'loadbalancer_ports': loadbalancer_ports,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
                                    'elb_health_check': elb_health_check,
                                    'unit_hosted_zone_name': None,
                                    'elb_log_bucket': None,
@@ -487,8 +487,8 @@ def create_stack(stack_title):
                             'elb_config': {
                                 'loadbalancer_protocol': loadbalancer_protocol,
                                 'instance_protocol': instance_protocol,
-                                'instance_ports': instance_ports,
-                                'loadbalancer_ports': loadbalancer_ports,
+                                'instance_port': instance_port,
+                                'loadbalancer_port': loadbalancer_port,
                                 'elb_health_check': elb_health_check,
                                 'unit_hosted_zone_name': None,
                                 'elb_log_bucket': None,
@@ -514,8 +514,8 @@ def create_stack(stack_title):
                             'elb_config': {
                                 'loadbalancer_protocol': loadbalancer_protocol,
                                 'instance_protocol': instance_protocol,
-                                'instance_ports': instance_ports,
-                                'loadbalancer_ports': loadbalancer_ports,
+                                'instance_port': instance_port,
+                                'loadbalancer_port': loadbalancer_port,
                                 'elb_health_check': elb_health_check,
                                 'unit_hosted_zone_name': None,
                                 'elb_log_bucket': None,
