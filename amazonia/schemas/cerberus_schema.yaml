@@ -51,7 +51,7 @@
 #                                            'userdata',
 #                                            'image_id',
 #                                            'instance_type',
-#                                            'path2ping',
+#                                            'elb_health_check',
 #                                            'protocols',
 #                                            'unit_hosted_zone_name',
 #                                            'loadbalancerports',
@@ -111,7 +111,7 @@ elb_config: &elb_config
       nullable: True
       schema:
         type: 'string'
-    path2ping: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
+    elb_health_check: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
       type: 'string'
       nullable: True
     public_unit: # a boolean value that determines the internet-facing scheme for the elb and the subnets it lives on in the asg class

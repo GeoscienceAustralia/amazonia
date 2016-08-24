@@ -61,7 +61,7 @@ elb_config:
     - '80'
   loadbalancerports:
     - '80'
-  path2ping: '/index.html'
+  elb_health_check: 'HTTP:80/index.html'
   elb_log_bucket:
   public_unit: true
   ssl_certificate_id:

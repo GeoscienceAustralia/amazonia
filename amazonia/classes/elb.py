@@ -26,8 +26,7 @@ class Elb(SecurityEnabledObject):
                              CrossZone=True,
                              # Assume health check against first protocol/instance port pair
                              HealthCheck=elb.HealthCheck(
-                                 Target=elb_config.protocols[0] + ':' + elb_config.instanceports[
-                                     0] + elb_config.path2ping,
+                                 Target=elb_config.elb_health_check,
                                  HealthyThreshold='10',
                                  UnhealthyThreshold='2',
                                  Interval='300',

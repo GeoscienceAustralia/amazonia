@@ -25,7 +25,7 @@ class Yaml(object):
     elb_config_key_list = ['protocols',
                            'instanceports',
                            'loadbalancerports',
-                           'path2ping',
+                           'elb_health_check',
                            'public_unit',
                            'elb_log_bucket',
                            'unit_hosted_zone_name',

@@ -13,7 +13,7 @@ autoscaling_units:
       - '80'
     loadbalancerports:
       - '80'
-    path2ping: '/amazonia/web/index.html'
+    elb_health_check: 'HTTP:80/amazonia/web/index.html'
     userdata: |
       #cloud-config
       repo_update: true
