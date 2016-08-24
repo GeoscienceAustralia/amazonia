@@ -83,6 +83,7 @@ runcmd:
                  'unit_hosted_zone_name': 'gadevs.ga.',
                  'elb_log_bucket': None,
                  'public_unit': True,
+                 'ssl_certificate_id': None
              },
              'blue_asg_config': {
                  'minsize': 1,
@@ -134,6 +135,7 @@ runcmd:
                                 'unit_hosted_zone_name': 'gadevs.ga.',
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
@@ -158,6 +160,7 @@ runcmd:
                                 'unit_hosted_zone_name': 'gadevs.ga.',
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'dependencies': []}
                            ],
