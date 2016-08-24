@@ -65,9 +65,9 @@ class ZdAutoscalingUnit(object):
 
         # create security group rules to allow traffic from the public to the loadbalancer
         [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancerports]
+         for loadbalancerport in elb_config.loadbalancer_ports]
         [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancerports]
+         for loadbalancerport in elb_config.loadbalancer_ports]
 
         # allow outbound traffic to the NAT
         self.green_asg.add_flow(receiver=network_config.nat, port='-1')
@@ -96,7 +96,7 @@ class ZdAutoscalingUnit(object):
         """
         :return: return list of ports exposed by ELB for routing other unit's traffic
         """
-        return self.elb_config.loadbalancerports
+        return self.elb_config.loadbalancer_ports
 
     def add_unit_flow(self, receiver):
         """

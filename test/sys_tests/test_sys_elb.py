@@ -71,7 +71,7 @@ def main():
     )
     elb_config1 = ElbConfig(
         instance_ports=['80'],
-        loadbalancerports=['80'],
+        loadbalancer_ports=['80'],
         loadbalancer_protocol=['HTTP'],
         instance_protocol=['HTTP'],
         elb_health_check='HTTP:80/index.html',
@@ -82,7 +82,7 @@ def main():
     )
     elb_config2 = ElbConfig(
         instance_ports=['80'],
-        loadbalancerports=['443'],
+        loadbalancer_ports=['443'],
         loadbalancer_protocol=['HTTPS'],
         instance_protocol=['HTTP'],
         elb_health_check='HTTP:80/index.html',

@@ -92,7 +92,7 @@ def test_complete_valid_values():
     assert_equals(autoscaling_unit_input['elb_config']['elb_health_check'], 'HTTP:80/index.html')
     assert_list_equal(autoscaling_unit_input['elb_config']['instance_protocol'], ['HTTP'])
     assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancer_protocol'], ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancerports'], ['80'])
+    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancer_ports'], ['80'])
     assert_list_equal(autoscaling_unit_input['elb_config']['instance_ports'], ['80'])
     assert_equals(autoscaling_unit_input['asg_config']['minsize'], '1')
     assert_equals(autoscaling_unit_input['asg_config']['maxsize'], '1')

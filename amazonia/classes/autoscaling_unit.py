@@ -16,7 +16,7 @@ class AutoscalingUnit(object):
         """
         self.template = template
         self.public_cidr = network_config.public_cidr
-        self.loadbalancerports = elb_config.loadbalancerports
+        self.loadbalancer_ports = elb_config.loadbalancer_ports
         self.dependencies = dependencies if dependencies else []
         self.elb = Elb(
             title=unit_title,
@@ -32,7 +32,7 @@ class AutoscalingUnit(object):
             load_balancers=[self.elb.trop_elb]
         )
         [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
-         self.loadbalancerports]
+         self.loadbalancer_ports]
         [self.elb.add_flow(receiver=self.asg, port=instanceport) for instanceport in elb_config.instance_ports]
         self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic between autoscaling groups and Nats
         network_config.jump.add_flow(receiver=self.asg, port='22')
@@ -55,7 +55,7 @@ class AutoscalingUnit(object):
         """
         :return: return list of ports exposed by ELB for routing other unit's traffic
         """
-        return self.loadbalancerports
+        return self.loadbalancer_ports
 
     def add_unit_flow(self, receiver):
         """

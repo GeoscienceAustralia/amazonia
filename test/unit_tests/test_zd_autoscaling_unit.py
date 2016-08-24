@@ -80,7 +80,7 @@ runcmd:
                            loadbalancer_protocol=['HTTP'],
                            instance_protocol=['HTTP'],
                            instance_ports=['80'],
-                           loadbalancerports=['80'],
+                           loadbalancer_ports=['80'],
                            elb_health_check='HTTP:80/index.html',
                            public_unit=True,
                            unit_hosted_zone_name=None,

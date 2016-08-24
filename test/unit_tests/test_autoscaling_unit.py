@@ -99,7 +99,7 @@ runcmd:
         loadbalancer_protocol=['HTTP'],
         instance_protocol=['HTTP'],
         instance_ports=['80'],
-        loadbalancerports=['80'],
+        loadbalancer_ports=['80'],
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,

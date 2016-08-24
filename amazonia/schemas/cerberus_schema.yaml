@@ -55,7 +55,7 @@
 #                                            'instance_protocol',
 #                                            'loadbalancer_protocol',
 #                                            'unit_hosted_zone_name',
-#                                            'loadbalancerports',
+#                                            'loadbalancer_ports',
 #                                            'instance_ports',
 #                                            'minsize',
 #                                            'maxsize',
@@ -112,7 +112,7 @@ elb_config: &elb_config
       nullable: True
       schema:
         type: 'string'
-    loadbalancerports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+    loadbalancer_ports: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
       type: 'list'
       nullable: True
       schema:

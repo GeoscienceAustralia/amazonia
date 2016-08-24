@@ -11,7 +11,7 @@ autoscaling_units:
       - 'HTTP'
     instance_ports:
       - '80'
-    loadbalancerports:
+    loadbalancer_ports:
       - '80'
     elb_health_check: 'HTTP:80/amazonia/web/index.html'
     userdata: |

@@ -13,7 +13,7 @@ autoscaling_units:
        - 'HTTP'
       instance_protocol:
        - 'HTTP'
-      loadbalancerports:
+      loadbalancer_ports:
        - '80'
       instance_ports:
        - '80'

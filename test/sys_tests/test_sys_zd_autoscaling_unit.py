@@ -82,7 +82,7 @@ runcmd:
     loadbalancer_protocol = ['HTTP']
     instance_protocol = ['HTTP']
     instance_ports = ['80']
-    loadbalancerports = ['80']
+    loadbalancer_ports = ['80']
     elb_health_check = 'HTTP:80/index.html'
     minsize = 1
     maxsize = 1
@@ -103,7 +103,7 @@ runcmd:
     elb_config = ElbConfig(loadbalancer_protocol=loadbalancer_protocol,
                            instance_protocol=instance_protocol,
                            instance_ports=instance_ports,
-                           loadbalancerports=loadbalancerports,
+                           loadbalancer_ports=loadbalancer_ports,
                            elb_log_bucket=None,
                            elb_health_check=elb_health_check,
                            public_unit=True,

@@ -19,7 +19,7 @@ class Elb(SecurityEnabledObject):
         """
         self.title = title + 'Elb'
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
-        listener_tuples = zip(elb_config.loadbalancerports,
+        listener_tuples = zip(elb_config.loadbalancer_ports,
                               elb_config.instance_ports,
                               elb_config.loadbalancer_protocol,
                               elb_config.instance_protocol)
