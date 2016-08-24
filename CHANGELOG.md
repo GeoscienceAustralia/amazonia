@@ -8,8 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Changing instance_protocol and loadbalancer_protocol to replace protocols. Updates to app and default yamls required 
 - Changing loadbalancerports to loadbalancer_port. Updates to app and default yamls required 
 - Changing instanceports to instance_port. Updates to app and default yamls required 
-- Updated relavant unit tests
-- Updated relavant systems tests
+- Updated relevant unit tests
+- Updated relevant systems tests
 
 ## [1.2.7] - 23/08/2016
 - Restoring application.yaml
