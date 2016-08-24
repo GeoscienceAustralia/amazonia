@@ -32,6 +32,7 @@ def main():
     )
 
     defaultcachebehavior = template.add_resource(cloudfront.DefaultCacheBehavior(
+            'defaultcachebehavior',
             TargetOriginId='targetoriginid',
             AllowedMethods=['GET','POST'],
             CachedMethods=['GET','POST'],
