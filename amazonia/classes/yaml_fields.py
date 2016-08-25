@@ -142,7 +142,7 @@ class YamlFields(object):
             ComplexObjectFieldMapping(
                 getattr(importlib.import_module('amazonia.classes.block_devices_config'), 'BlockDevicesConfig'), True,
                 block_devices_config_key_list),
-        'simple_scaling_policies':
+        'simple_scaling_policy_config':
             ComplexObjectFieldMapping(
                 getattr(importlib.import_module('amazonia.classes.simple_scaling_policy_config'),
                         'SimpleScalingPolicyConfig'), True, simple_scaling_policy_config_key_list),

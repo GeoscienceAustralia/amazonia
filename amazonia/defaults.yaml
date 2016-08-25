@@ -77,6 +77,18 @@ block_devices_config:
   ebs_snapshot_id:
   virtual_name: False
 
+# Simple scaling policy:
+simple_scaling_policy_config:
+  name: 'light load'
+  description: 'When under light CPU load for 6 consecutive periods of five minutes, remove one instance, wait 120 seconds'
+  metric_name: 'CPUUtilization'
+  comparison_operator: 'LessThanOrEqualToThreshold'
+  threshold: '15'
+  evaluation_periods: 6
+  period: 300
+  scaling_adjustment: -1
+  cooldown: 120
+
 # Asg default values
 asg_config: &asg_config
   image_id: 'ami-dc361ebf'
@@ -86,7 +98,7 @@ asg_config: &asg_config
   maxsize: '1'
   health_check_grace_period: '300'
   health_check_type: 'ELB'
-  block_devices:
+  block_devices_config:
   simple_scaling_policy_config:
   sns_topic_arn:
   sns_notification_types:

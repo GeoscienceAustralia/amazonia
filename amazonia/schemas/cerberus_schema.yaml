@@ -232,7 +232,7 @@ asg_config: &asg_config
       type: 'string'
       nullable: True
     iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
-    block_devices:
+    block_devices_config:
       type: 'list'
       nullable: True
       schema: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
