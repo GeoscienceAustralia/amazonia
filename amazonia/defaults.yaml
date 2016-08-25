@@ -74,7 +74,7 @@ block_devices_config:
   ebs_volume_size: '8'
   ebs_volume_type: 'standard'
   ebs_encrypted: False
-  ebs_snapshot_id: ''
+  ebs_snapshot_id:
   virtual_name: False
 
 # Asg default values
