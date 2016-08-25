@@ -173,20 +173,20 @@ autoscaling_units:
         - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
         - 'autoscaling:EC2_INSTANCE_TERMINATE'
         - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
-      block_devices_config:
+      block_devices:
         -
           device_name: '/dev/xvda'
           ebs_volume_size: '15'
           ebs_volume_type: 'standard'
           ebs_encrypted: False
-          ebs_snapshot_id: ''
+          ebs_snapshot_id:
           virtual_name: False
         -
-          device_name: ''
-          ebs_volume_size: ''
-          ebs_volume_type: ''
+          device_name: '/dev/std1'
+          ebs_volume_size:
+          ebs_volume_type:
           ebs_encrypted: False
-          ebs_snapshot_id: ''
+          ebs_snapshot_id:
           virtual_name: True
       userdata: |
         #cloud-config

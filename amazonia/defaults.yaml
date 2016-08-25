@@ -69,17 +69,16 @@ elb_config:
   ssl_certificate_id:
 
 # Block device configs
-block_devices_config: &block_devices_config
-  -
-    device_name: '/dev/xvda'
-    ebs_volume_size: '8'
-    ebs_volume_type: 'standard'
-    ebs_encrypted: False
-    ebs_snapshot_id: ''
-    virtual_name: False
+block_devices_config:
+  device_name: '/dev/xvda'
+  ebs_volume_size: '8'
+  ebs_volume_type: 'standard'
+  ebs_encrypted: False
+  ebs_snapshot_id: ''
+  virtual_name: False
 
 # Asg default values
-asg_config:
+asg_config: &asg_config
   image_id: 'ami-dc361ebf'
   instance_type: 't2.micro'
   iam_instance_profile_arn:
@@ -87,7 +86,7 @@ asg_config:
   maxsize: '1'
   health_check_grace_period: '300'
   health_check_type: 'ELB'
-  block_devices_config: *block_devices_config
+  block_devices:
   simple_scaling_policy_config:
   sns_topic_arn:
   sns_notification_types:
@@ -114,4 +113,5 @@ asg_config:
     runcmd:
      - service httpd start
 
-
+blue_asg_config: *asg_config
+green_asg_config: *asg_config

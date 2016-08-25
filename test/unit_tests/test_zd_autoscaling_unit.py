@@ -1,12 +1,12 @@
-from nose.tools import *
-from troposphere import ec2, Ref, Template
-
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from nose.tools import *
+from troposphere import ec2, Ref, Template
 
 template = elb_config = network_config = common_asg_config = block_devices_config = None
 
@@ -14,13 +14,13 @@ template = elb_config = network_config = common_asg_config = block_devices_confi
 def setup_resources():
     """ Setup global variables between tests"""
     global template, elb_config, network_config, common_asg_config, block_devices_config
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(
+        device_name='/dev/xvda',
+        ebs_volume_size='15',
+        ebs_volume_type='gp2',
+        ebs_encrypted=False,
+        ebs_snapshot_id=None,
+        virtual_name=False)]
 
     userdata = """
 #cloud-config
@@ -96,7 +96,9 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config)
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=None
+    )
 
 
 @with_setup(setup_resources)

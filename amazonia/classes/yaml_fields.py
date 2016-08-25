@@ -5,7 +5,7 @@ class ComplexObjectFieldMapping(object):
     def __init__(self, constructor, is_list, key_list):
         """
         Simple class to hold mapping information between input data and config classes
-        :param constructor: class path to config class definition
+        :param constructor: config class definition
         :param is_list: is the field a list of config objects or a single config object?
         :param key_list: expected config keys
         """
@@ -15,6 +15,8 @@ class ComplexObjectFieldMapping(object):
 
 
 class YamlFields(object):
+    """Simple object to consolidate a number of key list constants"""
+
     """ elb_config field list"""
     elb_config_key_list = ['instance_protocol',
                            'loadbalancer_protocol',

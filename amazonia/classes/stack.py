@@ -204,6 +204,7 @@ class Stack(object):
             if unit_title in self.units:
                 raise DuplicateUnitNameError("Error: unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(unit_title))
+            unit['unit_title'] = self.title + unit_title
             self.units[unit_title] = unit_constructor(
                 template=self.template,
                 network_config=self.network_config,

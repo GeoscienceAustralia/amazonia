@@ -186,6 +186,11 @@ def test_hosted_zone_name():
     helper_elb = create_elb(hosted_zone_name='myhostedzone.gadevs.ga.')
     assert helper_elb.elb_r53
 
+"""    # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
+    assert_equals(stack_input['autoscaling_units'][0]['elb_config'].unit_hosted_zone_name,
+                  stack_input['stack_hosted_zone_name'])
+                  """
+
 
 def test_elb_log_bucket():
     """
