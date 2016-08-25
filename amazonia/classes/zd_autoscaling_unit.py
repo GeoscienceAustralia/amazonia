@@ -14,7 +14,7 @@ class ZdAutoscalingUnit(object):
          'MyStackApi2' or 'MyStackDataprocessing'
         :param template: Troposphere template to append resources to
         :param dependencies: list of unit names this unit needs access to
-        :param network_config: network related paramters including subnet, nat, jump, etc
+        :param network_config: network related parameters including subnet, nat, jump, etc
         :param elb_config: shared elb configuration
         :param blue_asg_config: configuration specific to the blue asg
         :param green_asg_config: configuration specific to the green asg

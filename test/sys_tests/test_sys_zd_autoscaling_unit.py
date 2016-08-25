@@ -4,6 +4,7 @@ from troposphere import ec2, Ref, Template, Join, Tags
 
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.elb_config import ElbConfig
@@ -92,13 +93,12 @@ runcmd:
     image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
 
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
+                                               ebs_volume_size='15',
+                                               ebs_volume_type='gp2',
+                                               ebs_encrypted=False,
+                                               ebs_snapshot_id=None,
+                                               virtual_name=False)]
 
     elb_config = ElbConfig(loadbalancer_protocol=loadbalancer_protocol,
                            instance_protocol=instance_protocol,
@@ -119,7 +119,8 @@ runcmd:
                                 instance_type=instance_type,
                                 userdata=userdata,
                                 iam_instance_profile_arn=None,
-                                block_devices_config=block_devices_config)
+                                block_devices_config=block_devices_config,
+                                simple_scaling_policy_config=None)
     green_asg_config = AsgConfig(sns_topic_arn=None,
                                  sns_notification_types=None,
                                  health_check_grace_period=health_check_grace_period,
@@ -130,7 +131,8 @@ runcmd:
                                  instance_type=instance_type,
                                  userdata=userdata,
                                  iam_instance_profile_arn=None,
-                                 block_devices_config=block_devices_config)
+                                 block_devices_config=block_devices_config,
+                                 simple_scaling_policy_config=None)
 
     unit1 = ZdAutoscalingUnit(
         unit_title='app1',

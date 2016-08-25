@@ -70,8 +70,8 @@ class Asg(SecurityEnabledObject):
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
-        if asg_config.simple_scaling_policies is not None:
-            for scaling_policy_config in asg_config.simple_scaling_policies:
+        if asg_config.simple_scaling_policy_config is not None:
+            for scaling_policy_config in asg_config.simple_scaling_policy_config:
                 SimpleScalingPolicy(asg=self.trop_asg, template=self.template,
                                     scaling_policy_config=scaling_policy_config)
 

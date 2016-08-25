@@ -88,6 +88,7 @@ asg_config:
   health_check_grace_period: '300'
   health_check_type: 'ELB'
   block_devices_config: *block_devices_config
+  simple_scaling_policy_config:
   sns_topic_arn:
   sns_notification_types:
     - 'autoscaling:EC2_INSTANCE_LAUNCH'

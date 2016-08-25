@@ -136,8 +136,49 @@ elb_config: &elb_config
       nullable: True
       regex: '^arn:aws:'
 
+simple_scaling_policy_config: &simple_scaling_policy_config
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      name:
+        type: 'string'
+      description:
+        type: 'string'
+      metric_name:
+        type: 'string'
+      comparison_operator:
+        type: 'string'
+        allowed:
+         - 'GreaterThanOrEqualToThreshold'
+         - 'GreaterThanThreshold'
+         - 'LessThanThreshold'
+         - 'LessThanOrEqualToThreshold'
+      threshold:
+        type:
+         - 'number'
+         - 'string'
+      evaluation_periods:
+        type:
+         - 'number'
+         - 'string'
+      period:
+        type:
+         - 'number'
+         - 'string'
+      scaling_adjustment:
+        type:
+         - 'number'
+         - 'string'
+      cooldown:
+        type:
+         - 'number'
+         - 'string'
+
 block_devices_config: &block_devices_config
   type: 'list'
+  nullable: True
   schema:
     type: 'dict'
     schema:
@@ -196,6 +237,7 @@ asg_config: &asg_config
       nullable: True
     iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
     block_devices_config: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
+    simple_scaling_policy_config: *simple_scaling_policy_config # any scaling policies based upon cpu usage
 
 database_config: &database_config
   type: 'dict'

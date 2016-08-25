@@ -10,7 +10,8 @@ class SimpleScalingPolicyConfig(object):
         :param name: Human readable name of sclaing policy
         :param description: Description of scaling policy
         :param metric_name: EC2 metric to evaluate against
-        :param comparison_operator: GreaterThanOrEqualToThreshold | GreaterThanThreshold | LessThanThreshold | LessThanOrEqualToThreshold
+        :param comparison_operator: GreaterThanOrEqualToThreshold | GreaterThanThreshold | LessThanThreshold
+        | LessThanOrEqualToThreshold
         :param threshold: Metric threshold to evaluate against
         :param evaluation_periods: How many consecutive periods must pass before alarm/policy is triggered
         :param period: duration at threshold to trigger alarm/policy

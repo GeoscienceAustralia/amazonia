@@ -1,15 +1,14 @@
 #!/usr/bin/python3
 
 import troposphere.elasticloadbalancing as elb
-from troposphere import ec2, Ref, Template
-
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.network_config import NetworkConfig
+from troposphere import ec2, Ref, Template
 
 
 def main():
-
     template = Template()
 
     vpc = template.add_resource(ec2.VPC('MyVPC',
@@ -53,30 +52,30 @@ def main():
     )
 
     block_devices_config = [
-        {'device_name': '/dev/xvda',
-         'ebs_volume_size': '15',
-         'ebs_volume_type': 'gp2',
-         'ebs_encrypted': False,
-         'ebs_snapshot_id': '',
-         'virtual_name': False},
-        {'device_name': '/dev/xvda2',
-         'ebs_volume_size': '15',
-         'ebs_volume_type': 'gp2',
-         'ebs_encrypted': False,
-         'ebs_snapshot_id': 'ami-ce0531ad',
-         'virtual_name': False},
-        {'device_name': '/dev/sda1',
-         'ebs_volume_size': '',
-         'ebs_volume_type': '',
-         'ebs_encrypted': False,
-         'ebs_snapshot_id': '',
-         'virtual_name': True},
-        {'device_name': '/dev/sda2',
-         'ebs_volume_size': '15',
-         'ebs_volume_type': 'gp2',
-         'ebs_encrypted': True,
-         'ebs_snapshot_id': '',
-         'virtual_name': False}
+        BlockDevicesConfig(device_name='/dev/xvda',
+                           ebs_volume_size='15',
+                           ebs_volume_type='gp2',
+                           ebs_encrypted=False,
+                           ebs_snapshot_id=None,
+                           virtual_name=False),
+        BlockDevicesConfig(device_name='/dev/xvda2',
+                           ebs_volume_size='15',
+                           ebs_volume_type='gp2',
+                           ebs_encrypted=False,
+                           ebs_snapshot_id='ami-ce0531ad',
+                           virtual_name=False),
+        BlockDevicesConfig(device_name='/dev/sda1',
+                           ebs_volume_size=None,
+                           ebs_volume_type=None,
+                           ebs_encrypted=False,
+                           ebs_snapshot_id=None,
+                           virtual_name=True),
+        BlockDevicesConfig(device_name='/dev/sda2',
+                           ebs_volume_size='15',
+                           ebs_volume_type='gp2',
+                           ebs_encrypted=True,
+                           ebs_snapshot_id=None,
+                           virtual_name=False)
     ]
 
     asg_config = AsgConfig(
@@ -93,7 +92,8 @@ def main():
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=None
     )
 
     Asg(title='simple',

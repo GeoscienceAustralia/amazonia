@@ -51,9 +51,10 @@ def main():
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
-    simple_scaling_policies = [
+    simple_scaling_policy_config = [
         SimpleScalingPolicyConfig(name='heavy - load',
-                                  description='When under heavy CPU load for five minutes, add two instances, wait 45 seconds',
+                                  description='When under heavy CPU load for five minutes, add two instances, '
+                                              'wait 45 seconds',
                                   metric_name='CPUUtilization',
                                   comparison_operator='GreaterThanThreshold',
                                   threshold='45',
@@ -62,7 +63,8 @@ def main():
                                   scaling_adjustment=1,
                                   cooldown=45),
         SimpleScalingPolicyConfig(name='light - load',
-                                  description='When under light CPU load for 6 consecutive periods of five minutes, remove one instance, wait 120 seconds',
+                                  description='When under light CPU load for 6 consecutive periods of five minutes,'
+                                              ' remove one instance, wait 120 seconds',
                                   metric_name='CPUUtilization',
                                   comparison_operator='LessThanOrEqualToThreshold',
                                   threshold='15',
@@ -71,7 +73,8 @@ def main():
                                   scaling_adjustment=-1,
                                   cooldown=120),
         SimpleScalingPolicyConfig(name='medium - load',
-                                  description='When under medium CPU load for five minutes, add one instance, wait 45 seconds',
+                                  description='When under medium CPU load for five minutes, add one instance, '
+                                              'wait 45 seconds',
                                   metric_name='CPUUtilization',
                                   comparison_operator='GreaterThanOrEqualToThreshold',
                                   threshold='25',
@@ -96,7 +99,7 @@ def main():
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         block_devices_config=None,
-        simple_scaling_policies=simple_scaling_policies
+        simple_scaling_policy_config=simple_scaling_policy_config
     )
 
     Asg(title='simple',

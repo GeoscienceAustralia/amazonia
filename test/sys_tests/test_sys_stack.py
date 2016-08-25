@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 
-from amazonia.classes.stack import Stack
+from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.database_config import DatabaseConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.stack import Stack
 
 
 def main():
@@ -48,13 +51,12 @@ runcmd:
     jump_image_id = 'ami-dc361ebf'
     app_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
+                                               ebs_volume_size='15',
+                                               ebs_volume_type='gp2',
+                                               ebs_encrypted=False,
+                                               ebs_snapshot_id=None,
+                                               virtual_name=False)]
 
     stack = Stack(
         stack_title='test',
@@ -74,112 +76,115 @@ runcmd:
         stack_hosted_zone_name=None,
         zd_autoscaling_units=[
             {'unit_title': 'zdapp1',
-             'zd_state': 'blue',
-             'elb_config': {
-                 'loadbalancer_protocol': ['HTTP'],
-                 'instance_protocol': ['HTTP'],
-                 'instance_port': ['80'],
-                 'loadbalancer_port': ['80'],
-                 'elb_health_check': 'HTTP:80/index.html',
-                 'unit_hosted_zone_name': 'gadevs.ga.',
-                 'elb_log_bucket': None,
-                 'public_unit': True,
-                 'ssl_certificate_id': None
-             },
-             'blue_asg_config': {
-                 'minsize': 1,
-                 'maxsize': 1,
-                 'health_check_grace_period': 300,
-                 'health_check_type': 'ELB',
-                 'image_id': app_image_id,
-                 'instance_type': instance_type,
-                 'iam_instance_profile_arn': None,
-                 'sns_topic_arn': None,
-                 'sns_notification_types': None,
-                 'userdata': userdata1,
-                 'block_devices_config': block_devices_config
-             },
-             'green_asg_config': {
-                 'minsize': 1,
-                 'maxsize': 1,
-                 'health_check_grace_period': 300,
-                 'health_check_type': 'ELB',
-                 'image_id': app_image_id,
-                 'instance_type': instance_type,
-                 'iam_instance_profile_arn': None,
-                 'sns_topic_arn': None,
-                 'sns_notification_types': None,
-                 'userdata': userdata1,
-                 'block_devices_config': block_devices_config
-             },
+             'elb_config': ElbConfig(
+                 loadbalancer_protocol=['HTTP'],
+                 instance_protocol=['HTTP'],
+                 instance_port=['80'],
+                 loadbalancer_port=['80'],
+                 elb_health_check='HTTP:80/index.html',
+                 unit_hosted_zone_name='gadevs.ga.',
+                 elb_log_bucket=None,
+                 public_unit=True,
+                 ssl_certificate_id=None
+             ),
+             'blue_asg_config': AsgConfig(
+                 minsize=1,
+                 maxsize=1,
+                 health_check_grace_period=300,
+                 health_check_type='ELB',
+                 image_id=app_image_id,
+                 instance_type=instance_type,
+                 iam_instance_profile_arn=None,
+                 sns_topic_arn=None,
+                 sns_notification_types=None,
+                 userdata=userdata1,
+                 block_devices_config=block_devices_config,
+                 simple_scaling_policy_config=None
+             ),
+             'green_asg_config': AsgConfig(
+                 minsize=1,
+                 maxsize=1,
+                 health_check_grace_period=300,
+                 health_check_type='ELB',
+                 image_id=app_image_id,
+                 instance_type=instance_type,
+                 iam_instance_profile_arn=None,
+                 sns_topic_arn=None,
+                 sns_notification_types=None,
+                 userdata=userdata1,
+                 block_devices_config=block_devices_config,
+                 simple_scaling_policy_config=None
+             ),
              'dependencies': ['app2', 'db1']}
         ],
         autoscaling_units=[{'unit_title': 'app1',
-                            'asg_config': {
-                                'minsize': 1,
-                                'maxsize': 1,
-                                'health_check_grace_period': 300,
-                                'health_check_type': 'ELB',
-                                'image_id': app_image_id,
-                                'instance_type': instance_type,
-                                'iam_instance_profile_arn': None,
-                                'sns_topic_arn': None,
-                                'sns_notification_types': None,
-                                'userdata': userdata1,
-                                'block_devices_config': block_devices_config
-                            },
-                            'elb_config': {
-                                'loadbalancer_protocol': ['HTTP'],
-                                'instance_protocol': ['HTTP'],
-                                'instance_port': ['80'],
-                                'loadbalancer_port': ['80'],
-                                'elb_health_check': 'HTTP:80/index.html',
-                                'unit_hosted_zone_name': 'gadevs.ga.',
-                                'elb_log_bucket': None,
-                                'public_unit': True,
-                                'ssl_certificate_id': None
-                            },
+                            'asg_config': AsgConfig(
+                                minsize=1,
+                                maxsize=1,
+                                health_check_grace_period=300,
+                                health_check_type='ELB',
+                                image_id=app_image_id,
+                                instance_type=instance_type,
+                                iam_instance_profile_arn=None,
+                                sns_topic_arn=None,
+                                sns_notification_types=None,
+                                userdata=userdata1,
+                                block_devices_config=block_devices_config,
+                                simple_scaling_policy_config=None
+                            ),
+                            'elb_config': ElbConfig(
+                                loadbalancer_protocol=['HTTP'],
+                                instance_protocol=['HTTP'],
+                                instance_port=['80'],
+                                loadbalancer_port=['80'],
+                                elb_health_check='HTTP:80/index.html',
+                                unit_hosted_zone_name='gadevs.ga.',
+                                elb_log_bucket=None,
+                                public_unit=True,
+                                ssl_certificate_id=None
+                            ),
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
-                            'asg_config': {
-                                'minsize': 1,
-                                'maxsize': 1,
-                                'health_check_grace_period': 300,
-                                'health_check_type': 'ELB',
-                                'image_id': app_image_id,
-                                'instance_type': instance_type,
-                                'iam_instance_profile_arn': None,
-                                'sns_topic_arn': None,
-                                'sns_notification_types': None,
-                                'userdata': userdata2,
-                                'block_devices_config': block_devices_config
-                            },
-                            'elb_config': {
-                                'loadbalancer_protocol': ['HTTP'],
-                                'instance_protocol': ['HTTP'],
-                                'instance_port': ['80'],
-                                'loadbalancer_port': ['80'],
-                                'elb_health_check': 'HTTP:80/index.html',
-                                'unit_hosted_zone_name': 'gadevs.ga.',
-                                'elb_log_bucket': None,
-                                'public_unit': True,
-                                'ssl_certificate_id': None
-                            },
+                            'asg_config': AsgConfig(
+                                minsize=1,
+                                maxsize=1,
+                                health_check_grace_period=300,
+                                health_check_type='ELB',
+                                image_id=app_image_id,
+                                instance_type=instance_type,
+                                iam_instance_profile_arn=None,
+                                sns_topic_arn=None,
+                                sns_notification_types=None,
+                                userdata=userdata2,
+                                block_devices_config=block_devices_config,
+                                simple_scaling_policy_config=None
+                            ),
+                            'elb_config': ElbConfig(
+                                loadbalancer_protocol=['HTTP'],
+                                instance_protocol=['HTTP'],
+                                instance_port=['80'],
+                                loadbalancer_port=['80'],
+                                elb_health_check='HTTP:80/index.html',
+                                unit_hosted_zone_name='gadevs.ga.',
+                                elb_log_bucket=None,
+                                public_unit=True,
+                                ssl_certificate_id=None
+                            ),
                             'dependencies': []}
                            ],
         database_units=[{'unit_title': 'db1',
-                         'database_config': {
-                             'db_instance_type': 'db.m1.small',
-                             'db_engine': 'postgres',
-                             'db_port': '5432',
-                             'db_name': 'myDb',
-                             'db_hdd_size': 5,
-                             'db_snapshot_id': None,
-                             'db_backup_window': None,
-                             'db_backup_retention': None,
-                             'db_maintenance_window': None,
-                             'db_storage_type': None
-                         }
+                         'database_config': DatabaseConfig(
+                             db_instance_type='db.m1.small',
+                             db_engine='postgres',
+                             db_port='5432',
+                             db_name='myDb',
+                             db_hdd_size=5,
+                             db_snapshot_id=None,
+                             db_backup_window=None,
+                             db_backup_retention=None,
+                             db_maintenance_window=None,
+                             db_storage_type=None
+                         )
                          }]
 
     )

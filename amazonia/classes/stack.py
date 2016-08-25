@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 
-from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
-from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
-from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -187,63 +184,31 @@ class Stack(object):
                                             cd_service_role_arn=self.code_deploy_service_role
                                             )
         # Add ZD Autoscaling Units
-        for unit in self.zd_autoscaling_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: zd_autoscaling unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            # Update unit title with stackname prefix
-            unit['unit_title'] = self.title + orig_unit_title
-            elb_config = ElbConfig(**unit['elb_config'])
+        self.add_units(self.zd_autoscaling_units, ZdAutoscalingUnit)
 
-            blue_asg_config = AsgConfig(**unit['blue_asg_config'])
-            green_asg_config = AsgConfig(**unit['green_asg_config'])
-            self.units[orig_unit_title] = ZdAutoscalingUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                elb_config=elb_config,
-                blue_asg_config=blue_asg_config,
-                green_asg_config=green_asg_config,
-                dependencies=unit['dependencies']
-            )
         # Add Autoscaling Units
-        for unit in self.autoscaling_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: autoscaling unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            # Update unit title with stackname prefix
-            unit['unit_title'] = self.title + orig_unit_title
-            elb_config = ElbConfig(**unit['elb_config'])
-            asg_config = AsgConfig(**unit['asg_config'])
-            self.units[orig_unit_title] = AutoscalingUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                elb_config=elb_config,
-                asg_config=asg_config,
-                dependencies=unit['dependencies']
-            )
+        self.add_units(self.autoscaling_units, AutoscalingUnit)
+
         # Add Database Units
-        for unit in self.database_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            unit['unit_title'] = self.title + orig_unit_title
-            database_config = DatabaseConfig(**unit['database_config'])
-            self.units[orig_unit_title] = DatabaseUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                database_config=database_config
-            )
+        self.add_units(self.database_units, DatabaseUnit)
+
         # Add Unit flow
         for unit_name in self.units:
             dependencies = self.units[unit_name].get_dependencies()
             for dependency in dependencies:
                 self.units[unit_name].add_unit_flow(self.units[dependency])
+
+    def add_units(self, unit_list, unit_constructor):
+        for unit in unit_list:  # type: dict
+            unit_title = unit['unit_title']
+            if unit_title in self.units:
+                raise DuplicateUnitNameError("Error: unit name '{0}' has already been specified, "
+                                             'it must be unique.'.format(unit_title))
+            self.units[unit_title] = unit_constructor(
+                template=self.template,
+                network_config=self.network_config,
+                **unit
+            )
 
     def generate_subnet_cidr(self, is_public):
         """
