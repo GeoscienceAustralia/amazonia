@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 
 from troposphere import Base64, codedeploy, Ref, Join, Output
-from troposphere.policies import (
-    UpdatePolicy, AutoScalingRollingUpdate, AutoScalingReplacingUpdate
-)
+from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
