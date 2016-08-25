@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-from troposphere import Base64, codedeploy, Ref, Join, Output, ec2
+from troposphere import Base64, codedeploy, Ref, Join, Output
+from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
@@ -60,7 +61,12 @@ class Asg(SecurityEnabledObject):
             LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
             HealthCheckType=asg_config.health_check_type,
-            Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)])
+            Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)]),
+        )
+
+        self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
+            AutoScalingRollingUpdate=AutoScalingRollingUpdate(
+            )
         )
 
         if asg_config.sns_topic_arn is not None:
