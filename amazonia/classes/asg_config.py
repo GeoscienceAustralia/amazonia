@@ -41,7 +41,8 @@ class AsgConfig(object):
         self.simple_scaling_policy_config = simple_scaling_policy_config
 
         # check for insecure variables
-        detect_unencrypted_access_keys(self.userdata)
+        if self.userdata is not None:
+            detect_unencrypted_access_keys(self.userdata)
 
         # Validate that minsize is less than maxsize
         if self.minsize > self.maxsize:

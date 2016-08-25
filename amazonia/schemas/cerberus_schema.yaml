@@ -154,7 +154,6 @@ simple_scaling_policy_config: &simple_scaling_policy_config
        - 'LessThanOrEqualToThreshold'
     threshold:
       type:
-       - 'number'
        - 'string'
     evaluation_periods:
       type:
