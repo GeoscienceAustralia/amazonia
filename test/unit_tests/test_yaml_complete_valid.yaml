@@ -173,6 +173,27 @@ autoscaling_units:
         - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
         - 'autoscaling:EC2_INSTANCE_TERMINATE'
         - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+      simple_scaling_policy_config:
+        -
+          name: 'heavy - load'
+          description: 'When under heavy CPU load for five minutes, add two instances, wait 45 seconds'
+          metric_name: 'CPUUtilization'
+          comparison_operator: 'GreaterThanThreshold'
+          threshold: '45'
+          evaluation_periods: 1
+          period: 300
+          scaling_adjustment: 1
+          cooldown: 45
+        -
+          name: 'light - load'
+          description: 'When under light CPU load for 6 consecutive periods of five minutes, remove one instance, wait 120 seconds'
+          metric_name: 'CPUUtilization'
+          comparison_operator: 'LessThanOrEqualToThreshold'
+          threshold: '15'
+          evaluation_periods: 6
+          period: 300
+          scaling_adjustment: -1
+          cooldown: 120
       block_devices:
         -
           device_name: '/dev/xvda'
