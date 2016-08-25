@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.3.1] - 26/08/2016
 - Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
 - Corrected web_app.yaml to the latest format
+- Added configuration for simple ec2 metric scaling policies
+- Changed method that yaml.py interprets complex nested objects
+- Restored use of block_devices_config
+- Added simple_scaling_policy_config
+- Updated relevant unit tests
+- Updated relevant systems tests
 
 ## [1.3.0] - 24/08/2016
 - Introducing SSLCertificateId for ELBs
