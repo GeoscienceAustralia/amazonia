@@ -69,6 +69,7 @@ class Asg(SecurityEnabledObject):
 
         self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
             AutoScalingRollingUpdate=AutoScalingRollingUpdate(
+                MinInstancesInService=0
             )
         )
 
