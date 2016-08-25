@@ -3,22 +3,23 @@ from nose.tools import *
 from troposphere import Tags, Ref
 
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
-    minsize = maxsize = path2ping = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
+    minsize = maxsize = elb_health_check = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
     health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = \
     db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = None
 availability_zones = []
 home_cidrs = []
-instanceports = []
-loadbalancerports = []
-protocols = []
+instance_port = []
+loadbalancer_port = []
+instance_protocol = []
+loadbalancer_protocol = []
 
 
 def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
-        nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, db_backup_window, db_backup_retention, \
-        db_maintenance_window, db_storage_type, block_devices_config
+        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
+        unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
+        db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -38,12 +39,13 @@ runcmd:
     code_deploy_service_role = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
     vpc_cidr = '10.0.0.0/16'
     home_cidrs = [{'name': 'GA', 'cidr': '123.123.12.34/32'}, {'name': 'home', 'cidr': '192.168.0.1/16'}]
-    instanceports = ['80']
-    loadbalancerports = ['80']
-    protocols = ['HTTP']
+    instance_port = ['80']
+    loadbalancer_port = ['80']
+    instance_protocol = ['HTTP']
+    loadbalancer_protocol = ['HTTP']
     minsize = 1
     maxsize = 1
-    path2ping = '/index.html'
+    elb_health_check = 'HTTP:80/index.html'
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
@@ -157,25 +159,29 @@ def test_duplicate_unit_names():
                                    'block_devices_config': block_devices_config
                                },
                                'elb_config': {
-                                   'protocols': protocols,
-                                   'instanceports': instanceports,
-                                   'loadbalancerports': loadbalancerports,
-                                   'path2ping': path2ping,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
+                                   'elb_health_check': elb_health_check,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
-                                   'unit_hosted_zone_name': None
+                                   'unit_hosted_zone_name': None,
+                                   'ssl_certificate_id': None
                                },
                                'dependencies': ['app2', 'db1'],
                                },
                               {'unit_title': 'app1',
                                'elb_config': {
-                                   'protocols': protocols,
-                                   'instanceports': instanceports,
-                                   'loadbalancerports': loadbalancerports,
-                                   'path2ping': path2ping,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
+                                   'elb_health_check': elb_health_check,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
-                                   'unit_hosted_zone_name': None
+                                   'unit_hosted_zone_name': None,
+                                   'ssl_certificate_id': None
                                },
                                'asg_config': {
                                    'minsize': minsize,
@@ -263,13 +269,15 @@ def test_duplicate_unit_names():
         'zd_autoscaling_units': [],
         'autoscaling_units': [{'unit_title': 'app1',
                                'elb_config': {
-                                   'protocols': protocols,
-                                   'instanceports': instanceports,
-                                   'loadbalancerports': loadbalancerports,
-                                   'path2ping': path2ping,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
+                                   'elb_health_check': elb_health_check,
                                    'unit_hosted_zone_name': None,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
+                                   'ssl_certificate_id': None
                                },
                                'asg_config': {
                                    'minsize': minsize,
@@ -320,13 +328,15 @@ def test_duplicate_unit_names():
         'nat_alerting': nat_alerting,
         'zd_autoscaling_units': [{'unit_title': 'zdapp1',
                                   'elb_config': {
-                                      'protocols': protocols,
-                                      'instanceports': instanceports,
-                                      'loadbalancerports': loadbalancerports,
-                                      'path2ping': path2ping,
+                                      'loadbalancer_protocol': loadbalancer_protocol,
+                                      'instance_protocol': instance_protocol,
+                                      'instance_port': instance_port,
+                                      'loadbalancer_port': loadbalancer_port,
+                                      'elb_health_check': elb_health_check,
                                       'unit_hosted_zone_name': None,
                                       'elb_log_bucket': None,
                                       'public_unit': True,
+                                      'ssl_certificate_id': None
                                   },
                                   'blue_asg_config': {
                                       'minsize': minsize,
@@ -359,13 +369,15 @@ def test_duplicate_unit_names():
                                   },
                                  {'unit_title': 'zdapp1',
                                   'elb_config': {
-                                      'protocols': protocols,
-                                      'instanceports': instanceports,
-                                      'loadbalancerports': loadbalancerports,
-                                      'path2ping': path2ping,
+                                      'loadbalancer_protocol': loadbalancer_protocol,
+                                      'instance_protocol': instance_protocol,
+                                      'instance_port': instance_port,
+                                      'loadbalancer_port': loadbalancer_port,
+                                      'elb_health_check': elb_health_check,
                                       'unit_hosted_zone_name': None,
                                       'elb_log_bucket': None,
                                       'public_unit': True,
+                                      'ssl_certificate_id': None
                                   },
                                   'blue_asg_config': {
                                       'minsize': minsize,
@@ -409,10 +421,10 @@ def create_stack(stack_title):
     :return new stack
     """
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instanceports, loadbalancerports, protocols, minsize, maxsize, path2ping, home_cidrs, \
-        nat_image_id, jump_image_id, health_check_grace_period, health_check_type, unit_image_id, db_instance_type, \
-        db_engine, db_port, owner_emails, nat_alerting, db_backup_window, db_backup_retention, db_maintenance_window, \
-        db_storage_type, block_devices_config
+        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type,  \
+        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window,  \
+        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
 
     stack = Stack(
         stack_title=stack_title,
@@ -432,13 +444,15 @@ def create_stack(stack_title):
         nat_alerting=nat_alerting,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': {
-                                   'protocols': protocols,
-                                   'instanceports': instanceports,
-                                   'loadbalancerports': loadbalancerports,
-                                   'path2ping': path2ping,
+                                   'loadbalancer_protocol': loadbalancer_protocol,
+                                   'instance_protocol': instance_protocol,
+                                   'instance_port': instance_port,
+                                   'loadbalancer_port': loadbalancer_port,
+                                   'elb_health_check': elb_health_check,
                                    'unit_hosted_zone_name': None,
                                    'elb_log_bucket': None,
                                    'public_unit': True,
+                                   'ssl_certificate_id': None
                                },
                                'blue_asg_config': {
                                    'minsize': minsize,
@@ -471,13 +485,15 @@ def create_stack(stack_title):
                                }],
         autoscaling_units=[{'unit_title': 'app1',
                             'elb_config': {
-                                'protocols': protocols,
-                                'instanceports': instanceports,
-                                'loadbalancerports': loadbalancerports,
-                                'path2ping': path2ping,
+                                'loadbalancer_protocol': loadbalancer_protocol,
+                                'instance_protocol': instance_protocol,
+                                'instance_port': instance_port,
+                                'loadbalancer_port': loadbalancer_port,
+                                'elb_health_check': elb_health_check,
                                 'unit_hosted_zone_name': None,
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'asg_config': {
                                 'minsize': minsize,
@@ -496,13 +512,15 @@ def create_stack(stack_title):
                             },
                            {'unit_title': 'app2',
                             'elb_config': {
-                                'protocols': protocols,
-                                'instanceports': instanceports,
-                                'loadbalancerports': loadbalancerports,
-                                'path2ping': path2ping,
+                                'loadbalancer_protocol': loadbalancer_protocol,
+                                'instance_protocol': instance_protocol,
+                                'instance_port': instance_port,
+                                'loadbalancer_port': loadbalancer_port,
+                                'elb_health_check': elb_health_check,
                                 'unit_hosted_zone_name': None,
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'asg_config': {
                                 'minsize': minsize,

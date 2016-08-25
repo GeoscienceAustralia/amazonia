@@ -19,15 +19,17 @@ class Elb(SecurityEnabledObject):
         """
         self.title = title + 'Elb'
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
-        listener_tuples = zip(elb_config.loadbalancerports, elb_config.instanceports, elb_config.protocols)
+        listener_tuples = zip(elb_config.loadbalancer_port,
+                              elb_config.instance_port,
+                              elb_config.loadbalancer_protocol,
+                              elb_config.instance_protocol)
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets
         self.trop_elb = self.template.add_resource(
             elb.LoadBalancer(self.title,
                              CrossZone=True,
                              # Assume health check against first protocol/instance port pair
                              HealthCheck=elb.HealthCheck(
-                                 Target=elb_config.protocols[0] + ':' + elb_config.instanceports[
-                                     0] + elb_config.path2ping,
+                                 Target=elb_config.elb_health_check,
                                  HealthyThreshold='10',
                                  UnhealthyThreshold='2',
                                  Interval='300',
@@ -35,13 +37,17 @@ class Elb(SecurityEnabledObject):
                              Listeners=[elb.Listener(LoadBalancerPort=listener_tuple[0],
                                                      Protocol=listener_tuple[2],
                                                      InstancePort=listener_tuple[1],
-                                                     InstanceProtocol=listener_tuple[2]) for listener_tuple
+                                                     InstanceProtocol=listener_tuple[3]) for listener_tuple
                                         in listener_tuples],
                              Scheme='internet-facing' if elb_config.public_unit is True else 'internal',
                              SecurityGroups=[Ref(self.security_group)],
                              Subnets=[Ref(x) for x in subnets],
                              Tags=Tags(Name=self.title)))
         self.trop_elb.DependsOn = network_config.nat.single.title
+
+        for listener in self.trop_elb.Listeners:
+            if elb_config.ssl_certificate_id and listener.Protocol == 'HTTPS':
+                listener.SSLCertificateId = elb_config.ssl_certificate_id
 
         if elb_config.elb_log_bucket:
             self.trop_elb.AccessLoggingPolicy = elb.AccessLoggingPolicy(

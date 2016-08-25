@@ -92,13 +92,15 @@ zd_autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      protocols:
+      loadbalancer_protocol:
        - 'HTTP'
-      loadbalancerports:
+      instance_protocol:
+       - 'HTTP'
+      loadbalancer_port:
        - '80'
-      instanceports:
+      instance_port:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
     dependencies:
@@ -141,13 +143,15 @@ autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      protocols:
+      loadbalancer_protocol:
        - 'HTTP'
-      loadbalancerports:
+      instance_protocol:
+       - 'HTTP'
+      loadbalancer_port:
        - '80'
-      instanceports:
+      instance_port:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
     dependencies:
@@ -204,13 +208,15 @@ autoscaling_units:
          - service httpd start
     elb_config:
       unit_hosted_zone_name: 'test.lan.'
-      protocols:
+      loadbalancer_protocol:
        - 'HTTP'
-      loadbalancerports:
+      instance_protocol:
+       - 'HTTP'
+      loadbalancer_port:
        - '80'
-      instanceports:
+      instance_port:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: false
 

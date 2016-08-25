@@ -76,13 +76,15 @@ runcmd:
             {'unit_title': 'zdapp1',
              'zd_state': 'blue',
              'elb_config': {
-                 'protocols': ['HTTP'],
-                 'instanceports': ['80'],
-                 'loadbalancerports': ['80'],
-                 'path2ping': '/index.html',
+                 'loadbalancer_protocol': ['HTTP'],
+                 'instance_protocol': ['HTTP'],
+                 'instance_port': ['80'],
+                 'loadbalancer_port': ['80'],
+                 'elb_health_check': 'HTTP:80/index.html',
                  'unit_hosted_zone_name': 'gadevs.ga.',
                  'elb_log_bucket': None,
                  'public_unit': True,
+                 'ssl_certificate_id': None
              },
              'blue_asg_config': {
                  'minsize': 1,
@@ -127,13 +129,15 @@ runcmd:
                                 'block_devices_config': block_devices_config
                             },
                             'elb_config': {
-                                'protocols': ['HTTP'],
-                                'instanceports': ['80'],
-                                'loadbalancerports': ['80'],
-                                'path2ping': '/index.html',
+                                'loadbalancer_protocol': ['HTTP'],
+                                'instance_protocol': ['HTTP'],
+                                'instance_port': ['80'],
+                                'loadbalancer_port': ['80'],
+                                'elb_health_check': 'HTTP:80/index.html',
                                 'unit_hosted_zone_name': 'gadevs.ga.',
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
@@ -151,13 +155,15 @@ runcmd:
                                 'block_devices_config': block_devices_config
                             },
                             'elb_config': {
-                                'protocols': ['HTTP'],
-                                'instanceports': ['80'],
-                                'loadbalancerports': ['80'],
-                                'path2ping': '/index.html',
+                                'loadbalancer_protocol': ['HTTP'],
+                                'instance_protocol': ['HTTP'],
+                                'instance_port': ['80'],
+                                'loadbalancer_port': ['80'],
+                                'elb_health_check': 'HTTP:80/index.html',
                                 'unit_hosted_zone_name': 'gadevs.ga.',
                                 'elb_log_bucket': None,
                                 'public_unit': True,
+                                'ssl_certificate_id': None
                             },
                             'dependencies': []}
                            ],

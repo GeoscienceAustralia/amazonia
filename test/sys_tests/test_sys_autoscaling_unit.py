@@ -85,13 +85,15 @@ runcmd:
         cd_service_role_arn=service_role_arn
     )
     elb_config = ElbConfig(
-        protocols=['HTTP'],
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        path2ping='/index.html',
+        instance_protocol=['HTTP'],
+        loadbalancer_protocol=['HTTP'],
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
     )
 
     block_devices_config = [{

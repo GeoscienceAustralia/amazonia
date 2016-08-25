@@ -1,5 +1,5 @@
 from nose.tools import *
-from troposphere import ec2, Ref, Tags, Template
+from troposphere import ec2, Ref, Tags, Template, Join
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
@@ -82,7 +82,7 @@ def test_database():
     assert_equals(db.trop_db.BackupRetentionPeriod, '4'),
     assert_equals(db.trop_db.PreferredMaintenanceWindow, 'Mon:01:00-Mon:01:30'),
     assert_equals(db.trop_db.StorageType, 'gp2')
-
+    assert_equals(type(db.trop_db.DBInstanceIdentifier), Join)
     assert_raises(InvalidFlowError, db.add_unit_flow, **{'receiver': db})
 
 
@@ -106,3 +106,4 @@ def test_databse_snapshot():
     assert_equals(len(template.outputs), 1)
     assert_equals(len(template.parameters), 0)
     assert_equals(db.trop_db.AllocatedStorage, 5)
+    assert_equals(type(db.trop_db.DBInstanceIdentifier), Join)

@@ -9,13 +9,15 @@ autoscaling_units:
     unit_title: 'app1'
     elb_config:
       unit_hosted_zone_name: '.test.lan'
-      protocols:
+      loadbalancer_protocol:
        - 'HTTP'
-      loadbalancerports:
+      instance_protocol:
+       - 'HTTP'
+      loadbalancer_port:
        - '80'
-      instanceports:
+      instance_port:
        - '80'
-      path2ping: '/index.html'
+      elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
     asg_config:
       image_id: 'ami-dc361ebf'
