@@ -114,7 +114,8 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policies=None
     )
 
     unit1 = AutoscalingUnit(

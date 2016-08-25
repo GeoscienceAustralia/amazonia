@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
-from troposphere import Base64, codedeploy, Ref, Join, Output, ec2
-from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
-
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
 from amazonia.classes.block_devices import Bdm
+from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.simple_scaling_policy import SimpleScalingPolicy
+from troposphere import Base64, codedeploy, Ref, Join, Output
+from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 
 class Asg(SecurityEnabledObject):
@@ -16,7 +16,6 @@ class Asg(SecurityEnabledObject):
         :param network_config: object containing network related config
         :param asg_config: object containing asg related config
         :param load_balancers: list of load balancers to associate autoscaling group with
-        :param block_devices_config: List containing block device mappings
         """
         super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
 
@@ -71,13 +70,16 @@ class Asg(SecurityEnabledObject):
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
+        if asg_config.simple_scaling_policies is not None:
+            for scaling_policy_config in asg_config.simple_scaling_policies:
+                SimpleScalingPolicy(asg=self.trop_asg, template=self.template,
+                                    scaling_policy_config=scaling_policy_config)
+
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
             asg_config=asg_config,
             network_config=network_config
         ))
-        if asg_config.userdata is None:
-            self.lc.UserData = ''
 
     def create_launch_config(self, title, asg_config, network_config):
         """
@@ -106,9 +108,15 @@ class Asg(SecurityEnabledObject):
         ))
         if asg_config.iam_instance_profile_arn is not None:
             self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
-        self.lc.UserData = Base64(asg_config.userdata)
 
-        self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
+        if asg_config.userdata is None:
+            self.lc.UserData = ''
+        else:
+            self.lc.UserData = Base64(asg_config.userdata)
+
+        if asg_config.block_devices_config is not None:
+            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
+
         return launch_config_title
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):

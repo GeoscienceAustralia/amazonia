@@ -42,10 +42,22 @@ class Yaml(object):
                            'instance_type',
                            'userdata',
                            'iam_instance_profile_arn',
-                           'block_devices_config'
+                           'block_devices_config',
+                           'simple_scaling_policy_config'
                            ]
 
-    """asg_config field list"""
+    """simple_scaling_policy field list"""
+    simple_scaling_policy_config_key_list = ['name',
+                                      'description',
+                                      'metric_name',
+                                      'comparison_operator',
+                                      'threshold',
+                                      'evaluation_periods',
+                                      'period',
+                                      'scaling_adjustment',
+                                      'cooldown']
+
+    """block_devices_config field list"""
     block_devices_config_key_list = ['device_name',
                                      'ebs_volume_size',
                                      'ebs_volume_type',
@@ -179,6 +191,9 @@ class Yaml(object):
             if object_key == 'unit_hosted_zone_name':
                 unified_object[object_key] = nested_object_user_data.get(object_key,
                                                                          self.united_data['stack_hosted_zone_name'])
+            elif objecy_key in ['block_devices_config', 'simple_scaling_policy_config']:
+                unified_object[object_key] = self.set_nested_object_values(
+                        user_asg_config, self.default_data['asg_config'], self.asg_config_key_list
             else:
                 unified_object[object_key] = nested_object_user_data.get(object_key, nested_object_default[object_key])
 

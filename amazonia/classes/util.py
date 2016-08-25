@@ -1,9 +1,15 @@
 import logging
+import re
+
 import yaml
 
 logging.basicConfig(
     level=logging.INFO
 )
+
+
+def get_cf_friendly_name(object_name):
+    return re.sub(r'\W+', '', object_name)
 
 
 def read_yaml(user_yaml):

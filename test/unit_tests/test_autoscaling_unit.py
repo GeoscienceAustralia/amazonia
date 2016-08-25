@@ -93,7 +93,8 @@ runcmd:
         minsize=1,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policies=None
     )
     elb_config = ElbConfig(
         protocols=['HTTP'],
