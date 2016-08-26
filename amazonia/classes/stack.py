@@ -12,7 +12,7 @@ from troposphere import Ref, Template, ec2, Tags, Join
 
 
 class Stack(object):
-    def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
+    def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
                  nat_alerting):
@@ -22,7 +22,6 @@ class Stack(object):
         AWS CloudFormation -
          http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
-        :param stack_title: name of stack
         :param code_deploy_service_role: ARN to code deploy IAM role
         :param keypair: ssh keypair to be used throughout stack
         :param availability_zones: availability zones to use
@@ -46,7 +45,6 @@ class Stack(object):
         """
 
         super(Stack, self).__init__()
-        self.title = stack_title
         self.template = Template()
         self.code_deploy_service_role = code_deploy_service_role
         self.keypair = keypair
@@ -64,7 +62,7 @@ class Stack(object):
         self.public_subnets = []
 
         # Add VPC and Internet Gateway with Attachment
-        vpc_name = self.title + 'Vpc'
+        vpc_name = 'Vpc'
         self.vpc = self.template.add_resource(
             ec2.VPC(
                 vpc_name,
@@ -76,7 +74,7 @@ class Stack(object):
                 )
             ))
 
-        ig_name = self.title + 'Ig'
+        ig_name = 'Ig'
         self.internet_gateway = self.template.add_resource(
             ec2.InternetGateway(ig_name, Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', ig_name]))))
         self.internet_gateway.DependsOn = self.vpc.title
@@ -88,12 +86,12 @@ class Stack(object):
         self.gateway_attachment.DependsOn = self.internet_gateway.title
 
         # Add Public and Private Route Tables
-        public_rt_name = self.title + 'PubRt'
+        public_rt_name = 'PubRt'
         self.public_route_table = self.template.add_resource(
             ec2.RouteTable(public_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', public_rt_name]))))
 
-        private_rt_name = self.title + 'PriRt'
+        private_rt_name = 'PriRt'
         self.private_route_table = self.template.add_resource(
             ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
@@ -101,14 +99,12 @@ class Stack(object):
         # Add Public and Private Subnets
         for az in self.availability_zones:
             self.private_subnets.append(Subnet(template=self.template,
-                                               stack_title=self.title,
                                                route_table=self.private_route_table,
                                                az=az,
                                                vpc=self.vpc,
                                                is_public=False,
                                                cidr=self.generate_subnet_cidr(is_public=False)).trop_subnet)
             self.public_subnets.append(Subnet(template=self.template,
-                                              stack_title=self.title,
                                               route_table=self.public_route_table,
                                               az=az,
                                               vpc=self.vpc,
@@ -132,7 +128,7 @@ class Stack(object):
 
         # Add Jumpbox and NAT and associated security group ingress and egress rules
         self.jump = SingleInstance(
-            title=self.title + 'Jump',
+            title='Jump',
             template=self.template,
             single_instance_config=jump_config
         )
@@ -155,19 +151,19 @@ class Stack(object):
         )
 
         self.nat = SingleInstance(
-            title=self.title + 'Nat',
+            title='Nat',
             template=self.template,
             single_instance_config=nat_config
         )
 
         # Add Routes
-        self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
+        self.public_route = self.template.add_resource(ec2.Route('PubRtInboundRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
                                                                  RouteTableId=Ref(self.public_route_table),
                                                                  DestinationCidrBlock=self.public_cidr['cidr']))
         self.public_route.DependsOn = self.gateway_attachment.title
 
-        self.private_route = self.template.add_resource(ec2.Route(self.title + 'PriRtOutboundRoute',
+        self.private_route = self.template.add_resource(ec2.Route('PriRtOutboundRoute',
                                                                   InstanceId=Ref(self.nat.single),
                                                                   RouteTableId=Ref(self.private_route_table),
                                                                   DestinationCidrBlock=self.public_cidr['cidr']))
@@ -204,7 +200,7 @@ class Stack(object):
             if unit_title in self.units:
                 raise DuplicateUnitNameError("Error: unit name '{0}' has already been specified, "
                                              'it must be unique.'.format(unit_title))
-            unit['unit_title'] = self.title + unit_title
+            unit['unit_title'] = unit_title
             self.units[unit_title] = unit_constructor(
                 template=self.template,
                 network_config=self.network_config,

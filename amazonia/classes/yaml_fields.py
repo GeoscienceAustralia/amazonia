@@ -84,7 +84,6 @@ class YamlFields(object):
 
     """stack parameter field list"""
     stack_key_list = [
-        'stack_title',
         'code_deploy_service_role',
         'keypair',
         'availability_zones',

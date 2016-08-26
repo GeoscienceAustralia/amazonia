@@ -3,7 +3,7 @@ from troposphere import ec2, Tags, Ref, Join
 
 
 class Subnet(object):
-    def __init__(self, template, stack_title, cidr, vpc, route_table, is_public, az):
+    def __init__(self, template, cidr, vpc, route_table, is_public, az):
         """
         Class to create subnets and associate a route table to it
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
@@ -21,11 +21,10 @@ class Subnet(object):
         self.template = template
         self.cidr = cidr
         self.vpc = vpc
-        self.stack_title = stack_title
         self.pub_or_pri = 'Public' if is_public else 'Private'
 
         # Create Subnet
-        subnet_title = self.stack_title + self.pub_or_pri + 'Subnet' + az[-1:].upper()
+        subnet_title = self.pub_or_pri + 'Subnet' + az[-1:].upper()
         self.trop_subnet = self.template.add_resource(ec2.Subnet(subnet_title,
                                                                  AvailabilityZone=az,
                                                                  VpcId=Ref(self.vpc),

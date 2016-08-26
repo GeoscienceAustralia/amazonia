@@ -30,7 +30,7 @@
 #
 # See following list for values that can be provided.
 #
-# stack_key_list = ['stack_title',
+# stack_key_list = [
 #                       'code_deploy_service_role',
 #                       'keypair',
 #                       'availability_zones',
@@ -291,10 +291,6 @@ database_config: &database_config
       nullable: True
       regex: '^(standard|gp2)$'
 
-stack_title: # A string containing the name of the cloud formation stack.
-  type: 'string'
-  empty: False
-  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
   empty: False

@@ -8,7 +8,6 @@
 #   Multi line strings: can be used by establishing a literal block '|'
 
 # Stack values
-stack_title: 'myStack'
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 code_deploy_service_role:
 availability_zones:

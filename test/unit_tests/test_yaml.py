@@ -58,7 +58,6 @@ def test_complete_valid_values():
     assert_equals(len(expected_stack_set.difference(stack_input_set)), 0)
 
     # Assert correct values
-    assert_equals(stack_input['stack_title'], 'testStack')
     assert_equals(stack_input['code_deploy_service_role'], 'arn:aws:iam::1234567890123:role/CodeDeployServiceRole')
     assert_equals(stack_input['keypair'], 'key')
     assert_list_equal(stack_input['availability_zones'], ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])

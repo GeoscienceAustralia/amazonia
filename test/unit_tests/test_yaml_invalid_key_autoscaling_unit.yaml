@@ -2,7 +2,6 @@
 # Test Stack Yaml for Amazonia
 #
 
-stack_title: 'testStack'
 autoscaling_units:
   -
     blah: 'should not be here'

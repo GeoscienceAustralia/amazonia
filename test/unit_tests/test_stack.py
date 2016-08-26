@@ -86,8 +86,7 @@ def test_stack():
     """ Test stack structure
     """
     title = 'app'
-    stack = create_stack(stack_title=title)
-    assert_equals(stack.title, title)
+    stack = create_stack()
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
     assert_equals(stack.keypair, keypair)
     assert_equals(stack.availability_zones, availability_zones)
@@ -95,22 +94,22 @@ def test_stack():
     [assert_equals(stack.home_cidrs[num], home_cidrs[num]) for num in range(len(home_cidrs))]
     assert_equals(stack.public_cidr, {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
 
-    assert_equals(stack.vpc.title, title + 'Vpc')
+    assert_equals(stack.vpc.title, 'Vpc')
     assert_equals(stack.vpc.CidrBlock, vpc_cidr)
     assert_is(type(stack.vpc.Tags), Tags)
 
-    assert_equals(stack.internet_gateway.title, title + 'Ig')
+    assert_equals(stack.internet_gateway.title, 'Ig')
     assert_is(type(stack.internet_gateway.Tags), Tags)
 
-    assert_equals(stack.gateway_attachment.title, title + 'IgAtch')
+    assert_equals(stack.gateway_attachment.title, 'IgAtch')
     assert_is(type(stack.gateway_attachment.VpcId), Ref)
     assert_is(type(stack.gateway_attachment.InternetGatewayId), Ref)
 
-    assert_equals(stack.public_route_table.title, title + 'PubRt')
+    assert_equals(stack.public_route_table.title, 'PubRt')
     assert_is(type(stack.public_route_table.VpcId), Ref)
     assert_is(type(stack.public_route_table.Tags), Tags)
 
-    assert_equals(stack.private_route_table.title, title + 'PriRt')
+    assert_equals(stack.private_route_table.title, 'PriRt')
     assert_is(type(stack.private_route_table.VpcId), Ref)
     assert_is(type(stack.private_route_table.Tags), Tags)
 
@@ -134,7 +133,6 @@ def test_duplicate_unit_names():
     """
 
     assert_raises(DuplicateUnitNameError, Stack, **{
-        'stack_title': 'TestStack',
         'code_deploy_service_role': code_deploy_service_role,
         'keypair': keypair,
         'availability_zones': availability_zones,
@@ -210,7 +208,6 @@ def test_duplicate_unit_names():
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
-        'stack_title': 'TestStack',
         'code_deploy_service_role': code_deploy_service_role,
         'keypair': keypair,
         'availability_zones': availability_zones,
@@ -258,7 +255,6 @@ def test_duplicate_unit_names():
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
-        'stack_title': 'TestStack',
         'code_deploy_service_role': code_deploy_service_role,
         'keypair': keypair,
         'availability_zones': availability_zones,
@@ -319,7 +315,6 @@ def test_duplicate_unit_names():
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
-        'stack_title': 'TestStack',
         'code_deploy_service_role': code_deploy_service_role,
         'keypair': keypair,
         'availability_zones': availability_zones,
@@ -424,10 +419,9 @@ def test_duplicate_unit_names():
     })
 
 
-def create_stack(stack_title):
+def create_stack():
     """
     Helper function to create a stack with default values
-    :param stack_title: Title of stack
     :return new stack
     """
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
@@ -437,7 +431,6 @@ def create_stack(stack_title):
         db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
 
     stack = Stack(
-        stack_title=stack_title,
         code_deploy_service_role=code_deploy_service_role,
         keypair=keypair,
         availability_zones=availability_zones,
