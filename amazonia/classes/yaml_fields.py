@@ -1,4 +1,8 @@
-import importlib
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.database_config import DatabaseConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 
 
 class ComplexObjectFieldMapping(object):
@@ -123,29 +127,19 @@ class YamlFields(object):
     """ config classes """
     complex_object_field_mapping = {
         'elb_config':
-            ComplexObjectFieldMapping(getattr(importlib.import_module('amazonia.classes.elb_config'), 'ElbConfig'),
-                                      False, elb_config_key_list),
+            ComplexObjectFieldMapping(ElbConfig, False, elb_config_key_list),
         'asg_config':
-            ComplexObjectFieldMapping(getattr(importlib.import_module('amazonia.classes.asg_config'), 'AsgConfig'),
-                                      False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
         'blue_asg_config':
-            ComplexObjectFieldMapping(getattr(importlib.import_module('amazonia.classes.asg_config'), 'AsgConfig'),
-                                      False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
         'green_asg_config':
-            ComplexObjectFieldMapping(getattr(importlib.import_module('amazonia.classes.asg_config'), 'AsgConfig'),
-                                      False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
         'database_config':
-            ComplexObjectFieldMapping(
-                getattr(importlib.import_module('amazonia.classes.database_config'), 'DatabaseConfig'), False,
-                database_config_key_list),
+            ComplexObjectFieldMapping(DatabaseConfig, False, database_config_key_list),
         'block_devices_config':
-            ComplexObjectFieldMapping(
-                getattr(importlib.import_module('amazonia.classes.block_devices_config'), 'BlockDevicesConfig'), True,
-                block_devices_config_key_list),
+            ComplexObjectFieldMapping(BlockDevicesConfig, True, block_devices_config_key_list),
         'simple_scaling_policy_config':
-            ComplexObjectFieldMapping(
-                getattr(importlib.import_module('amazonia.classes.simple_scaling_policy_config'),
-                        'SimpleScalingPolicyConfig'), True, simple_scaling_policy_config_key_list),
+            ComplexObjectFieldMapping(SimpleScalingPolicyConfig, True, simple_scaling_policy_config_key_list),
         'autoscaling_units':
             ComplexObjectFieldMapping(dict, True, autoscaling_unit_key_list),
         'zd_autoscaling_units':
