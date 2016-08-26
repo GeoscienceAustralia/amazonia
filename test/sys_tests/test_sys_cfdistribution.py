@@ -58,38 +58,6 @@ def main():
         ),
     ]
 
-    # custom_error_response = template.add_resource(cloudfront.CustomErrorResponse(
-    #         'errorresponse',
-    #         ErrorCachingMinTTL=0,
-    #         ErrorCode=404,
-    #         ResponseCode=200,
-    #         ResponsePagePath='404.html',
-    #     )
-    # )
-    #
-    # georestriction = template.add_resource(cloudfront.GeoRestriction(
-    #         'georestriction',
-    #         Locations=['AU'],
-    #         RestrictionType='whitelist'
-    #     )
-    # )
-
-    # restrictions = template.add_resource(cloudfront.Restrictions(
-    #         'restrictions',
-    #         GeoRestriction=Ref(georestriction)
-    #     )
-    # )
-    #
-    # viewercertificate = template.add_resource(cloudfront.ViewerCertificate(
-    #         'viewercertificate',
-    #         AcmCertificateArn='arn:aws:acm::123456789012:certificate/Test',
-    #         CloudFrontDefaultCertificate=True,
-    #         IamCertificateId='1234',
-    #         MinimumProtocolVersion='TLSv1',
-    #         SslSupportMethod='sni-only'
-    #     )
-    # )
-
     distribution_config = CFDistributionConfig(
         aliases=['www.domain.com','domain.com'],
         comment='SysTestCFDistribution',
