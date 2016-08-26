@@ -164,7 +164,7 @@ class Asg(SecurityEnabledObject):
 
         self.cw_alarms.append(self.template.add_resource(Alarm(
             title=cf_name + 'Cwa',
-            AlarmActions=Ref(scaling_policy),
+            AlarmActions=[Ref(scaling_policy)],
             AlarmDescription=scaling_policy_config.description,
             AlarmName=scaling_policy_config.name,
             ComparisonOperator=scaling_policy_config.comparison_operator,
