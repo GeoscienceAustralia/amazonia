@@ -3,18 +3,17 @@
 # noinspection PyUnresolvedReferences
 import re
 
-from nose.tools import *
-from troposphere import ec2, Ref, Template
-
-from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from nose.tools import *
+from troposphere import ec2, Ref, Template
 
 
 def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
-               hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
+               hosted_zone_name=None, elb_health_check='HTTP:80/index.html', stack_hosted_zone_name=None,
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
@@ -63,7 +62,7 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         nat=nat,
         private_subnets=private_subnets,
         public_cidr=None,
-        stack_hosted_zone_name=None,
+        stack_hosted_zone_name=stack_hosted_zone_name,
         cd_service_role_arn=None,
         keypair=None
     )
@@ -184,12 +183,17 @@ def test_hosted_zone_name():
     Test route 53 record is created when hosted_zone_name is supplied
     """
     helper_elb = create_elb(hosted_zone_name='myhostedzone.gadevs.ga.')
-    assert helper_elb.elb_r53
+    assert_true(helper_elb.elb_r53)
 
-"""    # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
-    assert_equals(stack_input['autoscaling_units'][0]['elb_config'].unit_hosted_zone_name,
-                  stack_input['stack_hosted_zone_name'])
-                  """
+
+def test_stack_hosted_zone_name():
+    helper_elb = create_elb(stack_hosted_zone_name='stackhostedzone.gadevs.ga')
+    assert_true(helper_elb.elb_r53)
+
+
+def test_no_hosted_zone_name():
+    helper_elb = create_elb()
+    assert_false(helper_elb.elb_r53)
 
 
 def test_elb_log_bucket():
