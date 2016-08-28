@@ -6,7 +6,23 @@ class CFDistributionConfig(object):
                  target_origin_id, allowed_methods, cached_methods, trusted_signers,
                  viewer_protocol_policy, min_ttl, default_ttl, max_ttl, error_page_path):
         """
-
+        Class containing configuration details for a Cloudfront Distribution
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param aliases: A list of DNS CNAME aliases
+        :param comment: A description for the distribution
+        :param default_root_object: The object (e.g. index.html) that should be provided when the root URL is requested
+        :param enabled: Controls whether the distribution is enabled to access user requests
+        :param price_class: The price class that corresponds with the maximum price to be paid for the service
+        :param target_origin_id: Value of the unique ID for the default cache behavior of this distribution
+        :param allowed_methods: List of HTTP methods that can be passed to the origin
+        :param cached_methods: List of HTTP methods for which Cloudfront caches responses
+        :param trusted_signers: List of AWS accounts that can create signed URLs in order to access private content
+        :param viewer_protocol_policy: The protocol that users can use to access origin files
+        :param min_ttl: The minimum amount of time objects should stay in the cache
+        :param default_ttl: The default amount of time objects stay in the cache
+        :param max_ttl: The maximum amount of time objects should stay in the cache
+        :param error_page_path: The error page that should be served when an HTTP error code is returned
         """
 
         self.aliases = aliases

@@ -6,7 +6,17 @@ class CFCacheBehaviors(object):
                  forward_cookies, viewer_protocol_policy, min_ttl, default_ttl, max_ttl,
                  trusted_signers):
         """
-
+        Class containing cache behavior details for a Cloudfront origin
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachebehavior.html
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param path_pattern: The pattern to which this cache behavior applies
+        :param allowed_methods: List of HTTP methods that can be passed to the origin
+        :param cached_methods: List of HTTP methods for which Cloudfront caches responses
+        :param target_origin_id: Value of the unique ID for the default cache behavior of this distribution
+        :param viewer_protocol_policy: The protocol that users can use to access origin files
+        :param min_ttl: The minimum amount of time objects should stay in the cache
+        :param default_ttl: The default amount of time objects stay in the cache
+        :param max_ttl: The maximum amount of time objects should stay in the cache
         """
 
         self.path_pattern = path_pattern

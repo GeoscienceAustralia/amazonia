@@ -5,7 +5,14 @@ from troposphere import Tags, Ref, Output, Join, GetAtt, cloudfront
 class CFDistribution(object):
     def __init__(self, title, template, cforigins_config, cfcache_behaviors_config, cfdistribution_config):
         """
-
+        Class to abstract a Cloudfront Distribution object
+        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param title: The title of this Cloudfront distribution
+        :param template: Troposphere stack to append resources to
+        :param cforigins_config: A list of CFOriginsConfig objects
+        :param cfcache_behaviors_config: A list of CFCacheBehaviors objects
+        :param cfdistribution_config: A CFDistributionConfig object
         """
         self.title = title + 'CFDist'
         self.origins = []
@@ -18,6 +25,7 @@ class CFDistribution(object):
         # Populate cache_behaviors
         self.add_cache_behaviors(title, cfcache_behaviors_config)
 
+        # Set distribution-wide parameters
         cfdist_params = {
             'Aliases' : cfdistribution_config.aliases,
             'Comment' : self.title,
@@ -36,6 +44,10 @@ class CFDistribution(object):
         )
 
     def add_origins(self, title, cforigins_config):
+        """
+        Create Cloudfront Origin objects and append to list of origins
+        :param title: Title of this Cloudfront Distribution
+        """
         for n, origin in enumerate(cforigins_config):
 
             if (origin.origin_policy['type'] == 's3origin'):
@@ -66,6 +78,11 @@ class CFDistribution(object):
             self.origins.append(created_origin)
 
     def add_cache_behaviors(self, title, cfcache_behaviors_config):
+        """
+        Create Cloudfront CacheBehavior objects and append to list of cache_behaviors
+        :param title: Title of this Cloudfront Distribution
+        :param cfcache_behaviors_config: list of CFCacheBehaviors
+        """
         for n, cache_behavior in enumerate(cfcache_behaviors_config):
 
             created_cache_behavior = cloudfront.CacheBehavior(
@@ -92,7 +109,10 @@ class CFDistribution(object):
             self.cache_behaviors.append(created_cache_behavior)
 
     def add_default_cache_behavior(self, title, cfdistribution_config):
-
+        """
+        Create Cloudfront DefaultCacheBehavior object
+        :return: Returns the created DefaultCacheBehavior object
+        """
         return cloudfront.DefaultCacheBehavior(
             TargetOriginId=cfdistribution_config.target_origin_id,
             CachedMethods=cfdistribution_config.cached_methods,

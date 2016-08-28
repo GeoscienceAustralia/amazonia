@@ -13,7 +13,7 @@ def main():
 
     origins = [ CFOriginsConfig (
             template=template,
-            domain_name='s3.domain.com',
+            domain_name='amazonia-elb-bucket.s3.amazonaws.com',
             origin_id='S3-bucket-id',
             origin_policy={
                 'type' : 's3origin',
@@ -22,7 +22,7 @@ def main():
         ),
         CFOriginsConfig(
             template=template,
-            domain_name='ww.domain.com',
+            domain_name='amazonia-myStackap-DFODUO453-39457345.ap-southeast-2.elb.amazonaws.com',
             origin_id='www-origin',
             origin_policy={
                 'type' : 'customorigin',
@@ -59,7 +59,7 @@ def main():
     ]
 
     distribution_config = CFDistributionConfig(
-        aliases=['www.domain.com','domain.com'],
+        aliases=['amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com'],
         comment='SysTestCFDistribution',
         default_root_object='index.html',
         enabled=True,
