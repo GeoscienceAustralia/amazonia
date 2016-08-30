@@ -4,6 +4,9 @@ from amazonia.classes.util import detect_unencrypted_access_keys
 
 
 class InvalidAsgConfigError(Exception):
+    """
+    Exception if invalid properties are supplied
+    """
     def __init__(self, value):
         self.value = value
 

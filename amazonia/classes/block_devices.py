@@ -35,7 +35,7 @@ class Bdm(object):
                     VolumeType=block_device.ebs_volume_type)
                 if block_device.ebs_encrypted:
                     bdm.Ebs.Encrypted = block_device.ebs_encrypted
-                if block_device.ebs_snapshot_id is not None:
+                if block_device.ebs_snapshot_id:
                     bdm.Ebs.SnapshotId = block_device.ebs_snapshot_id
             self.trop_bdm.append(bdm)
 

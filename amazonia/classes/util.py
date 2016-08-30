@@ -8,8 +8,13 @@ logging.basicConfig(
 )
 
 
-def get_cf_friendly_name(object_name):
-    return re.sub(r'\W+', '', object_name)
+def get_cf_friendly_name(resource_name):
+    """
+    Strip non cloud formation friendly characters from a cloud formation resource name
+    :param resource_name: input name, potentially containing unfriendly characters like spaces, dashes, underscores etc
+    :return: return clean string
+    """
+    return re.sub(r'\W+', '', resource_name)
 
 
 def read_yaml(user_yaml):
@@ -39,5 +44,8 @@ def detect_unencrypted_access_keys(userdata):
 
 
 class InsecureVariableError(Exception):
+    """
+    Exception if aws access ud ir aws secret key is detected in userdata
+    """
     def __init__(self, value):
         self.value = value

@@ -60,8 +60,6 @@ class Elb(SecurityEnabledObject):
         self.elb_r53 = None
         if elb_config.unit_hosted_zone_name:
             self.create_r53_record(elb_config.unit_hosted_zone_name)
-        elif network_config.stack_hosted_zone_name:
-            self.create_r53_record(network_config.stack_hosted_zone_name)
         else:
             self.template.add_output(Output(
                 self.trop_elb.title,
@@ -70,6 +68,10 @@ class Elb(SecurityEnabledObject):
             ))
 
     def create_r53_record(self, hosted_zone_name):
+        """
+        Function to create r53 recourdset to associate with ELB
+        :param hosted_zone_name: R53 hosted zone to create record in
+        """
         self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
             self.title + 'R53',
             HostedZoneName=hosted_zone_name,
