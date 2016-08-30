@@ -186,12 +186,10 @@ def test_hosted_zone_name():
     assert_true(helper_elb.elb_r53)
 
 
-def test_stack_hosted_zone_name():
-    helper_elb = create_elb(stack_hosted_zone_name='stackhostedzone.gadevs.ga')
-    assert_true(helper_elb.elb_r53)
-
-
 def test_no_hosted_zone_name():
+    """
+    Test that an elb is created without a route 53 record if none is supplied
+    """
     helper_elb = create_elb()
     assert_false(helper_elb.elb_r53)
 

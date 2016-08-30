@@ -161,7 +161,7 @@ def test_asg():
         [assert_is(type(cdasg), Ref) for cdasg in asg.cd_deploygroup.AutoScalingGroups]
         assert_equals(asg.cd_deploygroup.ServiceRoleArn, 'arn:aws:iam::12345678987654321:role/CodeDeployServiceRole')
         assert_equals(len(asg.cw_alarms), 3)
-        assert_equals(len(asg.scaling_polcies), 3)
+        assert_equals(len(asg.scaling_polices), 3)
         assert_is(type(asg.trop_asg.resource['UpdatePolicy'].AutoScalingRollingUpdate), AutoScalingRollingUpdate)
 
 
