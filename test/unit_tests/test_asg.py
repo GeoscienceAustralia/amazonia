@@ -1,6 +1,7 @@
 import troposphere.elasticloadbalancing as elb
 from nose.tools import *
 from troposphere import ec2, Ref, Template, Join, Base64
+from troposphere.policies import AutoScalingRollingUpdate
 
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
@@ -128,6 +129,7 @@ def test_asg():
         assert_is(type(asg.cd_deploygroup.DeploymentGroupName), Join)
         [assert_is(type(cdasg), Ref) for cdasg in asg.cd_deploygroup.AutoScalingGroups]
         assert_equals(asg.cd_deploygroup.ServiceRoleArn, 'arn:aws:iam::12345678987654321:role/CodeDeployServiceRole')
+        assert_is(type(asg.trop_asg.resource['UpdatePolicy'].AutoScalingRollingUpdate), AutoScalingRollingUpdate)
 
 
 @with_setup(setup_resources)

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-from troposphere import Base64, codedeploy, Ref, Join, Output, ec2
+from troposphere import Base64, codedeploy, Ref, Join, Output
+from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
@@ -63,6 +64,11 @@ class Asg(SecurityEnabledObject):
             Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)],
             DependsOn=network_config.nat.single.title
         ))
+
+        self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
+            AutoScalingRollingUpdate=AutoScalingRollingUpdate(
+            )
+        )
 
         if asg_config.sns_topic_arn is not None:
             if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
