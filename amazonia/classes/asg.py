@@ -68,14 +68,14 @@ class Asg(SecurityEnabledObject):
             DependsOn=network_config.nat.single.title
         ))
 
-        #Set cloud formation update policy to update
+        # Set cloud formation update policy to update
         self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
             AutoScalingRollingUpdate=AutoScalingRollingUpdate(
                 MinInstancesInService=0
             )
         )
 
-        #Set up SNS topic for autoscaling events if an SNS topic arn is supplied
+        # Set up SNS topic for autoscaling events if an SNS topic arn is supplied
         if asg_config.sns_topic_arn is not None:
             if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
                 self.trop_asg.NotificationConfigurations = [
@@ -84,7 +84,7 @@ class Asg(SecurityEnabledObject):
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
-        #if there are any scaling policies specified, create and associated with ASG
+        # if there are any scaling policies specified, create and associated with ASG
         if asg_config.simple_scaling_policy_config is not None:
             for scaling_policy_config in asg_config.simple_scaling_policy_config:
                 self.create_simple_scaling_policy(scaling_policy_config=scaling_policy_config)
@@ -124,13 +124,13 @@ class Asg(SecurityEnabledObject):
         if asg_config.iam_instance_profile_arn is not None:
             self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
 
-        #Userdata must be a valid string
+        # Userdata must be a valid string
         if asg_config.userdata is None:
             self.lc.UserData = ''
         else:
             self.lc.UserData = Base64(asg_config.userdata)
 
-        #If block devices have been configured
+        # If block devices have been configured
         if asg_config.block_devices_config is not None:
             self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
 

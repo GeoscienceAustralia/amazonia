@@ -27,7 +27,7 @@ class Yaml(object):
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-    """ cerberus schema file location """
+    # cerberus schema file location
     cerberus_schema = read_yaml(os.path.join(__location__, '../schemas/cerberus_schema.yaml'))
 
     def __init__(self, user_stack_data, default_data):
