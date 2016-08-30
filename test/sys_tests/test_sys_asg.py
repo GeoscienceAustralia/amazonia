@@ -51,12 +51,16 @@ runcmd:
                                                            Scheme='internet-facing',
                                                            Subnets=[Ref(subnet) for subnet in subnets]))
 
+    class Single(object):
+        def __init__(self):
+            self.single = ec2.Instance('title')
+
     network_config = NetworkConfig(
         vpc=vpc,
         private_subnets=subnets,
         public_subnets=None,
         jump=None,
-        nat=None,
+        nat=Single(),
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair='pipeline',

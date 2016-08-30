@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.3.1] - 30/08/2016
+
+## [1.3.2] - 01/09/2016
 - Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
 - Corrected web_app.yaml to the latest format
 - Added configuration for simple ec2 metric scaling policies
@@ -11,6 +12,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added simple_scaling_policy_config
 - Updated relevant unit tests
 - Updated relevant systems tests
+
+
+## [1.3.1] - 31/08/2016
+- Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
+- Corrected web_app.yaml to the latest format
+- Moved DependsOn to inside of the object creation rather than outside of the object
+
 
 ## [1.3.0] - 24/08/2016
 - Introducing SSLCertificateId for ELBs

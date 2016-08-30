@@ -41,8 +41,8 @@ class Elb(SecurityEnabledObject):
                              Scheme='internet-facing' if elb_config.public_unit is True else 'internal',
                              SecurityGroups=[Ref(self.security_group)],
                              Subnets=[Ref(x) for x in subnets],
-                             Tags=Tags(Name=self.title)))
-        self.trop_elb.DependsOn = network_config.nat.single.title
+                             Tags=Tags(Name=self.title),
+                             DependsOn=network_config.nat.single.title))
 
         for listener in self.trop_elb.Listeners:
             if elb_config.ssl_certificate_id and listener.Protocol == 'HTTPS':
