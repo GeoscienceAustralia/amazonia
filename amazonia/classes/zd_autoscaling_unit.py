@@ -77,9 +77,6 @@ class ZdAutoscalingUnit(object):
         network_config.jump.add_flow(receiver=self.blue_asg, port='22')
         network_config.jump.add_flow(receiver=self.green_asg, port='22')
 
-        self.blue_asg.trop_asg.DependsOn = network_config.nat.single.title
-        self.green_asg.trop_asg.DependsOn = network_config.nat.single.title
-
     def get_dependencies(self):
         """
         :return: list of other unit's this unit is dependant upon

@@ -60,8 +60,9 @@ class Asg(SecurityEnabledObject):
             LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
             HealthCheckType=asg_config.health_check_type,
-            Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)])
-        )
+            Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)],
+            DependsOn=network_config.nat.single.title
+        ))
 
         if asg_config.sns_topic_arn is not None:
             if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
@@ -134,8 +135,8 @@ class Asg(SecurityEnabledObject):
                                        DeploymentConfigName='CodeDeployDefault.OneAtATime',
                                        DeploymentGroupName=Join('', [Ref('AWS::StackName'),
                                                                      '-', cd_deploygroup_title]),
-                                       ServiceRoleArn=cd_service_role_arn))
-        self.cd_deploygroup.DependsOn = [self.cd_app.title, self.trop_asg.title]
+                                       ServiceRoleArn=cd_service_role_arn,
+                                       DependsOn=[self.cd_app.title, self.trop_asg.title]))
 
         # Outputs
         self.template.add_output(

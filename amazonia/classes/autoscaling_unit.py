@@ -37,8 +37,6 @@ class AutoscalingUnit(object):
         self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic between autoscaling groups and Nats
         network_config.jump.add_flow(receiver=self.asg, port='22')
 
-        self.asg.trop_asg.DependsOn = network_config.nat.single.title
-
     def get_dependencies(self):
         """
         :return: list of other unit's this unit is dependant upon
