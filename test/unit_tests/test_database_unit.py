@@ -19,8 +19,8 @@ def setup_resources():
 
     gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
                                                                         InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc)))
-    gateway_attachment.DependsOn = internet_gateway.title
+                                                                        VpcId=Ref(vpc),
+                                                                        DependsOn=internet_gateway.title))
 
     private_subnets = [template.add_resource(ec2.Subnet('MyPrivSub1',
                                                         AvailabilityZone='ap-southeast-2a',

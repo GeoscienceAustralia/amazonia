@@ -29,14 +29,15 @@ runcmd:
                                         CidrBlock='10.0.0.0/16'))
 
     internet_gateway = template.add_resource(
-        ec2.InternetGateway('igname', Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname']))))
-    internet_gateway.DependsOn = vpc.title
+        ec2.InternetGateway('igname',
+                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname'])),
+                            DependsOn=vpc.title))
 
     gateway_attachment = template.add_resource(
         ec2.VPCGatewayAttachment(internet_gateway.title + 'Atch',
                                  VpcId=Ref(vpc),
-                                 InternetGatewayId=Ref(internet_gateway)))
-    gateway_attachment.DependsOn = internet_gateway.title
+                                 InternetGatewayId=Ref(internet_gateway),
+                                 DependsOn=internet_gateway.title))
 
     private_subnets = [template.add_resource(ec2.Subnet('MySubnet',
                                                         AvailabilityZone='ap-southeast-2a',

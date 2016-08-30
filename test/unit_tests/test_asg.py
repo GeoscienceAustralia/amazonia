@@ -6,7 +6,6 @@ from troposphere.policies import AutoScalingRollingUpdate
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.block_devices_config import BlockDevicesConfig
 
 template = asg_config = elb_config = network_config = load_balancer = None
 
@@ -58,13 +57,18 @@ runcmd:
                         AvailabilityZone='ap-southeast-2a',
                         VpcId=Ref(vpc),
                         CidrBlock='10.0.1.0/24')
+
+    class Single(object):
+        def __init__(self):
+            self.single = ec2.Instance('title')
+
     network_config = NetworkConfig(
         vpc=ec2.VPC('MyVPC',
                     CidrBlock='10.0.0.0/16'),
         private_subnets=[subnet],
         public_subnets=[subnet],
         jump=None,
-        nat=None,
+        nat=Single(),
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair='pipeline',

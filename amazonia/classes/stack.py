@@ -81,14 +81,15 @@ class Stack(object):
 
         ig_name = self.title + 'Ig'
         self.internet_gateway = self.template.add_resource(
-            ec2.InternetGateway(ig_name, Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', ig_name]))))
-        self.internet_gateway.DependsOn = self.vpc.title
+            ec2.InternetGateway(ig_name,
+                                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', ig_name])),
+                                DependsOn=self.vpc.title))
 
         self.gateway_attachment = self.template.add_resource(
             ec2.VPCGatewayAttachment(self.internet_gateway.title + 'Atch',
                                      VpcId=Ref(self.vpc),
-                                     InternetGatewayId=Ref(self.internet_gateway)))
-        self.gateway_attachment.DependsOn = self.internet_gateway.title
+                                     InternetGatewayId=Ref(self.internet_gateway),
+                                     DependsOn=self.internet_gateway.title))
 
         # Add Public and Private Route Tables
         public_rt_name = self.title + 'PubRt'
@@ -167,14 +168,14 @@ class Stack(object):
         self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
                                                                  RouteTableId=Ref(self.public_route_table),
-                                                                 DestinationCidrBlock=self.public_cidr['cidr']))
-        self.public_route.DependsOn = self.gateway_attachment.title
+                                                                 DestinationCidrBlock=self.public_cidr['cidr'],
+                                                                 DependsOn=self.gateway_attachment.title))
 
         self.private_route = self.template.add_resource(ec2.Route(self.title + 'PriRtOutboundRoute',
                                                                   InstanceId=Ref(self.nat.single),
                                                                   RouteTableId=Ref(self.private_route_table),
-                                                                  DestinationCidrBlock=self.public_cidr['cidr']))
-        self.private_route.DependsOn = self.gateway_attachment.title
+                                                                  DestinationCidrBlock=self.public_cidr['cidr'],
+                                                                  DependsOn=self.gateway_attachment.title))
 
         self.network_config = NetworkConfig(vpc=self.vpc,
                                             public_subnets=self.public_subnets,
