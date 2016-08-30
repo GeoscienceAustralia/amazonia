@@ -17,6 +17,7 @@ class CFDistribution(object):
         self.title = title + 'CFDist'
         self.origins = []
         self.cache_behaviors = []
+        self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
 
         self.default_cache_behavior = self.add_default_cache_behavior(title, cfdistribution_config)
 
@@ -34,11 +35,12 @@ class CFDistribution(object):
             'DefaultRootObject' : cfdistribution_config.default_root_object,
             'Enabled' : True,
             'Origins' : self.origins,
-            'PriceClass' : 'PriceClass_All',
+            'PriceClass' : cfdistribution_config.price_class,
         }
 
         self.cf_dist = template.add_resource(cloudfront.DistributionConfig(
                 self.title,
+                # TODO: unpack cfdist_params
                 **cfdist_params
             )
         )
@@ -48,12 +50,12 @@ class CFDistribution(object):
         Create Cloudfront Origin objects and append to list of origins
         :param title: Title of this Cloudfront Distribution
         """
-        for n, origin in enumerate(cforigins_config):
+        for number, origin in enumerate(cforigins_config):
 
-            if (origin.origin_policy['type'] == 's3origin'):
+            if (origin.origin_policy['is_s3']):
                 # Create S3Origin
                 created_origin = cloudfront.Origin(
-                    '{0}Origin{1}'.format(title, n),
+                    '{0}Origin{1}'.format(title, number),
                     DomainName=origin.domain_name,
                     Id=origin.origin_id,
                     S3OriginConfig=cloudfront.S3Origin(
@@ -63,15 +65,15 @@ class CFDistribution(object):
             else:
                 # Create CustomOrigin
                 created_origin = cloudfront.Origin(
-                    '{0}Origin{1}'.format(title, n),
+                    '{0}Origin{1}'.format(title, number),
                     DomainName=origin.domain_name,
                     Id=origin.origin_id,
                     CustomOriginConfig=cloudfront.CustomOrigin(
-                        HTTPPort='80',
-                        HTTPSPort='443',
+                        HTTPPort=origin.http_port,
+                        HTTPSPort=origin.https_port,
                         # Add input checking to ensure protocol_policy is one of (allow-all, http-only, https-only)
                         OriginProtocolPolicy=origin.origin_protocol_policy,
-                        OriginSSLProtocols=['TLSv1','TLSv1.1','TLSv1.2']
+                        OriginSSLProtocols=origin.origin_ssl_protocols,
                     )
                 )
 
@@ -83,10 +85,11 @@ class CFDistribution(object):
         :param title: Title of this Cloudfront Distribution
         :param cfcache_behaviors_config: list of CFCacheBehaviors
         """
-        for n, cache_behavior in enumerate(cfcache_behaviors_config):
+
+        for number, cache_behavior in enumerate(cfcache_behaviors_config):
 
             created_cache_behavior = cloudfront.CacheBehavior(
-                '{0}CacheBehavior{1}'.format(title, n),
+                '{0}CacheBehavior{1}'.format(title, number),
                 AllowedMethods=cache_behavior.allowed_methods,
                 CachedMethods=cache_behavior.cached_methods,
                 Compress=False,

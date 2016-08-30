@@ -16,7 +16,7 @@ def main():
             domain_name='amazonia-elb-bucket.s3.amazonaws.com',
             origin_id='S3-bucket-id',
             origin_policy={
-                'type' : 's3origin',
+                'is_s3' : True,
                 'origin_access_identity': 'originaccessid1'
             }
         ),
@@ -25,8 +25,11 @@ def main():
             domain_name='amazonia-myStackap-DFODUO453-39457345.ap-southeast-2.elb.amazonaws.com',
             origin_id='www-origin',
             origin_policy={
-                'type' : 'customorigin',
-                'origin_protocol_policy' : 'https-only'
+                'is_s3' : False,
+                'origin_protocol_policy' : 'https-only',
+                'http_port' : 80,
+                'https_port' : 443,
+                'origin_ssl_protocols' : ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
             }
         )
     ]

@@ -17,17 +17,13 @@ class CFOriginsConfig(object):
         self.origin_id = origin_id
         self.origin_policy = origin_policy
 
-        if (origin_policy['type'] == 's3origin'):
+        if (origin_policy['is_s3']):
+            # Set S3 origin variables
             if origin_policy['origin_access_identity']:
                 self.origin_access_identity = origin_policy['origin_access_identity']
-        elif (origin_policy['type'] == 'customorigin'):
-            if origin_policy['origin_protocol_policy']:
-                self.origin_protocol_policy = origin_policy['origin_protocol_policy']
-            else:
-                raise InvalidTypeError('Error: Cloudfront custom origin {0} must contain an origin_protocol_policy.'.__format__(self.title))
         else:
-            raise InvalidTypeError('Error: Cloudfront Origin type must be either s3origin or customorigin.')
-
-class InvalidTypeError(Exception):
-    def __init__(self, value):
-        self.value = value
+            # Set custom origin variables
+            self.origin_protocol_policy = origin_policy['origin_protocol_policy']
+            self.http_port = origin_policy['http_port']
+            self.https_port = origin_policy['https_port']
+            self.origin_ssl_protocols = origin_policy['origin_ssl_protocols']
