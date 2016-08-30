@@ -6,11 +6,8 @@ from troposphere.policies import AutoScalingRollingUpdate
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
-<<<<<<< HEAD
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
-=======
->>>>>>> integration
 
 template = asg_config = elb_config = network_config = load_balancer = None
 
