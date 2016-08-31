@@ -21,7 +21,7 @@ class ComplexObjectFieldMapping(object):
 class YamlFields(object):
     """Simple object to consolidate a number of key list constants"""
 
-    """ elb_config field list"""
+    # elb_config field list
     elb_config_key_list = ['instance_protocol',
                            'loadbalancer_protocol',
                            'instance_port',
@@ -33,7 +33,7 @@ class YamlFields(object):
                            'ssl_certificate_id'
                            ]
 
-    """asg_config field list"""
+    # asg_config field list
     asg_config_key_list = ['sns_topic_arn',
                            'sns_notification_types',
                            'health_check_grace_period',
@@ -48,7 +48,7 @@ class YamlFields(object):
                            'simple_scaling_policy_config'
                            ]
 
-    """simple_scaling_policy field list"""
+    # simple_scaling_policy field list
     simple_scaling_policy_config_key_list = ['name',
                                              'description',
                                              'metric_name',
@@ -59,7 +59,7 @@ class YamlFields(object):
                                              'scaling_adjustment',
                                              'cooldown']
 
-    """block_devices_config field list"""
+    # block_devices_config field list
     block_devices_config_key_list = ['device_name',
                                      'ebs_volume_size',
                                      'ebs_volume_type',
@@ -68,7 +68,7 @@ class YamlFields(object):
                                      'virtual_name',
                                      ]
 
-    """database_config field list"""
+    # database_config field list
     database_config_key_list = [
         'db_name',
         'db_instance_type',
@@ -82,7 +82,7 @@ class YamlFields(object):
         'db_storage_type'
     ]
 
-    """stack parameter field list"""
+    # stack parameter field list
     stack_key_list = [
         'code_deploy_service_role',
         'keypair',
@@ -103,6 +103,7 @@ class YamlFields(object):
         'nat_alerting'
     ]
 
+    # autoscaling unit parameter field list
     autoscaling_unit_key_list = [
         'unit_title',
         'dependencies',
@@ -110,11 +111,13 @@ class YamlFields(object):
         'asg_config'
     ]
 
+    # database unit parameter field list
     database_unit_key_list = [
         'unit_title',
         'database_config'
     ]
 
+    # zd autoscaling unit parameter field list
     zd_autoscaling_unit_key_list = [
         'unit_title',
         'dependencies',
@@ -123,7 +126,7 @@ class YamlFields(object):
         'green_asg_config'
     ]
 
-    """ config classes """
+    # config classes 
     complex_object_field_mapping = {
         'elb_config':
             ComplexObjectFieldMapping(ElbConfig, False, elb_config_key_list),
