@@ -2,6 +2,7 @@
 
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -14,8 +15,8 @@ from troposphere import Ref, Template, ec2, Tags, Join
 class Stack(object):
     def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
-                 autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
-                 nat_alerting):
+                 autoscaling_units, database_units, cfdistribution_units, stack_hosted_zone_name,
+                 iam_instance_profile_arn, owner_emails, nat_alerting):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -36,7 +37,8 @@ class Stack(object):
         :param zd_autoscaling_units: list of zd_autosclaing_unit dicts
         :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, elb_health_check, minsize,
         maxsize, image_id, instance_type, userdata)
-        :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
+        :param database_units: list of database_unit dicts (db_instance_type, db_engine, db_port)
+        :param cfdistribution_units: list of cfdistribution_unit dicts
         :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
         sets in.
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
@@ -55,6 +57,7 @@ class Stack(object):
         self.hosted_zone_name = stack_hosted_zone_name
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
+        self.cfdistribution_units = cfdistribution_units if cfdistribution_units else []
         self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.units = {}
@@ -188,6 +191,9 @@ class Stack(object):
 
         # Add Database Units
         self.add_units(self.database_units, DatabaseUnit)
+
+        # Add Cloudfront Units
+        self.add_units(self.cfdistribution_units, CFDistributionUnit)
 
         # Add Unit flow
         for unit_name in self.units:

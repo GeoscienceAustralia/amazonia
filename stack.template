@@ -1,0 +1,882 @@
+{
+  "Outputs": {
+    "Jump": {
+      "Description": "PublicIp address of Jump single instance",
+      "Value": {
+        "Fn::Join": [
+          " ",
+          [
+            "Jump PublicIp address",
+            {
+              "Fn::GetAtt": [
+                "Jump",
+                "PublicIp"
+              ]
+            },
+            "on subnet",
+            {
+              "Ref": "PublicSubnetA"
+            }
+          ]
+        ]
+      }
+    },
+    "Nat": {
+      "Description": "PrivateIp address of Nat single instance",
+      "Value": {
+        "Fn::Join": [
+          " ",
+          [
+            "Nat PrivateIp address",
+            {
+              "Fn::GetAtt": [
+                "Nat",
+                "PrivateIp"
+              ]
+            },
+            "on subnet",
+            {
+              "Ref": "PublicSubnetA"
+            }
+          ]
+        ]
+      }
+    },
+    "app1Elb": {
+      "Description": "URL of the app1Elb ELB",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "app1Elb",
+                "DNSName"
+              ]
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "Resources": {
+    "Ig": {
+      "DependsOn": "Vpc",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "Ig"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "IgAtch": {
+      "DependsOn": "Ig",
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "Ig"
+        },
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment"
+    },
+    "Jump": {
+      "DependsOn": "IgAtch",
+      "Properties": {
+        "ImageId": "ami-dc361ebf",
+        "InstanceType": "t2.micro",
+        "KeyName": "INSERT_YOUR_KEYPAIR_HERE",
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeleteOnTermination": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "JumpSg"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "PublicSubnetA"
+            }
+          }
+        ],
+        "SourceDestCheck": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "Jump"
+                ]
+              ]
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#cloud-config\n# Capture all cloud-config output into a more readable logfile\noutput: {all: '| tee -a /var/log/cloud-init-output.log'}\n# update and install packages, reboot if necessary\npackage_upgrade: true\npackage_reboot_if_required: true\npackages:\n - perl-Switch\n - perl-DateTime\n - perl-Sys-Syslog\n - perl-LWP-Protocol-https\n\nwrite_files:\n - path: /etc/awslogs.cfg\n   content: |\n    [general]\n    state_file = /var/awslogs/state/agent-state\n\n    [/var/log/messages]\n    file = /var/log/messages\n    log_group_name = /var/log/messages\n    log_stream_name = {instance_id}\n    datetime_format = %b %d %H:%M:%S\n\nruncmd:\n# cloudwatch monitoring scripts\n - curl -so /tmp/CloudWatchMonitoringScripts-1.2.1.zip http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip\n - unzip -d /opt /tmp/CloudWatchMonitoringScripts-1.2.1.zip\n - echo '*/5 * * * * root /opt/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used --mem-avail --disk-space-util --disk-path=/ --from-cron' > /etc/cron.d/cloudwatch\n# cloudwatch logs agent and forwarding config\n - curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O\n - chmod +x ./awslogs-agent-setup.py\n - ./awslogs-agent-setup.py -n -r ap-southeast-2 -c /etc/awslogs.cfg\n"
+        }
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "Jump22Fromoffice22": {
+      "Properties": {
+        "CidrIp": "123.45.12.34/16",
+        "FromPort": "22",
+        "GroupId": {
+          "Ref": "JumpSg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "22"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "Jump22Toapp1Asg22": {
+      "Properties": {
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "app1Sg",
+            "GroupId"
+          ]
+        },
+        "FromPort": "22",
+        "GroupId": {
+          "Ref": "JumpSg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "22"
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress"
+    },
+    "JumpAllToPublicIpAll": {
+      "Properties": {
+        "CidrIp": "0.0.0.0/0",
+        "FromPort": "0",
+        "GroupId": {
+          "Ref": "JumpSg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "65535"
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress"
+    },
+    "JumpSg": {
+      "Properties": {
+        "GroupDescription": "Security group",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "JumpSg"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "Nat": {
+      "DependsOn": "IgAtch",
+      "Properties": {
+        "ImageId": "ami-53371f30",
+        "InstanceType": "t2.micro",
+        "KeyName": "INSERT_YOUR_KEYPAIR_HERE",
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeleteOnTermination": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "NatSg"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "PublicSubnetA"
+            }
+          }
+        ],
+        "SourceDestCheck": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "Nat"
+                ]
+              ]
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#cloud-config\n# Capture all cloud-config output into a more readable logfile\noutput: {all: '| tee -a /var/log/cloud-init-output.log'}\n# update and install packages, reboot if necessary\npackage_upgrade: true\npackage_reboot_if_required: true\npackages:\n - perl-Switch\n - perl-DateTime\n - perl-Sys-Syslog\n - perl-LWP-Protocol-https\n\nwrite_files:\n - path: /etc/awslogs.cfg\n   content: |\n    [general]\n    state_file = /var/awslogs/state/agent-state\n\n    [/var/log/messages]\n    file = /var/log/messages\n    log_group_name = /var/log/messages\n    log_stream_name = {instance_id}\n    datetime_format = %b %d %H:%M:%S\n\nruncmd:\n# cloudwatch monitoring scripts\n - curl -so /tmp/CloudWatchMonitoringScripts-1.2.1.zip http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip\n - unzip -d /opt /tmp/CloudWatchMonitoringScripts-1.2.1.zip\n - echo '*/5 * * * * root /opt/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used --mem-avail --disk-space-util --disk-path=/ --from-cron' > /etc/cron.d/cloudwatch\n# cloudwatch logs agent and forwarding config\n - curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O\n - chmod +x ./awslogs-agent-setup.py\n - ./awslogs-agent-setup.py -n -r ap-southeast-2 -c /etc/awslogs.cfg\n"
+        }
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "NatAllFromapp1AsgAll": {
+      "Properties": {
+        "FromPort": "0",
+        "GroupId": {
+          "Ref": "NatSg"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "app1Sg",
+            "GroupId"
+          ]
+        },
+        "ToPort": "65535"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "NatSg": {
+      "Properties": {
+        "GroupDescription": "Security group",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "NatSg"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "PriRt": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PriRt"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::RouteTable"
+    },
+    "PriRtOutboundRoute": {
+      "DependsOn": "IgAtch",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "InstanceId": {
+          "Ref": "Nat"
+        },
+        "RouteTableId": {
+          "Ref": "PriRt"
+        }
+      },
+      "Type": "AWS::EC2::Route"
+    },
+    "PriRtPrivateSubnetAAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PriRt"
+        },
+        "SubnetId": {
+          "Ref": "PrivateSubnetA"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PriRtPrivateSubnetBAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PriRt"
+        },
+        "SubnetId": {
+          "Ref": "PrivateSubnetB"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PriRtPrivateSubnetCAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PriRt"
+        },
+        "SubnetId": {
+          "Ref": "PrivateSubnetC"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PrivateSubnetA": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2a",
+        "CidrBlock": "10.0.100.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PrivateSubnetA"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PrivateSubnetB": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2b",
+        "CidrBlock": "10.0.101.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PrivateSubnetB"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PrivateSubnetC": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2c",
+        "CidrBlock": "10.0.102.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PrivateSubnetC"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PubRt": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PubRt"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::RouteTable"
+    },
+    "PubRtInboundRoute": {
+      "DependsOn": "IgAtch",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "Ig"
+        },
+        "RouteTableId": {
+          "Ref": "PubRt"
+        }
+      },
+      "Type": "AWS::EC2::Route"
+    },
+    "PubRtPublicSubnetAAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PubRt"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetA"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PubRtPublicSubnetBAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PubRt"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetB"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PubRtPublicSubnetCAssociation": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PubRt"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetC"
+        }
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation"
+    },
+    "PublicSubnetA": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2a",
+        "CidrBlock": "10.0.0.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PublicSubnetA"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PublicSubnetB": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2b",
+        "CidrBlock": "10.0.1.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PublicSubnetB"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "PublicSubnetC": {
+      "Properties": {
+        "AvailabilityZone": "ap-southeast-2c",
+        "CidrBlock": "10.0.2.0/24",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "PublicSubnetC"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::Subnet"
+    },
+    "Vpc": {
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": "true",
+        "EnableDnsSupport": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "Vpc"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::EC2::VPC"
+    },
+    "app1Asg": {
+      "DependsOn": "Nat",
+      "Properties": {
+        "AvailabilityZones": [
+          "ap-southeast-2a",
+          "ap-southeast-2b",
+          "ap-southeast-2c"
+        ],
+        "HealthCheckGracePeriod": "300",
+        "HealthCheckType": "ELB",
+        "LaunchConfigurationName": {
+          "Ref": "app1AsgLc"
+        },
+        "LoadBalancerNames": [
+          {
+            "Ref": "app1Elb"
+          }
+        ],
+        "MaxSize": "1",
+        "MinSize": "1",
+        "Tags": [
+          {
+            "Key": "Name",
+            "PropagateAtLaunch": true,
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "app1Asg"
+                ]
+              ]
+            }
+          }
+        ],
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "PrivateSubnetA"
+          },
+          {
+            "Ref": "PrivateSubnetB"
+          },
+          {
+            "Ref": "PrivateSubnetC"
+          }
+        ]
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": 0
+        }
+      }
+    },
+    "app1Asg22FromJump22": {
+      "Properties": {
+        "FromPort": "22",
+        "GroupId": {
+          "Ref": "app1Sg"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JumpSg",
+            "GroupId"
+          ]
+        },
+        "ToPort": "22"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "app1Asg80Fromapp1Elb80": {
+      "Properties": {
+        "FromPort": "80",
+        "GroupId": {
+          "Ref": "app1Sg"
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "app1ElbSg",
+            "GroupId"
+          ]
+        },
+        "ToPort": "80"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "app1AsgAllToNatAll": {
+      "Properties": {
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "NatSg",
+            "GroupId"
+          ]
+        },
+        "FromPort": "0",
+        "GroupId": {
+          "Ref": "app1Sg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "65535"
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress"
+    },
+    "app1AsgLc": {
+      "Properties": {
+        "AssociatePublicIpAddress": "false",
+        "BlockDeviceMappings": [],
+        "ImageId": "ami-dc361ebf",
+        "InstanceMonitoring": "false",
+        "InstanceType": "t2.micro",
+        "KeyName": "INSERT_YOUR_KEYPAIR_HERE",
+        "SecurityGroups": [
+          {
+            "Ref": "app1Sg"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#cloud-config\nrepo_update: true\nrepo_upgrade: all\npackages:\n - httpd\nwrite_files:\n - content: |\n    <html>\n    <body>\n    <h1>Amazonia created this stack!</h1>\n    </body>\n    </html>\n   path: /var/www/html/index.html\n   permissions: '0644'\n   owner: root:root\nruncmd:\n - service httpd start\n"
+        }
+      },
+      "Type": "AWS::AutoScaling::LaunchConfiguration"
+    },
+    "app1Elb": {
+      "DependsOn": "Nat",
+      "Properties": {
+        "CrossZone": "true",
+        "HealthCheck": {
+          "HealthyThreshold": "10",
+          "Interval": "300",
+          "Target": "HTTP:80/index.html",
+          "Timeout": "60",
+          "UnhealthyThreshold": "2"
+        },
+        "Listeners": [
+          {
+            "InstancePort": "80",
+            "InstanceProtocol": "HTTP",
+            "LoadBalancerPort": "80",
+            "Protocol": "HTTP"
+          }
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "app1ElbSg"
+          }
+        ],
+        "Subnets": [
+          {
+            "Ref": "PublicSubnetA"
+          },
+          {
+            "Ref": "PublicSubnetB"
+          },
+          {
+            "Ref": "PublicSubnetC"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "app1Elb"
+          }
+        ]
+      },
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer"
+    },
+    "app1Elb80FromPublicIp80": {
+      "Properties": {
+        "CidrIp": "0.0.0.0/0",
+        "FromPort": "80",
+        "GroupId": {
+          "Ref": "app1ElbSg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "80"
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "app1Elb80Toapp1Asg80": {
+      "Properties": {
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "app1Sg",
+            "GroupId"
+          ]
+        },
+        "FromPort": "80",
+        "GroupId": {
+          "Ref": "app1ElbSg"
+        },
+        "IpProtocol": "tcp",
+        "ToPort": "80"
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress"
+    },
+    "app1ElbSg": {
+      "Properties": {
+        "GroupDescription": "Security group",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "app1ElbSg"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "app1Sg": {
+      "Properties": {
+        "GroupDescription": "Security group",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::StackName"
+                  },
+                  "-",
+                  "app1Sg"
+                ]
+              ]
+            }
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    }
+  }
+}

@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
 from nose.tools import *
-from amazonia.classes.cfdistribution import CFDistribution
-from amazonia.classes.cfdistribution_config import CFDistributionConfig
-from amazonia.classes.cforigins_config import CFOriginsConfig
-from amazonia.classes.cfcache_behaviors_config import CFCacheBehaviors
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_cache_behaviors_config import CFCacheBehaviors
 from troposphere import Template, cloudfront
 
-def create_cfdistribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.com'),
+def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.com'),
                                  comment='UnitTestCFDistConfig', default_root_object='index.html',
                                  enabled=True, price_class='PriceClass_All', target_origin_id='originId',
                                  allowed_methods=('GET','HEAD'), cached_methods=('GET','HEAD'),
@@ -31,7 +31,7 @@ def create_cfdistribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.c
     :param error_page_path: The error page that should be served when an HTTP error code is returned
     :return: Instance of CFDistributionConfig
     """
-    cfdistribution_config = CFDistributionConfig(
+    cf_distribution_config = CFDistributionConfig(
         aliases=aliases,
         comment=comment,
         default_root_object=default_root_object,
@@ -48,7 +48,7 @@ def create_cfdistribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.c
         error_page_path=error_page_path,
     )
 
-    return cfdistribution_config
+    return cf_distribution_config
 
 def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_id='S3-bucket-id',
                    is_s3=True, origin_access_identity = 'originaccessid1'):
@@ -144,14 +144,14 @@ def test_s3_origin():
     is_s3 = True
     origin_access_identity = 'TestOAI'
 
-    helper_cforigin = create_s3_origin(domain_name=domain_name,
+    helper_cf_origin = create_s3_origin(domain_name=domain_name,
                                         is_s3=is_s3,
                                         origin_access_identity=origin_access_identity
                                         )
 
-    assert_equal(domain_name, helper_cforigin.domain_name)
-    assert_equal(is_s3, helper_cforigin.origin_policy['is_s3'])
-    assert_equal(origin_access_identity, helper_cforigin.origin_policy['origin_access_identity'])
+    assert_equal(domain_name, helper_cf_origin.domain_name)
+    assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
+    assert_equal(origin_access_identity, helper_cf_origin.origin_policy['origin_access_identity'])
 
 def test_custom_origin():
     """
@@ -165,7 +165,7 @@ def test_custom_origin():
     https_port = '443'
     origin_ssl_protocols = ('TLSv1', 'TLSv1.1', 'TLSv1.2')
 
-    helper_cforigin = create_custom_origin(domain_name=domain_name,
+    helper_cf_origin = create_custom_origin(domain_name=domain_name,
                                         is_s3=is_s3,
                                         origin_protocol_policy=origin_protocol_policy,
                                         http_port=http_port,
@@ -173,14 +173,14 @@ def test_custom_origin():
                                         origin_ssl_protocols=origin_ssl_protocols
                                         )
 
-    assert_equal(domain_name, helper_cforigin.domain_name)
-    assert_equal(is_s3, helper_cforigin.origin_policy['is_s3'])
-    assert_equal(origin_protocol_policy, helper_cforigin.origin_protocol_policy)
-    assert_equal(http_port, helper_cforigin.http_port)
-    assert_equal(https_port, helper_cforigin.https_port)
-    assert_equal(origin_ssl_protocols, helper_cforigin.origin_ssl_protocols)
+    assert_equal(domain_name, helper_cf_origin.domain_name)
+    assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
+    assert_equal(origin_protocol_policy, helper_cf_origin.origin_protocol_policy)
+    assert_equal(http_port, helper_cf_origin.http_port)
+    assert_equal(https_port, helper_cf_origin.https_port)
+    assert_equal(origin_ssl_protocols, helper_cf_origin.origin_ssl_protocols)
 
-def test_cfcache_behavior():
+def test_cf_cache_behavior():
     """
     Test to check CacheBehavior object inputs match the created outputs
     """
@@ -195,29 +195,29 @@ def test_cfcache_behavior():
     max_ttl = 0
     trusted_signers = ('self')
 
-    helper_cfcache_behavior = create_cache_behavior(path_pattern=path_pattern, allowed_methods=allowed_methods,
+    helper_cf_cache_behavior = create_cache_behavior(path_pattern=path_pattern, allowed_methods=allowed_methods,
                                         cached_methods=cached_methods, target_origin_id=target_origin_id,
                                         forward_cookies=forward_cookies,viewer_protocol_policy=viewer_protocol_policy,
                                         min_ttl=min_ttl, default_ttl=default_ttl, max_ttl=max_ttl,
                                         trusted_signers=trusted_signers)
 
-    assert_equal(path_pattern, helper_cfcache_behavior.path_pattern)
-    assert_equal(allowed_methods, helper_cfcache_behavior.allowed_methods)
-    assert_equal(cached_methods, helper_cfcache_behavior.cached_methods)
-    assert_equal(target_origin_id, helper_cfcache_behavior.target_origin_id)
-    assert_equal(forward_cookies, helper_cfcache_behavior.forward_cookies)
-    assert_equal(min_ttl, helper_cfcache_behavior.min_ttl)
-    assert_equal(default_ttl, helper_cfcache_behavior.default_ttl)
-    assert_equal(max_ttl, helper_cfcache_behavior.max_ttl)
-    assert_equal(trusted_signers, helper_cfcache_behavior.trusted_signers)
+    assert_equal(path_pattern, helper_cf_cache_behavior.path_pattern)
+    assert_equal(allowed_methods, helper_cf_cache_behavior.allowed_methods)
+    assert_equal(cached_methods, helper_cf_cache_behavior.cached_methods)
+    assert_equal(target_origin_id, helper_cf_cache_behavior.target_origin_id)
+    assert_equal(forward_cookies, helper_cf_cache_behavior.forward_cookies)
+    assert_equal(min_ttl, helper_cf_cache_behavior.min_ttl)
+    assert_equal(default_ttl, helper_cf_cache_behavior.default_ttl)
+    assert_equal(max_ttl, helper_cf_cache_behavior.max_ttl)
+    assert_equal(trusted_signers, helper_cf_cache_behavior.trusted_signers)
 
-def test_cfdistribution_config():
+def test_cf_distribution_config():
     """
     Test to check DistributionConfig object inputs match the created outputs
     """
     template = Template()
 
-    aliases = ['wwwelb.ap-southeast-2.elb.amazonaws.com']
+    aliases = 'wwwelb.ap-southeast-2.elb.amazonaws.com'
     comment = 'UnitTestCFDistConfig'
     default_root_object = 'index.html'
     enabled = True
@@ -225,7 +225,7 @@ def test_cfdistribution_config():
     target_origin_id = 'originId'
     allowed_methods = ['GET', 'HEAD']
     cached_methods = ['GET', 'HEAD']
-    trusted_signers = ['self']
+    trusted_signers = 'self'
     viewer_protocol_policy = 'https-only'
     min_ttl = 0
     default_ttl = 0
@@ -235,24 +235,24 @@ def test_cfdistribution_config():
     origins = []
     cache_behaviors = []
 
-    helper_cfdist = create_cfdistribution_config(aliases=aliases, comment=comment, default_root_object=default_root_object,
+    helper_cf_dist = create_cf_distribution_config(aliases=aliases, comment=comment, default_root_object=default_root_object,
                                                  enabled=enabled, price_class=price_class, target_origin_id=target_origin_id,
                                                  allowed_methods=allowed_methods, cached_methods=cached_methods,
                                                  trusted_signers=trusted_signers, viewer_protocol_policy=viewer_protocol_policy,
                                                  min_ttl=min_ttl, default_ttl=default_ttl, max_ttl=max_ttl,
                                                  error_page_path=error_page_path)
 
-    assert_equal(aliases, helper_cfdist.aliases)
-    assert_equal(comment, helper_cfdist.comment)
-    assert_equal(default_root_object, helper_cfdist.default_root_object)
-    assert_equal(enabled, helper_cfdist.enabled)
-    assert_equal(price_class, helper_cfdist.price_class)
-    assert_equal(target_origin_id, helper_cfdist.target_origin_id)
-    assert_equal(allowed_methods, helper_cfdist.allowed_methods)
-    assert_equal(cached_methods, helper_cfdist.cached_methods)
-    assert_equal(trusted_signers, helper_cfdist.trusted_signers)
-    assert_equal(viewer_protocol_policy, helper_cfdist.viewer_protocol_policy)
-    assert_equal(min_ttl, helper_cfdist.min_ttl)
-    assert_equal(default_ttl, helper_cfdist.default_ttl)
-    assert_equal(max_ttl, helper_cfdist.max_ttl)
-    assert_equal(error_page_path, helper_cfdist.error_page_path)
+    assert_equal(aliases, helper_cf_dist.aliases)
+    assert_equal(comment, helper_cf_dist.comment)
+    assert_equal(default_root_object, helper_cf_dist.default_root_object)
+    assert_equal(enabled, helper_cf_dist.enabled)
+    assert_equal(price_class, helper_cf_dist.price_class)
+    assert_equal(target_origin_id, helper_cf_dist.target_origin_id)
+    assert_equal(allowed_methods, helper_cf_dist.allowed_methods)
+    assert_equal(cached_methods, helper_cf_dist.cached_methods)
+    assert_equal(trusted_signers, helper_cf_dist.trusted_signers)
+    assert_equal(viewer_protocol_policy, helper_cf_dist.viewer_protocol_policy)
+    assert_equal(min_ttl, helper_cf_dist.min_ttl)
+    assert_equal(default_ttl, helper_cf_dist.default_ttl)
+    assert_equal(max_ttl, helper_cf_dist.max_ttl)
+    assert_equal(error_page_path, helper_cf_dist.error_page_path)

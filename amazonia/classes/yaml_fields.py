@@ -68,6 +68,45 @@ class YamlFields(object):
                                      'virtual_name',
                                      ]
 
+    # cloudfront distribution config key list
+    cf_distribution_config_key_list = [
+        'aliases',
+        'comment',
+        'default_root_object',
+        'enabled',
+        'price_class',
+        'target_origin_id',
+        'allowed_methods',
+        'cached_methods',
+        'trusted_signers',
+        'viewer_protocol_policy',
+        'min_ttl',
+        'default_ttl',
+        'max_ttl',
+        'error_page_path'
+    ]
+
+    # cloudfront origins config key list
+    cf_origins_config_key_list = [
+        'domain_name',
+        'origin_id',
+        'origin_policy'
+    ]
+
+    # cloudfront cache behaviors config key list
+    cf_cache_behaviors_config_key_list = [
+        'path_pattern',
+        'allowed_methods',
+        'cached_methods',
+        'target_origin_id',
+        'forward_cookies',
+        'viewer_protocol_policy',
+        'min_ttl',
+        'default_ttl',
+        'max_ttl',
+        'trusted_signers'
+    ]
+
     # database_config field list
     database_config_key_list = [
         'db_name',
@@ -95,6 +134,7 @@ class YamlFields(object):
         'nat_instance_type',
         'home_cidrs',
         'stack_hosted_zone_name',
+        'cf_distribution_units',
         'zd_autoscaling_units',
         'autoscaling_units',
         'database_units',
@@ -115,6 +155,14 @@ class YamlFields(object):
     database_unit_key_list = [
         'unit_title',
         'database_config'
+    ]
+
+    # cloudfront distribution unit parameter field list
+    cf_distribution_unit_key_list = [
+        'unit_title',
+        'cf_cache_behaviors_config',
+        'cf_origins_config',
+        'cf_distribution_config'
     ]
 
     # zd autoscaling unit parameter field list
@@ -147,5 +195,7 @@ class YamlFields(object):
         'zd_autoscaling_units':
             ComplexObjectFieldMapping(dict, True, zd_autoscaling_unit_key_list),
         'database_units':
-            ComplexObjectFieldMapping(dict, True, database_unit_key_list)
+            ComplexObjectFieldMapping(dict, True, database_unit_key_list),
+        'cf_distribution_units':
+            ComplexObjectFieldMapping(dict, True, cf_distribution_unit_key_list)
     }

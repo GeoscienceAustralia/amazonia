@@ -291,6 +291,163 @@ database_config: &database_config
       nullable: True
       regex: '^(standard|gp2)$'
 
+cf_distribution_config: &cf_distribution_config
+  type: 'dict'
+  nullable: True
+  schema:
+    aliases:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    comment:
+      type: 'string'
+      nullable: True
+    default_root_object:
+      type: 'string'
+      nullable: True
+    enabled:
+      type: 'boolean'
+      nullable: False
+      empty: True
+    price_class:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'PriceClass_All'
+       - 'PriceClass_200'
+       - 'PriceClass_100'
+    target_origin_id:
+      type: 'string'
+      nullable: False
+    allowed_methods:
+      type: 'list'
+      schema:
+        type: 'string'
+        allowed:
+         - 'GET'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'POST'
+         - 'PUT'
+         - 'PATCH'
+    cached_methods:
+      type: 'list'
+      schema:
+        type: 'string'
+    trusted_signers:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    viewer_protocol_policy:
+      type: 'string'
+      allowed:
+       - 'allow-all'
+       - 'redirect-to-https'
+       - 'https-only'
+    min_ttl:
+      type: 'number'
+    default_ttl:
+      type: 'number'
+    max_ttl:
+      type: 'number'
+    error_page_path:
+      type: 'string'
+      nullable: True
+
+cf_origins_config: &cf_origins_config
+  type: 'dict'
+  nullable: True
+  schema:
+    domain_name:
+      type: 'string'
+      nullable: False
+    origin_id:
+      type: 'string'
+      nullable: False
+    origin_policy:
+      type: 'dict'
+      schema:
+        is_s3:
+          type: 'boolean'
+          nullable: True
+        origin_access_identity:
+          type: 'string'
+          nullable: True
+        origin_protocol_policy:
+          type: 'string'
+          nullable: True
+        http_port:
+          type: 'number'
+        https_port:
+          type: 'number'
+        origin_ssl_protocols:
+          type: 'list'
+          schema:
+            type: 'string'
+            allowed:
+             - 'TLSv1'
+             - 'TLSv1.1'
+             - 'TLSv1.2'
+
+cf_cache_behaviors_config: &cf_cache_behaviors_config
+  type: 'dict'
+  nullable: True
+  schema:
+    path_pattern:
+      type: 'string'
+      nullable: True
+    allowed_methods:
+      type: 'list'
+      schema:
+        type: 'string'
+        allowed:
+         - 'GET'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'POST'
+         - 'PUT'
+         - 'PATCH'
+    cached_methods:
+      type: 'list'
+      schema:
+        type: 'string'
+        allowed:
+         - 'GET'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'POST'
+         - 'PUT'
+         - 'PATCH'
+    target_origin_id:
+      type: 'string'
+      nullable: False
+    forward_cookies:
+      type: 'string'
+      nullable: True
+      empty: True
+    viewer_protocol_policy:
+      type: 'string'
+      allowed:
+       - 'allow-all'
+       - 'redirect-to-https'
+       - 'https-only'
+    min_ttl:
+      type: 'number'
+    default_ttl:
+      type: 'number'
+    max_ttl:
+      type: 'number'
+    trusted_signers:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
   empty: False
@@ -394,3 +551,14 @@ database_units: # A list of database units to create. Security groups, Database 
     schema:
       unit_title: *unit_title # A string containing the title of this autoscaling unit.
       database_config: *database_config #nested dictionary containing database specific configuration
+
+cf_distribution_units:  # A list of Cloudfront distributions to create. Origins, cache behaviors, default cache behavior will be created for each of these units
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:  *unit_title # A string containing the title of this distribution unit.
+      cf_cache_behaviors_config: *cf_cache_behaviors_config # nested dictionary containing cache behaviors for this distribution
+      cf_origins_config: *cf_origins_config # nested dictionary containing origins that this distribution is linked to
+      cf_distribution_config: *cf_distribution_config  # dictionary containing default cache behavior for this distribution

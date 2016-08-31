@@ -2,10 +2,10 @@
 
 from troposphere import cloudfront, Ref, Tags, Template
 
-from amazonia.classes.cfdistribution import CFDistribution
-from amazonia.classes.cfdistribution_config import CFDistributionConfig
-from amazonia.classes.cforigins_config import CFOriginsConfig
-from amazonia.classes.cfcache_behaviors_config import CFCacheBehaviors
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_cache_behaviors_config import CFCacheBehaviors
 
 
 def main():
@@ -78,11 +78,11 @@ def main():
         error_page_path='index.html',
     )
 
-    CFDistribution(title='cfdist',
+    CFDistributionUnit(unit_title='cfdist',
                    template=template,
-                   cforigins_config=origins,
-                   cfcache_behaviors_config=cache_behaviors,
-                   cfdistribution_config=distribution_config)
+                   cf_origins_config=origins,
+                   cf_cache_behaviors_config=cache_behaviors,
+                   cf_distribution_config=distribution_config)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

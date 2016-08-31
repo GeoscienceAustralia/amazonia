@@ -89,6 +89,7 @@ class Yaml(object):
                 value = cofm.constructor(**complex_params)
         # if simple field, return the user value or if not set the corresponding default value
         else:
+            print(current_key)
             value = user_values.get(current_key, default_values[current_key])
         return value
 
