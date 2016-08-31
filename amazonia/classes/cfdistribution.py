@@ -27,21 +27,21 @@ class CFDistribution(object):
         self.add_cache_behaviors(title, cfcache_behaviors_config)
 
         # Set distribution-wide parameters
-        cfdist_params = {
-            'Aliases' : cfdistribution_config.aliases,
-            'Comment' : self.title,
-            'DefaultCacheBehavior' : self.default_cache_behavior,
-            'CacheBehaviors' : self.cache_behaviors,
-            'DefaultRootObject' : cfdistribution_config.default_root_object,
-            'Enabled' : True,
-            'Origins' : self.origins,
-            'PriceClass' : cfdistribution_config.price_class,
-        }
+        self.cf_dist = cloudfront.DistributionConfig(
+            self.title,
+            Aliases=cfdistribution_config.aliases,
+            Comment=self.title,
+            DefaultCacheBehavior=self.default_cache_behavior,
+            CacheBehaviors=self.cache_behaviors,
+            DefaultRootObject=cfdistribution_config.default_root_object,
+            Enabled=cfdistribution_config.enabled,
+            Origins=self.origins,
+            PriceClass=cfdistribution_config.price_class
+        )
 
-        self.cf_dist = template.add_resource(cloudfront.DistributionConfig(
-                self.title,
-                # TODO: unpack cfdist_params
-                **cfdist_params
+        self.cf_dist = template.add_resource(cloudfront.Distribution(
+            self.title,
+            DistributionConfig=self.cf_dist
             )
         )
 
