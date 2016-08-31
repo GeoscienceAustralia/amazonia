@@ -30,7 +30,7 @@
 #
 # See following list for values that can be provided.
 #
-# stack_key_list = ['stack_title',
+# stack_key_list = [
 #                       'code_deploy_service_role',
 #                       'keypair',
 #                       'availability_zones',
@@ -136,25 +136,62 @@ elb_config: &elb_config
       nullable: True
       regex: '^arn:aws:'
 
-block_devices_config: &block_devices_config
-  type: 'list'
+simple_scaling_policy_config: &simple_scaling_policy_config
+  type: 'dict'
   schema:
-    type: 'dict'
-    schema:
-      device_name:  # Device name of disk
-        type: 'string'
-      ebs_volume_size:  # Size of disk
-        type: 'string'
-      ebs_volume_type:  # type of disk
-        type:
-          - 'number'
-          - 'string'
-      ebs_encrypted:  # Encryption enabled True or false
-        type: 'boolean'
-      ebs_snapshot_id:  # Snapshot ID
-        type: 'string'
-      virtual_name:  # Virual disk enabled True or False
-        type: 'boolean'
+    name:
+      type: 'string'
+    description:
+      type: 'string'
+    metric_name:
+      type: 'string'
+    comparison_operator:
+      type: 'string'
+      allowed:
+       - 'GreaterThanOrEqualToThreshold'
+       - 'GreaterThanThreshold'
+       - 'LessThanThreshold'
+       - 'LessThanOrEqualToThreshold'
+    threshold:
+      type:
+       - 'string'
+    evaluation_periods:
+      type:
+       - 'number'
+       - 'string'
+    period:
+      type:
+       - 'number'
+       - 'string'
+    scaling_adjustment:
+      type:
+       - 'number'
+       - 'string'
+    cooldown:
+      type:
+       - 'number'
+       - 'string'
+
+block_devices_config: &block_devices_config
+  type: 'dict'
+  schema:
+    device_name:  # Device name of disk
+      type: 'string'
+    ebs_volume_size:  # Size of disk
+      nullable: True
+      type: 'string'
+    ebs_volume_type:  # type of disk
+      nullable: True
+      type:
+        - 'number'
+        - 'string'
+    ebs_encrypted:  # Encryption enabled True or false
+      type: 'boolean'
+    ebs_snapshot_id:  # Snapshot ID
+      nullable: True
+      type: 'string'
+    virtual_name:  # Virual disk enabled True or False
+      type: 'boolean'
 
 asg_config: &asg_config
   type: 'dict'
@@ -195,7 +232,17 @@ asg_config: &asg_config
       type: 'string'
       nullable: True
     iam_instance_profile_arn: *iam_instance_profile_arn # A string specifying an instance IAM role for this specific autoscaling group by its ARN
-    block_devices_config: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
+    block_devices_config:
+      type: 'list'
+      nullable: True
+      schema: *block_devices_config # the size for the hard drive of the instances on this autocaling unit
+    simple_scaling_policy_config:
+      type: 'list'
+      nullable: True
+      schema: *simple_scaling_policy_config # any scaling policies based upon cpu usage
+
+blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
+green_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
 
 database_config: &database_config
   type: 'dict'
@@ -244,10 +291,6 @@ database_config: &database_config
       nullable: True
       regex: '^(standard|gp2)$'
 
-stack_title: # A string containing the name of the cloud formation stack.
-  type: 'string'
-  empty: False
-  regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
   empty: False

@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
-from troposphere import Base64, codedeploy, Ref, Join, Output
-from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
-from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
-
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
 from amazonia.classes.block_devices import Bdm
+from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.util import get_cf_friendly_name
+from troposphere import Base64, codedeploy, Ref, Join, Output
+from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
+from troposphere.autoscaling import ScalingPolicy
+from troposphere.cloudwatch import MetricDimension, Alarm
+from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
 
 
 class Asg(SecurityEnabledObject):
@@ -17,7 +19,6 @@ class Asg(SecurityEnabledObject):
         :param network_config: object containing network related config
         :param asg_config: object containing asg related config
         :param load_balancers: list of load balancers to associate autoscaling group with
-        :param block_devices_config: List containing block device mappings
         """
         super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
 
@@ -27,6 +28,8 @@ class Asg(SecurityEnabledObject):
         self.lc = None
         self.cd_app = None
         self.cd_deploygroup = None
+        self.cw_alarms = []
+        self.scaling_polices = []
         self.create_asg(
             title=self.title,
             network_config=network_config,
@@ -65,11 +68,14 @@ class Asg(SecurityEnabledObject):
             DependsOn=network_config.nat.single.title
         ))
 
+        # Set cloud formation update policy to update
         self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
             AutoScalingRollingUpdate=AutoScalingRollingUpdate(
+                MinInstancesInService=0
             )
         )
 
+        # Set up SNS topic for autoscaling events if an SNS topic arn is supplied
         if asg_config.sns_topic_arn is not None:
             if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
                 self.trop_asg.NotificationConfigurations = [
@@ -78,13 +84,16 @@ class Asg(SecurityEnabledObject):
             else:
                 raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
 
+        # if there are any scaling policies specified, create and associated with ASG
+        if asg_config.simple_scaling_policy_config is not None:
+            for scaling_policy_config in asg_config.simple_scaling_policy_config:
+                self.create_simple_scaling_policy(scaling_policy_config=scaling_policy_config)
+
         self.trop_asg.LaunchConfigurationName = Ref(self.create_launch_config(
             title=title,
             asg_config=asg_config,
             network_config=network_config
         ))
-        if asg_config.userdata is None:
-            self.lc.UserData = ''
 
     def create_launch_config(self, title, asg_config, network_config):
         """
@@ -111,12 +120,72 @@ class Asg(SecurityEnabledObject):
             KeyName=network_config.keypair,
             SecurityGroups=[Ref(self.security_group.name)],
         ))
+
         if asg_config.iam_instance_profile_arn is not None:
             self.lc.IamInstanceProfile = asg_config.iam_instance_profile_arn
-        self.lc.UserData = Base64(asg_config.userdata)
 
-        self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
+        # Userdata must be a valid string
+        if asg_config.userdata is None:
+            self.lc.UserData = ''
+        else:
+            self.lc.UserData = Base64(asg_config.userdata)
+
+        # If block devices have been configured
+        if asg_config.block_devices_config is not None:
+            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
+
         return launch_config_title
+
+    def create_simple_scaling_policy(self, scaling_policy_config):
+        """
+        Simple scaling policy based upon ec2 metrics
+
+        heavy-load
+        cpu > 45 for 1 period of 300 seconds add two instances, 45 second cooldown
+
+        light-load
+        cpu <= 15 for 6 periods of 300 seconds remove one instance, 120 second cooldown
+
+        medium-load
+        cpu >= 25 for 1 period of 300 seconds add one instance, 45 second cooldown
+
+        [name]
+        [metric_name] [comparison_operator] [threshold] [evaluation_periods] [period] [scaling_adjustment] [cooldown]
+
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-policy.html
+        :param scaling_policy_config: simple scaling policy config object
+        """
+
+        cf_name = self.trop_asg.title + get_cf_friendly_name(scaling_policy_config.name)
+
+        scaling_policy = self.template.add_resource(ScalingPolicy(
+            title=cf_name + 'Sp',
+            AdjustmentType='ChangeInCapacity',
+            AutoScalingGroupName=Ref(self.trop_asg),
+            Cooldown=scaling_policy_config.cooldown,
+            ScalingAdjustment=scaling_policy_config.scaling_adjustment,
+        ))
+
+        self.scaling_polices.append(scaling_policy)
+
+        self.cw_alarms.append(self.template.add_resource(Alarm(
+            title=cf_name + 'Cwa',
+            AlarmActions=[Ref(scaling_policy)],
+            AlarmDescription=scaling_policy_config.description,
+            AlarmName=cf_name,
+            ComparisonOperator=scaling_policy_config.comparison_operator,
+            Dimensions=[MetricDimension(
+                Name='AutoScalingGroupName',
+                Value=Ref(self.trop_asg)
+            )],
+            EvaluationPeriods=scaling_policy_config.evaluation_periods,
+            MetricName=scaling_policy_config.metric_name,
+            Namespace='AWS/EC2',
+            Period=scaling_policy_config.period,
+            Statistic='Average',
+            Threshold=scaling_policy_config.threshold
+        )))
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):
         """

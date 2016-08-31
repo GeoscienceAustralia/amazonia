@@ -103,7 +103,6 @@ def create_subnet(**kwargs):
     cidr = '10.0.{0}.0/24'.format(str(third_octect))
     subnet = Subnet(az=kwargs['az'],
                     template=template,
-                    stack_title='MyStack',
                     route_table=kwargs['route_table'],
                     cidr=cidr,
                     is_public=kwargs['is_public'],

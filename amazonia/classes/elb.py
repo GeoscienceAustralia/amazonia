@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
 import troposphere.elasticloadbalancing as elb
-from troposphere import Tags, Ref, Output, Join, GetAtt, route53
-
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from troposphere import Tags, Ref, Output, Join, GetAtt, route53
 
 
 class Elb(SecurityEnabledObject):
@@ -58,30 +57,36 @@ class Elb(SecurityEnabledObject):
                                          '-',
                                          self.title])
             )
-
+        self.elb_r53 = None
         if elb_config.unit_hosted_zone_name:
-            self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
-                self.title + 'R53',
-                HostedZoneName=elb_config.unit_hosted_zone_name,
-                RecordSets=[route53.RecordSet(
-                    Name=Join('', [Ref('AWS::StackName'),
-                                   '-',
-                                   self.title,
-                                   '.',
-                                   elb_config.unit_hosted_zone_name]),
-                    AliasTarget=route53.AliasTarget(dnsname=GetAtt(self.trop_elb, 'DNSName'),
-                                                    hostedzoneid=GetAtt(self.trop_elb, 'CanonicalHostedZoneNameID')),
-                    Type='A')]))
-
-            self.template.add_output(Output(
-                self.trop_elb.title,
-                Description='URL of the {0} ELB'.format(self.title),
-                Value=Join('', ['http://', self.elb_r53.RecordSets[0].Name])
-            ))
-
+            self.create_r53_record(elb_config.unit_hosted_zone_name)
         else:
             self.template.add_output(Output(
                 self.trop_elb.title,
                 Description='URL of the {0} ELB'.format(self.title),
                 Value=Join('', ['http://', GetAtt(self.trop_elb, 'DNSName')])
             ))
+
+    def create_r53_record(self, hosted_zone_name):
+        """
+        Function to create r53 recourdset to associate with ELB
+        :param hosted_zone_name: R53 hosted zone to create record in
+        """
+        self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
+            self.title + 'R53',
+            HostedZoneName=hosted_zone_name,
+            RecordSets=[route53.RecordSet(
+                Name=Join('', [Ref('AWS::StackName'),
+                               '-',
+                               self.title,
+                               '.',
+                               hosted_zone_name]),
+                AliasTarget=route53.AliasTarget(dnsname=GetAtt(self.trop_elb, 'DNSName'),
+                                                hostedzoneid=GetAtt(self.trop_elb, 'CanonicalHostedZoneNameID')),
+                Type='A')]))
+
+        self.template.add_output(Output(
+            self.trop_elb.title,
+            Description='URL of the {0} ELB'.format(self.title),
+            Value=Join('', ['http://', self.elb_r53.RecordSets[0].Name])
+        ))

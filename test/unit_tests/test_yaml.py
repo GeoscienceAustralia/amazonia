@@ -3,7 +3,10 @@
 import os
 
 import yaml
-from amazonia.classes.yaml import Yaml, InsecureVariableError
+from amazonia.classes.asg_config import InvalidAsgConfigError
+from amazonia.classes.util import InsecureVariableError
+from amazonia.classes.yaml import Yaml
+from amazonia.classes.yaml_fields import YamlFields
 from cerberus import ValidationError
 from nose.tools import *
 
@@ -48,14 +51,13 @@ def test_complete_valid_values():
 
     # Assert that there are no invalid stack keys
     stack_input_set = set(stack_input)
-    expected_stack_set = set(Yaml.stack_key_list)
+    expected_stack_set = set(YamlFields.stack_key_list)
     assert_equals(len(stack_input_set.difference(expected_stack_set)), 0)
 
     # Assert that there are no stack keys we missed
     assert_equals(len(expected_stack_set.difference(stack_input_set)), 0)
 
     # Assert correct values
-    assert_equals(stack_input['stack_title'], 'testStack')
     assert_equals(stack_input['code_deploy_service_role'], 'arn:aws:iam::1234567890123:role/CodeDeployServiceRole')
     assert_equals(stack_input['keypair'], 'key')
     assert_list_equal(stack_input['availability_zones'], ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])
@@ -80,39 +82,35 @@ def test_complete_valid_values():
 
     # Assert that there are no invalid autoscaling unit keys
     autoscaling_unit_input_set = set(autoscaling_unit_input.keys())
-    expected_autoscaling_unit_set = set(Yaml.unit_key_list['autoscaling_units'])
+    expected_autoscaling_unit_set = set(YamlFields.autoscaling_unit_key_list)
     assert_equals(len(autoscaling_unit_input_set.difference(expected_autoscaling_unit_set)), 0)
 
     # Assert that there are no autoscaling unit keys we missed
     assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
 
     assert_equals(autoscaling_unit_input['unit_title'], 'app1')
-    assert_equals(autoscaling_unit_input['asg_config']['image_id'], 'ami-dc361ebf')
-    assert_equals(autoscaling_unit_input['asg_config']['instance_type'], 't2.micro')
-    assert_equals(autoscaling_unit_input['elb_config']['elb_health_check'], 'HTTP:80/index.html')
-    assert_list_equal(autoscaling_unit_input['elb_config']['instance_protocol'], ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancer_protocol'], ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['elb_config']['loadbalancer_port'], ['80'])
-    assert_list_equal(autoscaling_unit_input['elb_config']['instance_port'], ['80'])
-    assert_equals(autoscaling_unit_input['asg_config']['minsize'], '1')
-    assert_equals(autoscaling_unit_input['asg_config']['maxsize'], '1')
-    assert_equals(autoscaling_unit_input['asg_config']['health_check_grace_period'], '300')
-    assert_equals(autoscaling_unit_input['asg_config']['iam_instance_profile_arn'],
+    assert_equals(autoscaling_unit_input['asg_config'].image_id, 'ami-dc361ebf')
+    assert_equals(autoscaling_unit_input['asg_config'].instance_type, 't2.micro')
+    assert_equals(autoscaling_unit_input['elb_config'].elb_health_check, 'HTTP:80/index.html')
+    assert_list_equal(autoscaling_unit_input['elb_config'].instance_protocol, ['HTTP'])
+    assert_list_equal(autoscaling_unit_input['elb_config'].loadbalancer_protocol, ['HTTP'])
+    assert_list_equal(autoscaling_unit_input['elb_config'].loadbalancer_port, ['80'])
+    assert_list_equal(autoscaling_unit_input['elb_config'].instance_port, ['80'])
+    assert_equals(autoscaling_unit_input['asg_config'].minsize, '1')
+    assert_equals(autoscaling_unit_input['asg_config'].maxsize, '1')
+    assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
+    assert_equals(autoscaling_unit_input['asg_config'].iam_instance_profile_arn,
                   'arn:aws:iam::1234567890124:role/InstanceProfile')
-    assert_equals(autoscaling_unit_input['asg_config']['sns_topic_arn'], 'sns_topic_arn')
-    assert_equals(autoscaling_unit_input['asg_config']['sns_notification_types'],
+    assert_equals(autoscaling_unit_input['asg_config'].sns_topic_arn, 'sns_topic_arn')
+    assert_equals(autoscaling_unit_input['asg_config'].sns_notification_types,
                   ['autoscaling:EC2_INSTANCE_LAUNCH',
                    'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                    'autoscaling:EC2_INSTANCE_TERMINATE',
                    'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
-    assert_equals(autoscaling_unit_input['elb_config']['elb_log_bucket'], 'elb_log_bucket')
-    assert_equals(autoscaling_unit_input['asg_config']['health_check_type'], 'ELB')
+    assert_equals(autoscaling_unit_input['elb_config'].elb_log_bucket, 'elb_log_bucket')
+    assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])
-    assert_equals(autoscaling_unit_input['elb_config']['unit_hosted_zone_name'], 'test.org.')
-
-    # Assert that unit is picking up the stack_hosted_zone_name if unit_hosted_zone_name isn't provided
-    assert_equals(stack_input['autoscaling_units'][0]['elb_config']['unit_hosted_zone_name'],
-                  stack_input['stack_hosted_zone_name'])
+    assert_equals(autoscaling_unit_input['elb_config'].unit_hosted_zone_name, None)
 
     database_unit_input = stack_input['database_units'][0]
 
@@ -121,17 +119,17 @@ def test_complete_valid_values():
 
     # Assert that there are no invalid database unit keys
     database_unit_input_set = set(database_unit_input)
-    expected_database_unit_set = set(Yaml.unit_key_list['database_units'])
+    expected_database_unit_set = set(YamlFields.database_unit_key_list)
     assert_equals(len(database_unit_input_set.difference(expected_database_unit_set)), 0)
 
     # Assert that there are no database unit keys we missed
     assert_equals(len(expected_database_unit_set.difference(database_unit_input_set)), 0)
 
     assert_equals(database_unit_input['unit_title'], 'db1')
-    assert_equals(database_unit_input['database_config']['db_instance_type'], 'db.m1.small')
-    assert_equals(database_unit_input['database_config']['db_engine'], 'postgres')
-    assert_equals(database_unit_input['database_config']['db_port'], '5432')
-    assert_equals(database_unit_input['database_config']['db_name'], 'myDb')
+    assert_equals(database_unit_input['database_config'].db_instance_type, 'db.m1.small')
+    assert_equals(database_unit_input['database_config'].db_engine, 'postgres')
+    assert_equals(database_unit_input['database_config'].db_port, '5432')
+    assert_equals(database_unit_input['database_config'].db_name, 'myDb')
 
 
 @with_setup(setup_resources)
@@ -193,16 +191,5 @@ def test_invalid_min_max_asg():
     global default_data
     invalid_min_max_stack_data = open_yaml_file('test_yaml_invalid_min_max_asg.yaml')
 
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_min_max_stack_data,
-                                            'default_data': default_data})
-
-
-def test_detect_unencrypted_access_keys():
-    """
-    Detect unencrypted AWS access ID and AWS secret key
-    """
-    assert_raises(InsecureVariableError, Yaml.detect_unencrypted_access_keys,
-                  **{'userdata': '9VJrJAil2XtEC/B7g+Y+/Fmerk3iqyDH/UIhKjXk'})
-
-    assert_raises(InsecureVariableError, Yaml.detect_unencrypted_access_keys,
-                  **{'userdata': 'AKI3ISW6DFTLGVWEDYMQ'})
+    assert_raises(InvalidAsgConfigError, Yaml, **{'user_stack_data': invalid_min_max_stack_data,
+                                                  'default_data': default_data})
