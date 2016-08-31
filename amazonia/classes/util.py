@@ -45,7 +45,7 @@ def detect_unencrypted_access_keys(userdata):
 
 class InsecureVariableError(Exception):
     """
-    Exception if aws access ud ir aws secret key is detected in userdata
+    Exception if aws access id or aws secret key is detected in userdata
     """
     def __init__(self, value):
         self.value = value
