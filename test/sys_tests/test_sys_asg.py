@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
 import troposphere.elasticloadbalancing as elb
-from troposphere import ec2, Ref, Template
-
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
-from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
+from troposphere import ec2, Ref, Template
 
 
 def main():
@@ -51,25 +51,61 @@ runcmd:
                                                            Scheme='internet-facing',
                                                            Subnets=[Ref(subnet) for subnet in subnets]))
 
+    class Single(object):
+        def __init__(self):
+            self.single = ec2.Instance('title')
+
     network_config = NetworkConfig(
         vpc=vpc,
         private_subnets=subnets,
         public_subnets=None,
         jump=None,
-        nat=None,
+        nat=Single(),
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair='pipeline',
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
     )
 
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
+                                               ebs_volume_size='15',
+                                               ebs_volume_type='gp2',
+                                               ebs_encrypted=False,
+                                               ebs_snapshot_id=None,
+                                               virtual_name=False)]
+
+    simple_scaling_policy_config = [
+        SimpleScalingPolicyConfig(name='heavy - load',
+                                  description='When under heavy CPU load for five minutes, add two instances, '
+                                              'wait 45 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='GreaterThanThreshold',
+                                  threshold='45',
+                                  evaluation_periods=1,
+                                  period=300,
+                                  scaling_adjustment=1,
+                                  cooldown=45),
+        SimpleScalingPolicyConfig(name='light - load',
+                                  description='When under light CPU load for 6 consecutive periods of five minutes,'
+                                              ' remove one instance, wait 120 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='LessThanOrEqualToThreshold',
+                                  threshold='15',
+                                  evaluation_periods=6,
+                                  period=300,
+                                  scaling_adjustment=-1,
+                                  cooldown=120),
+        SimpleScalingPolicyConfig(name='medium - load',
+                                  description='When under medium CPU load for five minutes, add one instance, '
+                                              'wait 45 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='GreaterThanOrEqualToThreshold',
+                                  threshold='25',
+                                  evaluation_periods=1,
+                                  period=300,
+                                  scaling_adjustment=1,
+                                  cooldown=120)
+    ]
 
     asg_config = AsgConfig(
         image_id='ami-dc361ebf',
@@ -85,7 +121,8 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                 'autoscaling:EC2_INSTANCE_TERMINATE',
                                 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=simple_scaling_policy_config
     )
 
     Asg(title='simple',

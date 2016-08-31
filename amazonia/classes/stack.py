@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 
-from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
-from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
-from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -15,7 +12,7 @@ from troposphere import Ref, Template, ec2, Tags, Join
 
 
 class Stack(object):
-    def __init__(self, stack_title, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
+    def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
                  nat_alerting):
@@ -25,7 +22,6 @@ class Stack(object):
         AWS CloudFormation -
          http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
-        :param stack_title: name of stack
         :param code_deploy_service_role: ARN to code deploy IAM role
         :param keypair: ssh keypair to be used throughout stack
         :param availability_zones: availability zones to use
@@ -38,7 +34,7 @@ class Stack(object):
         :param nat_image_id: AMI for nat
         :param nat_instance_type: instance type for nat
         :param zd_autoscaling_units: list of zd_autosclaing_unit dicts
-        :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, path2ping, minsize,
+        :param autoscaling_units: list of autoscaling_unit dicts (unit_title, protocol, port, elb_health_check, minsize,
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of dabase_unit dicts (db_instance_type, db_engine, db_port)
         :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
@@ -49,7 +45,6 @@ class Stack(object):
         """
 
         super(Stack, self).__init__()
-        self.title = stack_title
         self.template = Template()
         self.code_deploy_service_role = code_deploy_service_role
         self.keypair = keypair
@@ -67,7 +62,7 @@ class Stack(object):
         self.public_subnets = []
 
         # Add VPC and Internet Gateway with Attachment
-        vpc_name = self.title + 'Vpc'
+        vpc_name = 'Vpc'
         self.vpc = self.template.add_resource(
             ec2.VPC(
                 vpc_name,
@@ -79,24 +74,25 @@ class Stack(object):
                 )
             ))
 
-        ig_name = self.title + 'Ig'
+        ig_name = 'Ig'
         self.internet_gateway = self.template.add_resource(
-            ec2.InternetGateway(ig_name, Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', ig_name]))))
-        self.internet_gateway.DependsOn = self.vpc.title
+            ec2.InternetGateway(ig_name,
+                                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', ig_name])),
+                                DependsOn=self.vpc.title))
 
         self.gateway_attachment = self.template.add_resource(
             ec2.VPCGatewayAttachment(self.internet_gateway.title + 'Atch',
                                      VpcId=Ref(self.vpc),
-                                     InternetGatewayId=Ref(self.internet_gateway)))
-        self.gateway_attachment.DependsOn = self.internet_gateway.title
+                                     InternetGatewayId=Ref(self.internet_gateway),
+                                     DependsOn=self.internet_gateway.title))
 
         # Add Public and Private Route Tables
-        public_rt_name = self.title + 'PubRt'
+        public_rt_name = 'PubRt'
         self.public_route_table = self.template.add_resource(
             ec2.RouteTable(public_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', public_rt_name]))))
 
-        private_rt_name = self.title + 'PriRt'
+        private_rt_name = 'PriRt'
         self.private_route_table = self.template.add_resource(
             ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
@@ -104,14 +100,12 @@ class Stack(object):
         # Add Public and Private Subnets
         for az in self.availability_zones:
             self.private_subnets.append(Subnet(template=self.template,
-                                               stack_title=self.title,
                                                route_table=self.private_route_table,
                                                az=az,
                                                vpc=self.vpc,
                                                is_public=False,
                                                cidr=self.generate_subnet_cidr(is_public=False)).trop_subnet)
             self.public_subnets.append(Subnet(template=self.template,
-                                              stack_title=self.title,
                                               route_table=self.public_route_table,
                                               az=az,
                                               vpc=self.vpc,
@@ -135,7 +129,7 @@ class Stack(object):
 
         # Add Jumpbox and NAT and associated security group ingress and egress rules
         self.jump = SingleInstance(
-            title=self.title + 'Jump',
+            title='Jump',
             template=self.template,
             single_instance_config=jump_config
         )
@@ -158,23 +152,23 @@ class Stack(object):
         )
 
         self.nat = SingleInstance(
-            title=self.title + 'Nat',
+            title='Nat',
             template=self.template,
             single_instance_config=nat_config
         )
 
         # Add Routes
-        self.public_route = self.template.add_resource(ec2.Route(self.title + 'PubRtInboundRoute',
+        self.public_route = self.template.add_resource(ec2.Route('PubRtInboundRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
                                                                  RouteTableId=Ref(self.public_route_table),
-                                                                 DestinationCidrBlock=self.public_cidr['cidr']))
-        self.public_route.DependsOn = self.gateway_attachment.title
+                                                                 DestinationCidrBlock=self.public_cidr['cidr'],
+                                                                 DependsOn=self.gateway_attachment.title))
 
-        self.private_route = self.template.add_resource(ec2.Route(self.title + 'PriRtOutboundRoute',
+        self.private_route = self.template.add_resource(ec2.Route('PriRtOutboundRoute',
                                                                   InstanceId=Ref(self.nat.single),
                                                                   RouteTableId=Ref(self.private_route_table),
-                                                                  DestinationCidrBlock=self.public_cidr['cidr']))
-        self.private_route.DependsOn = self.gateway_attachment.title
+                                                                  DestinationCidrBlock=self.public_cidr['cidr'],
+                                                                  DependsOn=self.gateway_attachment.title))
 
         self.network_config = NetworkConfig(vpc=self.vpc,
                                             public_subnets=self.public_subnets,
@@ -187,63 +181,31 @@ class Stack(object):
                                             cd_service_role_arn=self.code_deploy_service_role
                                             )
         # Add ZD Autoscaling Units
-        for unit in self.zd_autoscaling_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: zd_autoscaling unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            # Update unit title with stackname prefix
-            unit['unit_title'] = self.title + orig_unit_title
-            elb_config = ElbConfig(**unit['elb_config'])
+        self.add_units(self.zd_autoscaling_units, ZdAutoscalingUnit)
 
-            blue_asg_config = AsgConfig(**unit['blue_asg_config'])
-            green_asg_config = AsgConfig(**unit['green_asg_config'])
-            self.units[orig_unit_title] = ZdAutoscalingUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                elb_config=elb_config,
-                blue_asg_config=blue_asg_config,
-                green_asg_config=green_asg_config,
-                dependencies=unit['dependencies']
-            )
         # Add Autoscaling Units
-        for unit in self.autoscaling_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: autoscaling unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            # Update unit title with stackname prefix
-            unit['unit_title'] = self.title + orig_unit_title
-            elb_config = ElbConfig(**unit['elb_config'])
-            asg_config = AsgConfig(**unit['asg_config'])
-            self.units[orig_unit_title] = AutoscalingUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                elb_config=elb_config,
-                asg_config=asg_config,
-                dependencies=unit['dependencies']
-            )
+        self.add_units(self.autoscaling_units, AutoscalingUnit)
+
         # Add Database Units
-        for unit in self.database_units:  # type: dict
-            orig_unit_title = unit['unit_title']
-            if orig_unit_title in self.units:
-                raise DuplicateUnitNameError("Error: database unit name '{0}' has already been specified, "
-                                             'it must be unique.'.format(orig_unit_title))
-            unit['unit_title'] = self.title + orig_unit_title
-            database_config = DatabaseConfig(**unit['database_config'])
-            self.units[orig_unit_title] = DatabaseUnit(
-                unit_title=unit['unit_title'],
-                template=self.template,
-                network_config=self.network_config,
-                database_config=database_config
-            )
+        self.add_units(self.database_units, DatabaseUnit)
+
         # Add Unit flow
         for unit_name in self.units:
             dependencies = self.units[unit_name].get_dependencies()
             for dependency in dependencies:
                 self.units[unit_name].add_unit_flow(self.units[dependency])
+
+    def add_units(self, unit_list, unit_constructor):
+        for unit in unit_list:  # type: dict
+            unit_title = unit['unit_title']
+            if unit_title in self.units:
+                raise DuplicateUnitNameError("Error: unit name '{0}' has already been specified, "
+                                             'it must be unique.'.format(unit_title))
+            self.units[unit_title] = unit_constructor(
+                template=self.template,
+                network_config=self.network_config,
+                **unit
+            )
 
     def generate_subnet_cidr(self, is_public):
         """

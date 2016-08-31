@@ -1,11 +1,13 @@
 import troposphere.elasticloadbalancing as elb
 from nose.tools import *
 from troposphere import ec2, Ref, Template, Join, Base64
+from troposphere.policies import AutoScalingRollingUpdate
 
 from amazonia.classes.asg import Asg, MalformedSNSError
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 
 template = asg_config = elb_config = network_config = load_balancer = None
 
@@ -17,13 +19,46 @@ def setup_resources():
     global template, asg_config, elb_config, network_config, load_balancer
     template = Template()
 
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(
+        device_name='/dev/xvda',
+        ebs_volume_size='15',
+        ebs_volume_type='gp2',
+        ebs_encrypted=False,
+        ebs_snapshot_id='',
+        virtual_name=False)]
+
+    simple_scaling_policy_config = [
+        SimpleScalingPolicyConfig(name='heavy - load',
+                                  description='When under heavy CPU load for five minutes, add two instances, '
+                                              'wait 45 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='GreaterThanThreshold',
+                                  threshold='45',
+                                  evaluation_periods=1,
+                                  period=300,
+                                  scaling_adjustment=1,
+                                  cooldown=45),
+        SimpleScalingPolicyConfig(name='light - load',
+                                  description='When under light CPU load for 6 consecutive periods of five minutes,'
+                                              ' remove one instance, wait 120 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='LessThanOrEqualToThreshold',
+                                  threshold='15',
+                                  evaluation_periods=6,
+                                  period=300,
+                                  scaling_adjustment=-1,
+                                  cooldown=120),
+        SimpleScalingPolicyConfig(name='medium - load',
+                                  description='When under medium CPU load for five minutes, add one instance, '
+                                              'wait 45 seconds',
+                                  metric_name='CPUUtilization',
+                                  comparison_operator='GreaterThanOrEqualToThreshold',
+                                  threshold='25',
+                                  evaluation_periods=1,
+                                  period=300,
+                                  scaling_adjustment=1,
+                                  cooldown=120)
+    ]
 
     asg_config = AsgConfig(
         userdata="""
@@ -47,7 +82,8 @@ runcmd:
                                 'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         maxsize=1,
         minsize=1,
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=simple_scaling_policy_config
     )
 
     vpc = ec2.VPC('MyVPC',
@@ -57,13 +93,18 @@ runcmd:
                         AvailabilityZone='ap-southeast-2a',
                         VpcId=Ref(vpc),
                         CidrBlock='10.0.1.0/24')
+
+    class Single(object):
+        def __init__(self):
+            self.single = ec2.Instance('title')
+
     network_config = NetworkConfig(
         vpc=ec2.VPC('MyVPC',
                     CidrBlock='10.0.0.0/16'),
         private_subnets=[subnet],
         public_subnets=[subnet],
         jump=None,
-        nat=None,
+        nat=Single(),
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair='pipeline',
@@ -124,6 +165,9 @@ def test_asg():
         assert_is(type(asg.cd_deploygroup.DeploymentGroupName), Join)
         [assert_is(type(cdasg), Ref) for cdasg in asg.cd_deploygroup.AutoScalingGroups]
         assert_equals(asg.cd_deploygroup.ServiceRoleArn, 'arn:aws:iam::12345678987654321:role/CodeDeployServiceRole')
+        assert_equals(len(asg.cw_alarms), 3)
+        assert_equals(len(asg.scaling_polices), 3)
+        assert_is(type(asg.trop_asg.resource['UpdatePolicy'].AutoScalingRollingUpdate), AutoScalingRollingUpdate)
 
 
 @with_setup(setup_resources)

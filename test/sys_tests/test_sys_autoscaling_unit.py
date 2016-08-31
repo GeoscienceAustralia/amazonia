@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 
-from troposphere import ec2, Ref, Template, Join, Tags
-
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.asg_config import AsgConfig
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.elb_config import ElbConfig
-from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
+from troposphere import ec2, Ref, Template, Join, Tags
 
 
 def main():
@@ -29,14 +28,15 @@ runcmd:
                                         CidrBlock='10.0.0.0/16'))
 
     internet_gateway = template.add_resource(
-        ec2.InternetGateway('igname', Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname']))))
-    internet_gateway.DependsOn = vpc.title
+        ec2.InternetGateway('igname',
+                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname'])),
+                            DependsOn=vpc.title))
 
     gateway_attachment = template.add_resource(
         ec2.VPCGatewayAttachment(internet_gateway.title + 'Atch',
                                  VpcId=Ref(vpc),
-                                 InternetGatewayId=Ref(internet_gateway)))
-    gateway_attachment.DependsOn = internet_gateway.title
+                                 InternetGatewayId=Ref(internet_gateway),
+                                 DependsOn=internet_gateway.title))
 
     private_subnets = [template.add_resource(ec2.Subnet('MySubnet',
                                                         AvailabilityZone='ap-southeast-2a',
@@ -85,23 +85,24 @@ runcmd:
         cd_service_role_arn=service_role_arn
     )
     elb_config = ElbConfig(
-        protocols=['HTTP'],
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        path2ping='/index.html',
+        instance_protocol=['HTTP'],
+        loadbalancer_protocol=['HTTP'],
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
     )
 
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False},
-    ]
+    block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
+                                               ebs_volume_size='15',
+                                               ebs_volume_type='gp2',
+                                               ebs_encrypted=False,
+                                               ebs_snapshot_id=None,
+                                               virtual_name=False)
+                            ]
 
     asg_config = AsgConfig(
         minsize=1,
@@ -114,7 +115,8 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=None
     )
 
     unit1 = AutoscalingUnit(

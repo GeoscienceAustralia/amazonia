@@ -8,7 +8,6 @@
 #   Multi line strings: can be used by establishing a literal block '|'
 
 # Stack values
-stack_title: 'myStack'
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 code_deploy_service_role:
 availability_zones:
@@ -55,28 +54,42 @@ database_config:
 # ELB default values
 elb_config:
   unit_hosted_zone_name:
-  protocols:
+  loadbalancer_protocol:
     - 'HTTP'
-  instanceports:
+  instance_protocol:
+    - 'HTTP'
+  instance_port:
     - '80'
-  loadbalancerports:
+  loadbalancer_port:
     - '80'
-  path2ping: '/index.html'
+  elb_health_check: 'HTTP:80/index.html'
   elb_log_bucket:
   public_unit: true
+  ssl_certificate_id:
 
 # Block device configs
-block_devices_config: &block_devices_config
-  -
-    device_name: '/dev/xvda'
-    ebs_volume_size: '8'
-    ebs_volume_type: 'standard'
-    ebs_encrypted: False
-    ebs_snapshot_id: ''
-    virtual_name: False
+block_devices_config:
+  device_name: '/dev/xvda'
+  ebs_volume_size: '8'
+  ebs_volume_type: 'standard'
+  ebs_encrypted: False
+  ebs_snapshot_id:
+  virtual_name: False
+
+# Simple scaling policy:
+simple_scaling_policy_config:
+  name: 'light load'
+  description: 'When under light CPU load for 6 consecutive periods of five minutes, remove one instance, wait 120 seconds'
+  metric_name: 'CPUUtilization'
+  comparison_operator: 'LessThanOrEqualToThreshold'
+  threshold: '15'
+  evaluation_periods: 6
+  period: 300
+  scaling_adjustment: -1
+  cooldown: 120
 
 # Asg default values
-asg_config:
+asg_config: &asg_config
   image_id: 'ami-dc361ebf'
   instance_type: 't2.micro'
   iam_instance_profile_arn:
@@ -84,7 +97,8 @@ asg_config:
   maxsize: '1'
   health_check_grace_period: '300'
   health_check_type: 'ELB'
-  block_devices_config: *block_devices_config
+  block_devices_config:
+  simple_scaling_policy_config:
   sns_topic_arn:
   sns_notification_types:
     - 'autoscaling:EC2_INSTANCE_LAUNCH'
@@ -110,4 +124,5 @@ asg_config:
     runcmd:
      - service httpd start
 
-
+blue_asg_config: *asg_config
+green_asg_config: *asg_config

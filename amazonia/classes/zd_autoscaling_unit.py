@@ -14,7 +14,7 @@ class ZdAutoscalingUnit(object):
          'MyStackApi2' or 'MyStackDataprocessing'
         :param template: Troposphere template to append resources to
         :param dependencies: list of unit names this unit needs access to
-        :param network_config: network related paramters including subnet, nat, jump, etc
+        :param network_config: network related parameters including subnet, nat, jump, etc
         :param elb_config: shared elb configuration
         :param blue_asg_config: configuration specific to the blue asg
         :param green_asg_config: configuration specific to the green asg
@@ -55,19 +55,19 @@ class ZdAutoscalingUnit(object):
 
         # create security group rules to allow communication between the two ELBS to the two ASGs
         [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_port]
         [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_port]
         [self.pre_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_port]
         [self.pre_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instanceports]
+         for instanceport in elb_config.instance_port]
 
         # create security group rules to allow traffic from the public to the loadbalancer
         [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancerports]
+         for loadbalancerport in elb_config.loadbalancer_port]
         [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancerports]
+         for loadbalancerport in elb_config.loadbalancer_port]
 
         # allow outbound traffic to the NAT
         self.green_asg.add_flow(receiver=network_config.nat, port='-1')
@@ -76,9 +76,6 @@ class ZdAutoscalingUnit(object):
         # allow inbound traffic from the jumphost
         network_config.jump.add_flow(receiver=self.blue_asg, port='22')
         network_config.jump.add_flow(receiver=self.green_asg, port='22')
-
-        self.blue_asg.trop_asg.DependsOn = network_config.nat.single.title
-        self.green_asg.trop_asg.DependsOn = network_config.nat.single.title
 
     def get_dependencies(self):
         """
@@ -96,7 +93,7 @@ class ZdAutoscalingUnit(object):
         """
         :return: return list of ports exposed by ELB for routing other unit's traffic
         """
-        return self.elb_config.loadbalancerports
+        return self.elb_config.loadbalancer_port
 
     def add_unit_flow(self, receiver):
         """

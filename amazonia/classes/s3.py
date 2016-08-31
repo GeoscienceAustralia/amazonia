@@ -50,4 +50,3 @@ class S3(object):
                                                                   Bucket=title,
                                                                   PolicyDocument=bucket_policy,
                                                                   DependsOn=[self.s3_b.title]))
-

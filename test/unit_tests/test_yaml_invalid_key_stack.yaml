@@ -2,7 +2,6 @@
 # Test Stack Yaml for Amazonia
 #
 
-stack_title: 'testStack'
 blah: 'should not be here'
 code_deploy_service_role: 'arn:aws:iam::1234567890124:role/CodeDeployServiceRole'
 keypair: 'key'

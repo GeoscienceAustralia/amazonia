@@ -1,12 +1,12 @@
-from nose.tools import *
-from troposphere import ec2, Ref, Template
-
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from nose.tools import *
+from troposphere import ec2, Ref, Template
 
 template = elb_config = network_config = common_asg_config = block_devices_config = None
 
@@ -14,13 +14,13 @@ template = elb_config = network_config = common_asg_config = block_devices_confi
 def setup_resources():
     """ Setup global variables between tests"""
     global template, elb_config, network_config, common_asg_config, block_devices_config
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(
+        device_name='/dev/xvda',
+        ebs_volume_size='15',
+        ebs_volume_type='gp2',
+        ebs_encrypted=False,
+        ebs_snapshot_id=None,
+        virtual_name=False)]
 
     userdata = """
 #cloud-config
@@ -67,15 +67,24 @@ runcmd:
     jump = SingleInstance(title='Jump',
                           template=template,
                           single_instance_config=single_instance_config)
-    network_config = NetworkConfig(jump=jump, nat=nat, private_subnets=private_subnets, public_subnets=public_subnets,
-                                   vpc=vpc, public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
+    network_config = NetworkConfig(jump=jump,
+                                   nat=nat,
+                                   private_subnets=private_subnets,
+                                   public_subnets=public_subnets,
+                                   vpc=vpc,
+                                   public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
                                    stack_hosted_zone_name=None,
                                    keypair='pipeline',
                                    cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK')
-    elb_config = ElbConfig(elb_log_bucket=None, protocols=['HTTP'],
-                           instanceports=['80'],
-                           loadbalancerports=['80'], path2ping='index.html', public_unit=True,
-                           unit_hosted_zone_name=None)
+    elb_config = ElbConfig(elb_log_bucket=None,
+                           loadbalancer_protocol=['HTTP'],
+                           instance_protocol=['HTTP'],
+                           instance_port=['80'],
+                           loadbalancer_port=['80'],
+                           elb_health_check='HTTP:80/index.html',
+                           public_unit=True,
+                           unit_hosted_zone_name=None,
+                           ssl_certificate_id=None)
     common_asg_config = AsgConfig(
         minsize=1,
         maxsize=1,
@@ -87,7 +96,9 @@ runcmd:
         iam_instance_profile_arn=None,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config)
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=None
+    )
 
 
 @with_setup(setup_resources)
@@ -97,7 +108,8 @@ def test_autoscaling_unit():
     title = 'app'
     blue_asg_config = common_asg_config
     green_asg_config = common_asg_config
-    unit = create_zdtd_autoscaling_unit(unit_title=title, blue_asg_config=blue_asg_config,
+    unit = create_zdtd_autoscaling_unit(unit_title=title,
+                                        blue_asg_config=blue_asg_config,
                                         green_asg_config=green_asg_config)
     assert_equals(unit.green_asg.trop_asg.title, 'green' + title + 'Asg')
     assert_equals(unit.blue_asg.trop_asg.title, 'blue' + title + 'Asg')
@@ -123,9 +135,11 @@ def test_unit_association():
     blue_asg_config = common_asg_config
 
     green_asg_config = common_asg_config
-    unit1 = create_zdtd_autoscaling_unit(unit_title='app1', blue_asg_config=blue_asg_config,
+    unit1 = create_zdtd_autoscaling_unit(unit_title='app1',
+                                         blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
-    unit2 = create_zdtd_autoscaling_unit(unit_title='app2', blue_asg_config=blue_asg_config,
+    unit2 = create_zdtd_autoscaling_unit(unit_title='app2',
+                                         blue_asg_config=blue_asg_config,
                                          green_asg_config=green_asg_config)
 
     unit1.add_unit_flow(receiver=unit2)

@@ -2,6 +2,42 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [1.3.2] - 01/09/2016
+- Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
+- Corrected web_app.yaml to the latest format
+- Added configuration for simple ec2 metric scaling policies
+- Changed method that yaml.py interprets complex nested objects
+- Restored use of block_devices_config
+- Added simple_scaling_policy_config
+- Updated relevant unit tests
+- Updated relevant systems tests
+
+
+## [1.3.1] - 31/08/2016
+- Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
+- Corrected web_app.yaml to the latest format
+- Moved DependsOn to inside of the object creation rather than outside of the object
+
+
+## [1.3.0] - 24/08/2016
+- Introducing SSLCertificateId for ELBs
+- Changing path2ping to elb_health_check and making it an explicit health check e.g. /index.html --> HTTP:80/index.html. Updates to app and default yamls required 
+- Changing instance_protocol and loadbalancer_protocol to replace protocols. Updates to app and default yamls required 
+- Changing loadbalancerports to loadbalancer_port. Updates to app and default yamls required 
+- Changing instanceports to instance_port. Updates to app and default yamls required 
+- Updated relevant unit tests
+- Updated relevant systems tests
+
+## [1.2.7] - 23/08/2016
+- Restoring application.yaml
+- Updating DBInstanceIdentifer to use unit title without 'Rds'
+- Adding test for DBInstanceIdentifer in test_database_unit.py
+
+## [1.2.6] - 23/08/2016
+- Creating DBINstance parameter for database unit
+- Removing Dbname was passing in a RDS snapshot id
+
 ## [1.2.0] - 17/08/2016
 - Introducing block device mappings for autoscaling groups, removing hdd_size as a config
 

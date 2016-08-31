@@ -3,28 +3,30 @@
 # noinspection PyUnresolvedReferences
 import re
 
-from nose.tools import *
-from troposphere import ec2, Ref, Template
-
-from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from nose.tools import *
+from troposphere import ec2, Ref, Template
 
 
-def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted_zone_name=None, path2ping='index.html',
-               elb_log_bucket=None, public_unit=True):
+def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
+               hosted_zone_name=None, elb_health_check='HTTP:80/index.html', stack_hosted_zone_name=None,
+               elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
     :param loadbalancerport - port for traffic to the load balancer from public
-    :param protocol: protocol for traffic
-    :param path2ping: path to test page
+    :param loadbalancer_protocol: protocol for traffic into ELB from World
+    :param instance_protocol: protocol for traffic into ASG from ELB
+    :param elb_health_check: path to test page
     :param elb_log_bucket: S3 bucket to log access log to
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
-    :return: Troposphere object for Elb,
+    :param ssl_certificate_id: SSL Certificate to attach to elb for https using AWS Certificate Manager
+    :return: Troposphere object for Elb
     """
     template = Template()
     vpc = ec2.VPC('MyVPC',
@@ -60,18 +62,20 @@ def create_elb(instanceport='80', loadbalancerport='80', protocol='HTTP', hosted
         nat=nat,
         private_subnets=private_subnets,
         public_cidr=None,
-        stack_hosted_zone_name=None,
+        stack_hosted_zone_name=stack_hosted_zone_name,
         cd_service_role_arn=None,
         keypair=None
     )
     elb_config = ElbConfig(
-        instanceports=[instanceport],
-        loadbalancerports=[loadbalancerport],
-        protocols=[protocol],
-        path2ping=path2ping,
+        instance_port=[instanceport],
+        loadbalancer_port=[loadbalancerport],
+        loadbalancer_protocol=[loadbalancer_protocol],
+        instance_protocol=[instance_protocol],
+        elb_health_check=elb_health_check,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
-        unit_hosted_zone_name=hosted_zone_name
+        unit_hosted_zone_name=hosted_zone_name,
+        ssl_certificate_id=ssl_certificate_id
     )
 
     elb = Elb(title='elb',
@@ -91,8 +95,7 @@ def test_protocol():
 
     def helper_test_protocol(protocol_list):
         for protocol in protocol_list:
-            helper_elb = create_elb(protocol=protocol)
-            assert_true(re.match(protocol, helper_elb.trop_elb.HealthCheck.Target))
+            helper_elb = create_elb(instance_protocol=protocol, loadbalancer_protocol=protocol)
             for listener in helper_elb.trop_elb.Listeners:
                 assert_equal(protocol, listener.Protocol)
                 assert_equal(protocol, listener.InstanceProtocol)
@@ -100,17 +103,34 @@ def test_protocol():
     helper_test_protocol(protocols)
 
 
+def test_health_check_target():
+    """
+    Test to check that chealth check target inputs match the Target Address
+    e.g. HTTP:80/index.html matches HTTP:80/index.html
+    """
+    elb_health_check_list = ['HTTP:80/index.html', 'HTTPS:443/index.html', 'HTTPS:443/index.html']
+
+    def helper_test_protocol(elb_health_checks):
+        for elb_health_check in elb_health_checks:
+            helper_elb = create_elb(elb_health_check=elb_health_check)
+            assert_equals(elb_health_check, helper_elb.trop_elb.HealthCheck.Target)
+
+    helper_test_protocol(elb_health_check_list)
+
+
 def test_target():
     """
-    Tests to make sure that inputs of 'protocol', 'instanceport' and 'path2ping' correctly forms target healthcheck url
+    Tests to make sure that inputs of 'instance_protocol', 'loadbalancer_protocol', 'instanceport' and
+    'elb_health_check' correctly forms target healthcheck url
     """
-    helper_elb = create_elb(protocol='HTTPS',
+    helper_elb = create_elb(instance_protocol='HTTPS',
+                            loadbalancer_protocol='HTTPS',
                             instanceport='443',
-                            path2ping='/test/index.html')
+                            elb_health_check='HTTPS:443/test/index.html')
     assert_equals('HTTPS:443/test/index.html', helper_elb.trop_elb.HealthCheck.Target)
 
 
-def test_instance_ports():
+def test_instance_port():
     """
     Tests to validate that passing 'instanceport' correctly sets the instanceport in the Listener object of the ELB
     as well as the Health check target.
@@ -120,12 +140,11 @@ def test_instance_ports():
 
     for port in ports:
         helper_elb = create_elb(instanceport=port)
-        assert_in(port, helper_elb.trop_elb.HealthCheck.Target)
         for listener in helper_elb.trop_elb.Listeners:
             assert_equal(port, listener.InstancePort)
 
 
-def test_loadbalancer_ports():
+def test_loadbalancer_port():
     """
     Tests to validate that passing 'loadbalancerport' correctly sets the loadbalancer port for the Listener on the ELB
     'Listener.LoadBalancerPort'
@@ -164,7 +183,15 @@ def test_hosted_zone_name():
     Test route 53 record is created when hosted_zone_name is supplied
     """
     helper_elb = create_elb(hosted_zone_name='myhostedzone.gadevs.ga.')
-    assert helper_elb.elb_r53
+    assert_true(helper_elb.elb_r53)
+
+
+def test_no_hosted_zone_name():
+    """
+    Test that an elb is created without a route 53 record if none is supplied
+    """
+    helper_elb = create_elb()
+    assert_false(helper_elb.elb_r53)
 
 
 def test_elb_log_bucket():
@@ -183,3 +210,22 @@ def test_public_unit():
     assert_equals(helper_elb.trop_elb.Scheme, 'internal')
     helper_elb = create_elb(public_unit=True)
     assert_equals(helper_elb.trop_elb.Scheme, 'internet-facing')
+
+
+@AttributeError
+def test_ssl_none():
+    """
+    # Test to determine that the ssl certificate is being passed into the elb listners
+    """
+    helper_elb = create_elb(ssl_certificate_id=None)
+    for listener in helper_elb.trop_elb.Listeners:
+        assert_raises(listener.SSLCertificateId, AttributeError)
+
+
+def test_ssl_certificate():
+    """
+    # Test to determine that the ssl certificate is being passed into the elb listners
+    """
+    helper_elb = create_elb(ssl_certificate_id='arn:aws:acm::tester', loadbalancer_protocol='HTTPS')
+    for listener in helper_elb.trop_elb.Listeners:
+        assert_equals(listener.SSLCertificateId, 'arn:aws:acm::tester')

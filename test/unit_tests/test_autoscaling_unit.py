@@ -64,13 +64,13 @@ def setup_resources():
         keypair='pipeline'
     )
 
-    block_devices_config = [{
-            'device_name': '/dev/xvda',
-            'ebs_volume_size': '15',
-            'ebs_volume_type': 'gp2',
-            'ebs_encrypted': False,
-            'ebs_snapshot_id': '',
-            'virtual_name': False}]
+    block_devices_config = [BlockDevicesConfig(
+        device_name='/dev/xvda',
+        ebs_volume_size='15',
+        ebs_volume_type='gp2',
+        ebs_encrypted=False,
+        ebs_snapshot_id='',
+        virtual_name=False)]
 
     asg_config = AsgConfig(
         userdata="""
@@ -93,16 +93,19 @@ runcmd:
         minsize=1,
         sns_topic_arn=None,
         sns_notification_types=None,
-        block_devices_config=block_devices_config
+        block_devices_config=block_devices_config,
+        simple_scaling_policy_config=None
     )
     elb_config = ElbConfig(
-        protocols=['HTTP'],
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        path2ping='index.html',
+        loadbalancer_protocol=['HTTP'],
+        instance_protocol=['HTTP'],
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
     )
 
 

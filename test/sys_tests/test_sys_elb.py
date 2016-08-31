@@ -26,8 +26,8 @@ def main():
 
     gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
                                                                         InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc)))
-    gateway_attachment.DependsOn = internet_gateway.title
+                                                                        VpcId=Ref(vpc),
+                                                                        DependsOn=internet_gateway.title))
 
     public_subnets = [template.add_resource(ec2.Subnet('MyPubSub1',
                                                        AvailabilityZone='ap-southeast-2a',
@@ -69,19 +69,38 @@ def main():
         keypair=None,
         cd_service_role_arn=None
     )
-    elb_config = ElbConfig(
-        instanceports=['80'],
-        loadbalancerports=['80'],
-        protocols=['HTTP'],
-        path2ping='/index.html',
+    elb_config1 = ElbConfig(
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        loadbalancer_protocol=['HTTP'],
+        instance_protocol=['HTTP'],
+        elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
-        unit_hosted_zone_name=None
+        unit_hosted_zone_name=None,
+        ssl_certificate_id=None
+    )
+    elb_config2 = ElbConfig(
+        instance_port=['80'],
+        loadbalancer_port=['443'],
+        loadbalancer_protocol=['HTTPS'],
+        instance_protocol=['HTTP'],
+        elb_health_check='HTTP:80/index.html',
+        elb_log_bucket='my-s3-bucket',
+        public_unit=True,
+        unit_hosted_zone_name=None,
+        ssl_certificate_id='arn:aws:acm::tester'
     )
 
-    Elb(title='MyUnit',
+    Elb(title='MyUnit1',
         network_config=network_config,
-        elb_config=elb_config,
+        elb_config=elb_config1,
+        template=template
+        )
+
+    Elb(title='MyUnit2',
+        network_config=network_config,
+        elb_config=elb_config2,
         template=template
         )
 
