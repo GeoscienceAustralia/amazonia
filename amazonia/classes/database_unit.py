@@ -56,11 +56,11 @@ class DatabaseUnit(SecurityEnabledObject):
         # Remove username and password if SnapshotID present
         if database_config.db_snapshot_id is None:
             self.username = self.template.add_parameter(Parameter(
-                self.title + 'Username', Type='String', Description='Master username of {0} RDS'.format(self.title),
+                self.title + 'MasterUsername', Type='String', Description='Master username of {0} RDS'.format(self.title),
                 NoEcho=True))
 
             self.password = self.template.add_parameter(Parameter(
-                self.title + 'Password', Type='String', Description='Master password of {0} RDS'.format(self.title),
+                self.title + 'MasterPassword', Type='String', Description='Master password of {0} RDS'.format(self.title),
                 NoEcho=True))
             rds_params['MasterUsername'] = Ref(self.username)
             rds_params['MasterUserPassword'] = Ref(self.password)
