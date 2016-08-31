@@ -126,7 +126,7 @@ class YamlFields(object):
         'green_asg_config'
     ]
 
-    # config classes 
+    # config classes
     complex_object_field_mapping = {
         'elb_config':
             ComplexObjectFieldMapping(ElbConfig, False, elb_config_key_list),
