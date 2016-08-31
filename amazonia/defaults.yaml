@@ -30,10 +30,10 @@ owner_emails:
 nat_alerting: false
 iam_instance_profile_arn:
 zd_autoscaling_units:
-cfdistribution_units:
+cf_distribution_units:
 cf_cache_behaviors_config:
-cforigins_config:
-cfdistribution_config:
+cf_origins_config:
+cf_distribution_config:
 autoscaling_units:
 database_units:
 

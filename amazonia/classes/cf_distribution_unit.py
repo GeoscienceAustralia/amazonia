@@ -3,7 +3,8 @@
 from troposphere import Tags, Ref, Output, Join, GetAtt, cloudfront
 
 class CFDistributionUnit(object):
-    def __init__(self, unit_title, template, cf_origins_config, cf_cache_behaviors_config, cf_distribution_config):
+    def __init__(self, unit_title, template, cf_origins_config, cf_cache_behaviors_config, cf_distribution_config,
+                 network_config):
         """
         Class to abstract a Cloudfront Distribution object
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
