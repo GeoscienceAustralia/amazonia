@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-class CFCacheBehaviors(object):
+class CFCacheBehavior(object):
     def __init__(self, path_pattern, allowed_methods, cached_methods, target_origin_id,
                  forward_cookies, viewer_protocol_policy, min_ttl, default_ttl, max_ttl,
                  trusted_signers):
@@ -9,6 +9,8 @@ class CFCacheBehaviors(object):
         Class containing cache behavior details for a Cloudfront origin
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachebehavior.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param template: The current Cloudformation template (unused)
+        :param network_config: The network_config of this stack (unused)
         :param path_pattern: The pattern to which this cache behavior applies
         :param allowed_methods: List of HTTP methods that can be passed to the origin
         :param cached_methods: List of HTTP methods for which Cloudfront caches responses
@@ -18,7 +20,6 @@ class CFCacheBehaviors(object):
         :param default_ttl: The default amount of time objects stay in the cache
         :param max_ttl: The maximum amount of time objects should stay in the cache
         """
-
         self.path_pattern = path_pattern
         self.allowed_methods = allowed_methods
         self.cached_methods = cached_methods

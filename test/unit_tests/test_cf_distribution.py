@@ -4,7 +4,7 @@ from nose.tools import *
 from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
 from amazonia.classes.cf_origins_config import CFOriginsConfig
-from amazonia.classes.cf_cache_behaviors_config import CFCacheBehaviors
+from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from troposphere import Template, cloudfront
 
 def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.com'),
@@ -63,7 +63,6 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
     template = Template()
 
     origin = CFOriginsConfig(
-        template=template,
         domain_name=domain_name,
         origin_id=origin_id,
         origin_policy={
@@ -92,7 +91,6 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', ori
     template = Template()
 
     origin = CFOriginsConfig(
-        template=template,
         domain_name=domain_name,
         origin_id=origin_id,
         origin_policy={
@@ -120,7 +118,7 @@ def create_cache_behavior(path_pattern='/index.html', allowed_methods=('GET', 'P
     :param max_ttl: The maximum amount of time objects should stay in the cache
     :return: Instance of CacheBehavior object
     """
-    cache_behavior = CFCacheBehaviors(
+    cache_behavior = CFCacheBehavior(
         path_pattern=path_pattern,
         allowed_methods=allowed_methods,
         cached_methods=cached_methods,
@@ -142,6 +140,24 @@ def test_s3_origin():
 
     domain_name = 'www.domain.com'
     is_s3 = True
+    origin_access_identity = 'origin-access-identity/cloudfront/TestOAI'
+
+    helper_cf_origin = create_s3_origin(domain_name=domain_name,
+                                        is_s3=is_s3,
+                                        origin_access_identity=origin_access_identity
+                                        )
+
+    assert_equal(domain_name, helper_cf_origin.domain_name)
+    assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
+    assert_equal(origin_access_identity, helper_cf_origin.origin_access_identity)
+
+def test_s3_origin_oai():
+    """
+    Test to check S3Origin object inputs match the created outputs
+    """
+
+    domain_name = 'www.domain.com'
+    is_s3 = True
     origin_access_identity = 'TestOAI'
 
     helper_cf_origin = create_s3_origin(domain_name=domain_name,
@@ -151,7 +167,8 @@ def test_s3_origin():
 
     assert_equal(domain_name, helper_cf_origin.domain_name)
     assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
-    assert_equal(origin_access_identity, helper_cf_origin.origin_policy['origin_access_identity'])
+    assert_equal('origin-access-identity/cloudfront/' + origin_access_identity,
+                 helper_cf_origin.origin_access_identity)
 
 def test_custom_origin():
     """

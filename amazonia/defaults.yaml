@@ -30,10 +30,6 @@ owner_emails:
 nat_alerting: false
 iam_instance_profile_arn:
 zd_autoscaling_units:
-cf_distribution_units:
-cf_cache_behaviors_config:
-cf_origins_config:
-cf_distribution_config:
 autoscaling_units:
 database_units:
 
@@ -130,3 +126,44 @@ asg_config: &asg_config
 
 blue_asg_config: *asg_config
 green_asg_config: *asg_config
+
+cf_distribution_units:
+
+cf_distribution_config:
+  aliases:
+  comment:
+  default_root_object:
+  enabled:
+  price_class:
+  target_origin_id:
+  allowed_methods:
+  cached_methods:
+  trusted_signers:
+  viewer_protocol_policy: 'https-only'
+  min_ttl:
+  default_ttl:
+  max_ttl:
+  error_page_path:
+
+cf_origins_config:
+   domain_name:
+   origin_id:
+   origin_policy:
+     is_s3:
+     origin_access_identity:
+     origin_protocol_policy:
+     http_port:
+     https_port:
+     origin_ssl_protocols:
+
+cf_cache_behavior_config:
+   allowed_methods:
+   cached_methods:
+   target_origin_id:
+   forward_cookies:
+   viewer_protocol_policy: 'https-only'
+   min_ttl:
+   default_ttl:
+   max_ttl:
+   trusted_signers:
+   path_pattern:

@@ -3,8 +3,8 @@
 from troposphere import Tags, Ref, Output, Join, GetAtt, cloudfront
 
 class CFDistributionUnit(object):
-    def __init__(self, unit_title, template, cf_origins_config, cf_cache_behaviors_config, cf_distribution_config,
-                 network_config):
+    def __init__(self, unit_title, template, network_config, cf_origins_config, cf_cache_behavior_config,
+                 cf_distribution_config):
         """
         Class to abstract a Cloudfront Distribution object
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
@@ -12,10 +12,13 @@ class CFDistributionUnit(object):
         :param title: The title of this Cloudfront distribution
         :param template: Troposphere stack to append resources to
         :param cf_origins_config: A list of CFOriginsConfig objects
-        :param cf_cache_behaviors_config: A list of CFCacheBehaviors objects
+        :param cf_cache_behavior_config: A list of CFCacheBehavior objects
         :param cf_distribution_config: A CFDistributionConfig object
+        :param network_config: Network config information (unused)
         """
+
         self.title = unit_title + 'CFDist'
+        self.dependencies = []
         self.origins = []
         self.cache_behaviors = []
         self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
@@ -25,7 +28,7 @@ class CFDistributionUnit(object):
         # Populate origins
         self.add_origins(self.title, cf_origins_config)
         # Populate cache_behaviors
-        self.add_cache_behaviors(self.title, cf_cache_behaviors_config)
+        self.add_cache_behaviors(self.title, cf_cache_behavior_config)
 
         # Set distribution-wide parameters
         self.cf_dist = cloudfront.DistributionConfig(
@@ -72,22 +75,22 @@ class CFDistributionUnit(object):
                     CustomOriginConfig=cloudfront.CustomOrigin(
                         HTTPPort=origin.http_port,
                         HTTPSPort=origin.https_port,
-                        # Add input checking to ensure protocol_policy is one of (allow-all, http-only, https-only)
                         OriginProtocolPolicy=origin.origin_protocol_policy,
-                        OriginSSLProtocols=origin.origin_ssl_protocols,
+                        # TODO: Uncomment when pip troposphere support OriginSSLProtocols
+                        #OriginSSLProtocols=origin.origin_ssl_protocols,
                     )
                 )
 
             self.origins.append(created_origin)
 
-    def add_cache_behaviors(self, title, cf_cache_behaviors_config):
+    def add_cache_behaviors(self, title, cf_cache_behavior_config):
         """
         Create Cloudfront CacheBehavior objects and append to list of cache_behaviors
         :param title: Title of this Cloudfront Distribution
-        :param cf_cache_behaviors_config: list of CFCacheBehaviors
+        :param cf_cache_behavior_config: list of CFCacheBehavior
         """
 
-        for number, cache_behavior in enumerate(cf_cache_behaviors_config):
+        for number, cache_behavior in enumerate(cf_cache_behavior_config):
 
             created_cache_behavior = cloudfront.CacheBehavior(
                 '{0}CacheBehavior{1}'.format(title, number),
@@ -130,3 +133,10 @@ class CFDistributionUnit(object):
             DefaultTTL=cf_distribution_config.default_ttl,
             MaxTTL=cf_distribution_config.max_ttl
         )
+
+
+    def get_dependencies(self):
+        """
+        :return: returns an empty list as a cfdistribution has no upstream dependencies
+        """
+        return self.dependencies

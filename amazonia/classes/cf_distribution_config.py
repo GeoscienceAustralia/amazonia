@@ -9,6 +9,8 @@ class CFDistributionConfig(object):
         Class containing configuration details for a Cloudfront Distribution
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param template: The current Cloudformation template (unused)
+        :param network_config: The network_config of this stack (unused)
         :param aliases: A list of DNS CNAME aliases
         :param comment: A description for the distribution
         :param default_root_object: The object (e.g. index.html) that should be provided when the root URL is requested

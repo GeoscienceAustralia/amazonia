@@ -1,5 +1,9 @@
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
+from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
@@ -93,8 +97,8 @@ class YamlFields(object):
         'origin_policy'
     ]
 
-    # cloudfront cache behaviors config key list
-    cf_cache_behaviors_config_key_list = [
+    # cloudfront cache behavior config key list
+    cf_cache_behavior_config_key_list = [
         'path_pattern',
         'allowed_methods',
         'cached_methods',
@@ -160,7 +164,7 @@ class YamlFields(object):
     # cloudfront distribution unit parameter field list
     cf_distribution_unit_key_list = [
         'unit_title',
-        'cf_cache_behaviors_config',
+        'cf_cache_behavior_config',
         'cf_origins_config',
         'cf_distribution_config'
     ]
@@ -197,5 +201,11 @@ class YamlFields(object):
         'database_units':
             ComplexObjectFieldMapping(dict, True, database_unit_key_list),
         'cf_distribution_units':
-            ComplexObjectFieldMapping(dict, True, cf_distribution_unit_key_list)
+            ComplexObjectFieldMapping(dict, True, cf_distribution_unit_key_list),
+        'cf_cache_behavior_config':
+            ComplexObjectFieldMapping(CFCacheBehavior, True, cf_cache_behavior_config_key_list),
+        'cf_distribution_config':
+            ComplexObjectFieldMapping(CFDistributionConfig, False, cf_distribution_config_key_list),
+        'cf_origins_config':
+            ComplexObjectFieldMapping(CFOriginsConfig, True, cf_origins_config_key_list)
     }
