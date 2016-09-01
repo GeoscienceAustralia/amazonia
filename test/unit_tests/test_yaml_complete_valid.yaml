@@ -320,6 +320,9 @@ cf_distribution_units:
       trusted_signers:
        - 'self'
       error_page_path: '404.html'
+      acm_cert_arn: ''
+      minimum_protocol_version: 'TLSv1'
+      ssl_support_method: 'sni-only'
     cf_cache_behavior_config:
       -
         allowed_methods:
@@ -391,6 +394,9 @@ cf_distribution_units:
       trusted_signers:
        - 'self'
       error_page_path: '404.html'
+      acm_cert_arn: ''
+      minimum_protocol_version: 'TLSv1'
+      ssl_support_method: 'sni-only'
     cf_cache_behavior_config:
       -
         allowed_methods:

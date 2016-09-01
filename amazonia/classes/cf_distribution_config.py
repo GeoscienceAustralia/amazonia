@@ -4,7 +4,8 @@
 class CFDistributionConfig(object):
     def __init__(self, aliases, comment, default_root_object, enabled, price_class,
                  target_origin_id, allowed_methods, cached_methods, trusted_signers,
-                 viewer_protocol_policy, min_ttl, default_ttl, max_ttl, error_page_path):
+                 viewer_protocol_policy, min_ttl, default_ttl, max_ttl, error_page_path,
+                 acm_cert_arn, minimum_protocol_version, ssl_support_method):
         """
         Class containing configuration details for a Cloudfront Distribution
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
@@ -25,6 +26,9 @@ class CFDistributionConfig(object):
         :param default_ttl: The default amount of time objects stay in the cache
         :param max_ttl: The maximum amount of time objects should stay in the cache
         :param error_page_path: The error page that should be served when an HTTP error code is returned
+        :param acm_cert_arn: ARN of the ACM certificate
+        :param minimum_protocol_version: The minimum version of the SSL protocol that should be used for HTTPS
+        :param ssl_support_method: Specifies how Cloudfront serves HTTPS requests
         """
 
         self.aliases = aliases
@@ -41,3 +45,6 @@ class CFDistributionConfig(object):
         self.default_ttl = default_ttl
         self.max_ttl = max_ttl
         self.error_page_path = error_page_path
+        self.acm_cert_arn = acm_cert_arn
+        self.minimum_protocol_version = minimum_protocol_version
+        self.ssl_support_method = ssl_support_method

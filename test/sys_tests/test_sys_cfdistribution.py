@@ -74,6 +74,9 @@ def main():
         default_ttl=0,
         max_ttl=0,
         error_page_path='index.html',
+        acm_cert_arn='',
+        minimum_protocol_version='TLSv1',
+        ssl_support_method='sni-only'
     )
 
     CFDistributionUnit(unit_title='cfdist',

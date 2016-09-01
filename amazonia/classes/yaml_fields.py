@@ -87,7 +87,10 @@ class YamlFields(object):
         'min_ttl',
         'default_ttl',
         'max_ttl',
-        'error_page_path'
+        'error_page_path',
+        'acm_cert_arn',
+        'minimum_protocol_version',
+        'ssl_support_method'
     ]
 
     # cloudfront origins config key list

@@ -365,6 +365,22 @@ cf_distribution_config: &cf_distribution_config
     error_page_path:
       type: 'string'
       nullable: True
+    acm_cert_arn:
+      type: 'string'
+      nullable: True
+    minimum_protocol_version:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'TLSv1'
+       - 'TLSv1.1'
+       - 'TLSv1.2'
+    ssl_support_method:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'sni-only'
+       - 'vip'
 
 cf_origins_config: &cf_origins_config
     type: 'dict'

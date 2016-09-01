@@ -132,18 +132,26 @@ cf_distribution_units:
 cf_distribution_config:
   aliases:
   comment:
-  default_root_object:
-  enabled:
-  price_class:
+  default_root_object: 'index.html'
+  enabled: True
+  price_class: 'PriceClass_All'
   target_origin_id:
   allowed_methods:
+   - 'GET'
+   - 'HEAD'
   cached_methods:
+   - 'GET'
+   - 'HEAD'
   trusted_signers:
+   - 'self'
   viewer_protocol_policy: 'https-only'
-  min_ttl:
-  default_ttl:
-  max_ttl:
-  error_page_path:
+  min_ttl: 0
+  default_ttl: 0
+  max_ttl: 0
+  error_page_path: '404.html'
+  acm_cert_arn: ''
+  minimum_protocol_version: 'TLSv1'
+  ssl_support_method: 'sni-only'
 
 cf_origins_config:
    domain_name:
@@ -152,18 +160,26 @@ cf_origins_config:
      is_s3:
      origin_access_identity:
      origin_protocol_policy:
-     http_port:
-     https_port:
+     http_port: 80
+     https_port: 443
      origin_ssl_protocols:
+      - 'TLSv1'
+      - 'TLSv1.1'
+      - 'TLSv1.2'
 
 cf_cache_behavior_config:
    allowed_methods:
+    - 'GET'
+    - 'HEAD'
    cached_methods:
+    - 'GET'
+    - 'HEAD'
    target_origin_id:
-   forward_cookies:
+   forward_cookies: 'all'
    viewer_protocol_policy: 'https-only'
-   min_ttl:
-   default_ttl:
-   max_ttl:
+   min_ttl: 0
+   default_ttl: 0
+   max_ttl: 0
    trusted_signers:
+    - 'self'
    path_pattern:

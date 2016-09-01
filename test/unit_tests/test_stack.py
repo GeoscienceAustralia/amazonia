@@ -602,6 +602,9 @@ def create_stack():
                                     default_ttl=0,
                                     max_ttl=0,
                                     error_page_path='index.html',
+                                    acm_cert_arn = 'arn.acm.certificate',
+                                    minimum_protocol_version = 'TLSv1',
+                                    ssl_support_method = 'sni-only'
                                 ),
                                 'cf_cache_behavior_config': [ CFCacheBehavior(
                                         path_pattern='/index.html',

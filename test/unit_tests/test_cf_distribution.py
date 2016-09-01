@@ -12,7 +12,9 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
                                  enabled=True, price_class='PriceClass_All', target_origin_id='originId',
                                  allowed_methods=('GET','HEAD'), cached_methods=('GET','HEAD'),
                                  trusted_signers=('self'), viewer_protocol_policy='https-only',
-                                 min_ttl=0, default_ttl=0, max_ttl=0, error_page_path='index.html'):
+                                 min_ttl=0, default_ttl=0, max_ttl=0, error_page_path='index.html',
+                                 acm_cert_arn='arn.acm.certificate', minimum_protocol_version='TLSv1',
+                                 ssl_support_method='sni-only'):
     """
     Create a CFDistributionConfig object
     :param aliases: A list of DNS CNAME aliases
@@ -29,6 +31,9 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
     :param default_ttl: The default amount of time objects stay in the cache
     :param max_ttl: The maximum amount of time objects should stay in the cache
     :param error_page_path: The error page that should be served when an HTTP error code is returned
+    :param acm_cert_arn: ARN of the ACM certificate
+    :param minimum_protocol_version: The minimum version of the SSL protocol that should be used for HTTPS
+    :param ssl_support_method: Specifies how Cloudfront serves HTTPS requests
     :return: Instance of CFDistributionConfig
     """
     cf_distribution_config = CFDistributionConfig(
@@ -46,6 +51,9 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
         default_ttl=default_ttl,
         max_ttl=max_ttl,
         error_page_path=error_page_path,
+        acm_cert_arn=acm_cert_arn,
+        minimum_protocol_version=minimum_protocol_version,
+        ssl_support_method=ssl_support_method
     )
 
     return cf_distribution_config
@@ -248,6 +256,9 @@ def test_cf_distribution_config():
     default_ttl = 0
     max_ttl = 0
     error_page_path = 'index.html'
+    acm_cert_arn = 'arn.acm.certificate'
+    minimum_protocol_version = 'TLSv1'
+    ssl_support_method = 'sni-only'
 
     origins = []
     cache_behaviors = []
@@ -257,7 +268,9 @@ def test_cf_distribution_config():
                                                  allowed_methods=allowed_methods, cached_methods=cached_methods,
                                                  trusted_signers=trusted_signers, viewer_protocol_policy=viewer_protocol_policy,
                                                  min_ttl=min_ttl, default_ttl=default_ttl, max_ttl=max_ttl,
-                                                 error_page_path=error_page_path)
+                                                 error_page_path=error_page_path, acm_cert_arn=acm_cert_arn,
+                                                 minimum_protocol_version=minimum_protocol_version,
+                                                 ssl_support_method=ssl_support_method)
 
     assert_equal(aliases, helper_cf_dist.aliases)
     assert_equal(comment, helper_cf_dist.comment)

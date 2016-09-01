@@ -76,7 +76,7 @@ class CFDistributionUnit(object):
                         HTTPPort=origin.http_port,
                         HTTPSPort=origin.https_port,
                         OriginProtocolPolicy=origin.origin_protocol_policy,
-                        # TODO: Uncomment when pip troposphere support OriginSSLProtocols
+                        # TODO: Uncomment when pip troposphere supports OriginSSLProtocols
                         #OriginSSLProtocols=origin.origin_ssl_protocols,
                     )
                 )
@@ -131,7 +131,13 @@ class CFDistributionUnit(object):
             ViewerProtocolPolicy=cf_distribution_config.viewer_protocol_policy,
             MinTTL=cf_distribution_config.min_ttl,
             DefaultTTL=cf_distribution_config.default_ttl,
-            MaxTTL=cf_distribution_config.max_ttl
+            MaxTTL=cf_distribution_config.max_ttl,
+            # TODO: Uncomment when pip troposphere supports ViewerCertificate
+            #ViewerCertificate=cloudfront.ViewerCertificate(
+                #AcmCertificateArn=cf_distribution_config.acm_cert_arn,
+                #MinimumProtocolVersion=cf_distribution_config.minimum_protocol_version,
+                #SslSupportMethod=cf_distribution_config.ssl_support_method
+            #)
         )
 
 
