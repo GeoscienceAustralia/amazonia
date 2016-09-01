@@ -269,3 +269,147 @@ database_units:
       db_engine: 'postgres'
       db_port: '5432'
       db_name: 'myDb'
+
+cf_distribution_units:
+  -
+    unit_title: 'distribution1'
+    cf_origins_config:
+      -
+        domain_name: 's3bucket.s3.amazonaws.com'
+        origin_id: 'S3-s3bucket'
+        origin_policy:
+          is_s3 : True
+          origin_access_identity: 'origin-access-identity/cloudfront/ABCD1234ABCD1234'
+      -
+        domain_name: 'elbname-ABCD1234.ap-southeast-2.elb.amazonaws.com'
+        origin_id: 'ELB-elbname-ABCD1234'
+        origin_policy:
+          is_s3 : False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+    cf_distribution_config:
+      aliases:
+       - 'www.domain.com'
+       - 'domain.com'
+      comment: 'Cloudfront for domain.com'
+      default_root_object: 'index.html'
+      enabled: True
+      price_class: 'PriceClass_All'
+      target_origin_id: 'ELB-elbname-ABCD1234'
+      allowed_methods:
+       - 'GET'
+       - 'POST'
+       - 'HEAD'
+       - 'DELETE'
+       - 'OPTIONS'
+       - 'PUT'
+       - 'PATCH'
+      cached_methods:
+       - 'GET'
+       - 'HEAD'
+      trusted_signers:
+       - 'self'
+      min_ttl: 0
+      default_ttl: 0
+      max_ttl: 0
+      trusted_signers:
+       - 'self'
+      error_page_path: '404.html'
+    cf_cache_behavior_config:
+      -
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+        cached_methods:
+         - 'GET'
+         - 'HEAD'
+        target_origin_id: 'S3-s3bucket'
+        forward_cookies: 'all'
+        viewer_protocol_policy: 'allow-all'
+        min_ttl: 0
+        default_ttl: 10
+        max_ttl: 84600
+        trusted_signers:
+          - 'self'
+        path_pattern: '/login'
+  -
+    unit_title: 'distribution2'
+    cf_origins_config:
+      -
+        domain_name: 's3bucket.s3.amazonaws.com'
+        origin_id: 'S3-s3bucket'
+        origin_policy:
+          is_s3 : True
+          origin_access_identity: 'origin-access-identity/cloudfront/ABCD1234ABCD1234'
+      -
+        domain_name: 'elbname-ABCD1234.ap-southeast-2.elb.amazonaws.com'
+        origin_id: 'ELB-elbname-ABCD1234'
+        origin_policy:
+          is_s3 : False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+    cf_distribution_config:
+      aliases:
+       - 'www.domain.com'
+       - 'domain.com'
+      comment: 'Cloudfront for domain.com'
+      default_root_object: 'index.html'
+      enabled: True
+      price_class: 'PriceClass_All'
+      target_origin_id: 'ELB-elbname-ABCD1234'
+      allowed_methods:
+       - 'GET'
+       - 'POST'
+       - 'HEAD'
+       - 'DELETE'
+       - 'OPTIONS'
+       - 'PUT'
+       - 'PATCH'
+      cached_methods:
+       - 'GET'
+       - 'HEAD'
+      trusted_signers:
+       - 'self'
+      min_ttl: 0
+      default_ttl: 0
+      max_ttl: 0
+      trusted_signers:
+       - 'self'
+      error_page_path: '404.html'
+    cf_cache_behavior_config:
+      -
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+        cached_methods:
+         - 'GET'
+         - 'HEAD'
+        target_origin_id: 'S3-s3bucket'
+        forward_cookies: 'all'
+        viewer_protocol_policy: 'allow-all'
+        min_ttl: 0
+        default_ttl: 10
+        max_ttl: 84600
+        trusted_signers:
+          - 'self'
+        path_pattern: '/login'
