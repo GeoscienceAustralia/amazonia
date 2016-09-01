@@ -36,7 +36,7 @@ class AutoscalingUnit(object):
              self.loadbalancer_port]
         [self.elb.add_flow(receiver=self.asg, port=instanceport) for instanceport in elb_config.instance_port]
         if network_config.nat_highly_available:
-            self.asg.add_flow(receiver=self.public_cidr, port='-1')  # All Traffic to Nat gateways
+            self.asg.add_egress(receiver=self.public_cidr, port='-1')  # All Traffic to Nat gateways
         else:
             self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic to Nat
         network_config.jump.add_flow(receiver=self.asg, port='22')

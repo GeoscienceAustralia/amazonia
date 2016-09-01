@@ -7,7 +7,7 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
-
+from amazonia.classes.util import get_cf_friendly_name
 from troposphere import Ref, Template, ec2, Tags, Join, GetAtt
 from troposphere.ec2 import EIP, NatGateway
 
@@ -134,7 +134,7 @@ class Stack(object):
 
         # Add Public and Private Subnets and Private Route Table
         for az in self.availability_zones:
-            private_rt_name = az + 'PriRt'
+            private_rt_name = get_cf_friendly_name(az) + 'PriRt'
             private_route_table = self.template.add_resource(
                 ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
                                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
@@ -198,7 +198,7 @@ class Stack(object):
                 single_instance_config=nat_config
             )
             for az in self.availability_zones:
-                self.template.add_resource(ec2.Route(az + 'PriRoute',
+                self.template.add_resource(ec2.Route(get_cf_friendly_name(az) + 'PriRoute',
                                                      InstanceId=Ref(self.nat.single),
                                                      RouteTableId=Ref(self.private_route_tables[az]),
                                                      DestinationCidrBlock=self.public_cidr['cidr'],
@@ -213,13 +213,13 @@ class Stack(object):
                         Domain='vpc'
                         ))
 
-                nat_gateway = self.template.add_resource(NatGateway(az + 'NatGw',
+                nat_gateway = self.template.add_resource(NatGateway(get_cf_friendly_name(az) + 'NatGw',
                                                                     AllocationId=GetAtt(ip_address, 'AllocationId'),
                                                                     SubnetId=Ref(public_subnet),
                                                                     DependsOn=self.gateway_attachment.title
                                                                     ))
 
-                self.template.add_resource(ec2.Route(az + 'PriRoute',
+                self.template.add_resource(ec2.Route(get_cf_friendly_name(az) + 'PriRoute',
                                                      NatGatewayId=Ref(nat_gateway),
                                                      RouteTableId=Ref(self.private_route_tables[az]),
                                                      DestinationCidrBlock=self.public_cidr['cidr'],

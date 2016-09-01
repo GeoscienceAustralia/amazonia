@@ -73,8 +73,8 @@ class ZdAutoscalingUnit(object):
 
         if network_config.nat_highly_available:
             # All Traffic to Nat gateways
-            self.green_asg.add_flow(receiver=self.public_cidr, port='-1')
-            self.blue_asg.add_flow(receiver=self.public_cidr, port='-1')
+            self.green_asg.add_egress(receiver=self.public_cidr, port='-1')
+            self.blue_asg.add_egress(receiver=self.public_cidr, port='-1')
         else:
             # allow outbound traffic to the NAT
             self.green_asg.add_flow(receiver=network_config.nat, port='-1')
