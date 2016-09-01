@@ -20,6 +20,7 @@ public_cidr:
   cidr: '0.0.0.0/0'
 jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
+nat_highly_available: false
 nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
 home_cidrs:

@@ -20,6 +20,7 @@ class ZdAutoscalingUnit(object):
         :param green_asg_config: configuration specific to the green asg
         """
         self.template = template
+        self.public_cidr = network_config.public_cidr
         self.dependencies = dependencies if dependencies else []
         self.elb_config = elb_config
 
@@ -64,14 +65,20 @@ class ZdAutoscalingUnit(object):
          for instanceport in elb_config.instance_port]
 
         # create security group rules to allow traffic from the public to the loadbalancer
-        [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancer_port]
-        [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-         for loadbalancerport in elb_config.loadbalancer_port]
+        if elb_config.public_unit:
+            [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
+             for loadbalancerport in elb_config.loadbalancer_port]
+            [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
+             for loadbalancerport in elb_config.loadbalancer_port]
 
-        # allow outbound traffic to the NAT
-        self.green_asg.add_flow(receiver=network_config.nat, port='-1')
-        self.blue_asg.add_flow(receiver=network_config.nat, port='-1')
+        if network_config.nat_highly_available:
+            # All Traffic to Nat gateways
+            self.green_asg.add_flow(receiver=self.public_cidr, port='-1')
+            self.blue_asg.add_flow(receiver=self.public_cidr, port='-1')
+        else:
+            # allow outbound traffic to the NAT
+            self.green_asg.add_flow(receiver=network_config.nat, port='-1')
+            self.blue_asg.add_flow(receiver=network_config.nat, port='-1')
 
         # allow inbound traffic from the jumphost
         network_config.jump.add_flow(receiver=self.blue_asg, port='22')

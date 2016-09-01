@@ -8,14 +8,15 @@ from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 
-from troposphere import Ref, Template, ec2, Tags, Join
+from troposphere import Ref, Template, ec2, Tags, Join, GetAtt
+from troposphere.ec2 import EIP, NatGateway
 
 
 class Stack(object):
     def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, stack_hosted_zone_name, iam_instance_profile_arn, owner_emails,
-                 nat_alerting):
+                 nat_alerting, nat_highly_available):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -42,10 +43,11 @@ class Stack(object):
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
         :param nat_alerting: True/False for whether or not to alert on the nat instance status.
+        :param nat_highly_available: True/False for whether or not to use a series of NAT gateways or a single NAT
         """
 
         super(Stack, self).__init__()
-        self.template = Template()
+        # set parameters
         self.code_deploy_service_role = code_deploy_service_role
         self.keypair = keypair
         self.availability_zones = availability_zones
@@ -53,14 +55,52 @@ class Stack(object):
         self.home_cidrs = home_cidrs
         self.public_cidr = public_cidr
         self.hosted_zone_name = stack_hosted_zone_name
+        self.jump_image_id = jump_image_id
+        self.jump_instance_type = jump_instance_type
+        self.nat_image_id = nat_image_id
+        self.nat_instance_type = nat_instance_type
+        self.owner_emails = owner_emails
+        self.nat_alerting = nat_alerting
+        self.nat_highly_available = nat_highly_available
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
         self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
         self.iam_instance_profile_arn = iam_instance_profile_arn
+
+        # initialize object references
+        self.template = Template()
         self.units = {}
         self.private_subnets = []
         self.public_subnets = []
+        self.vpc = None
+        self.internet_gateway = None
+        self.gateway_attachment = None
+        self.public_route_table = None
+        self.private_route_tables = {}
+        self.nat = None
+        self.jump = None
+        self.private_route = None
+        self.public_route = None
+        self.network_config = None
 
+        self.setup_vpc()
+
+        # Add ZD Autoscaling Units
+        self.add_units(self.zd_autoscaling_units, ZdAutoscalingUnit)
+
+        # Add Autoscaling Units
+        self.add_units(self.autoscaling_units, AutoscalingUnit)
+
+        # Add Database Units
+        self.add_units(self.database_units, DatabaseUnit)
+
+        # Add Unit flow
+        for unit_name in self.units:
+            dependencies = self.units[unit_name].get_dependencies()
+            for dependency in dependencies:
+                self.units[unit_name].add_unit_flow(self.units[dependency])
+
+    def setup_vpc(self):
         # Add VPC and Internet Gateway with Attachment
         vpc_name = 'Vpc'
         self.vpc = self.template.add_resource(
@@ -86,21 +126,22 @@ class Stack(object):
                                      InternetGatewayId=Ref(self.internet_gateway),
                                      DependsOn=self.internet_gateway.title))
 
-        # Add Public and Private Route Tables
+        # Add Public Route Table
         public_rt_name = 'PubRt'
         self.public_route_table = self.template.add_resource(
             ec2.RouteTable(public_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', public_rt_name]))))
 
-        private_rt_name = 'PriRt'
-        self.private_route_table = self.template.add_resource(
-            ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
-                           Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
-
-        # Add Public and Private Subnets
+        # Add Public and Private Subnets and Private Route Table
         for az in self.availability_zones:
+            private_rt_name = az + 'PriRt'
+            private_route_table = self.template.add_resource(
+                ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
+                               Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
+            self.private_route_tables[az] = private_route_table
+
             self.private_subnets.append(Subnet(template=self.template,
-                                               route_table=self.private_route_table,
+                                               route_table=private_route_table,
                                                az=az,
                                                vpc=self.vpc,
                                                is_public=False,
@@ -110,20 +151,19 @@ class Stack(object):
                                               az=az,
                                               vpc=self.vpc,
                                               is_public=True,
-                                              cidr=self.generate_subnet_cidr(is_public=True)
-                                              ).trop_subnet)
+                                              cidr=self.generate_subnet_cidr(is_public=True)).trop_subnet)
 
         jump_config = SingleInstanceConfig(
             keypair=self.keypair,
-            si_image_id=jump_image_id,
-            si_instance_type=jump_instance_type,
+            si_image_id=self.jump_image_id,
+            si_instance_type=self.jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
             hosted_zone_name=self.hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
-            alert_emails=owner_emails,
-            alert=nat_alerting,
+            alert_emails=self.owner_emails,
+            alert=self.nat_alerting,
             is_nat=False
         )
 
@@ -137,63 +177,72 @@ class Stack(object):
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
         self.jump.add_egress(receiver=self.public_cidr, port='-1')
 
-        nat_config = SingleInstanceConfig(
-            keypair=self.keypair,
-            si_image_id=nat_image_id,
-            si_instance_type=nat_instance_type,
-            subnet=self.public_subnets[0],
-            vpc=self.vpc,
-            is_nat=True,
-            instance_dependencies=self.gateway_attachment.title,
-            iam_instance_profile_arn=self.iam_instance_profile_arn,
-            alert_emails=owner_emails,
-            alert=nat_alerting,
-            hosted_zone_name=None
-        )
+        if self.nat_highly_available:
+            nat_config = SingleInstanceConfig(
+                keypair=self.keypair,
+                si_image_id=self.nat_image_id,
+                si_instance_type=self.nat_instance_type,
+                subnet=self.public_subnets[0],
+                vpc=self.vpc,
+                is_nat=True,
+                instance_dependencies=self.gateway_attachment.title,
+                iam_instance_profile_arn=self.iam_instance_profile_arn,
+                alert_emails=self.owner_emails,
+                alert=self.nat_alerting,
+                hosted_zone_name=None
+            )
 
-        self.nat = SingleInstance(
-            title='Nat',
-            template=self.template,
-            single_instance_config=nat_config
-        )
+            self.nat = SingleInstance(
+                title='Nat',
+                template=self.template,
+                single_instance_config=nat_config
+            )
+            for az in self.availability_zones:
+                self.template.add_resource(ec2.Route(az + 'PriRoute',
+                                                     InstanceId=Ref(self.nat.single),
+                                                     RouteTableId=Ref(self.private_route_tables[az]),
+                                                     DestinationCidrBlock=self.public_cidr['cidr'],
+                                                     DependsOn=self.gateway_attachment.title))
+        else:
 
-        # Add Routes
-        self.public_route = self.template.add_resource(ec2.Route('PubRtInboundRoute',
+            for public_subnet in self.public_subnets:
+                az = public_subnet.az
+                ip_address = self.template.add_resource(
+                    EIP(az + 'NatGwEip',
+                        DependsOn='AttachGateway',
+                        Domain='vpc'
+                        ))
+
+                nat_gateway = self.template.add_resource(NatGateway(az + 'NatGw',
+                                                                    AllocationId=GetAtt(ip_address, 'AllocationId'),
+                                                                    SubnetId=Ref(public_subnet),
+                                                                    DependsOn=self.gateway_attachment.title
+                                                                    ))
+
+                self.template.add_resource(ec2.Route(az + 'PriRoute',
+                                                     NatGatewayId=Ref(nat_gateway),
+                                                     RouteTableId=Ref(self.private_route_tables[az]),
+                                                     DestinationCidrBlock=self.public_cidr['cidr'],
+                                                     DependsOn=self.gateway_attachment.title))
+
+        # Add Public Route
+        self.public_route = self.template.add_resource(ec2.Route('PubRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
                                                                  RouteTableId=Ref(self.public_route_table),
                                                                  DestinationCidrBlock=self.public_cidr['cidr'],
                                                                  DependsOn=self.gateway_attachment.title))
-
-        self.private_route = self.template.add_resource(ec2.Route('PriRtOutboundRoute',
-                                                                  InstanceId=Ref(self.nat.single),
-                                                                  RouteTableId=Ref(self.private_route_table),
-                                                                  DestinationCidrBlock=self.public_cidr['cidr'],
-                                                                  DependsOn=self.gateway_attachment.title))
 
         self.network_config = NetworkConfig(vpc=self.vpc,
                                             public_subnets=self.public_subnets,
                                             private_subnets=self.private_subnets,
                                             jump=self.jump,
                                             nat=self.nat,
+                                            nat_highly_available=self.nat_highly_available,
                                             public_cidr=self.public_cidr,
                                             stack_hosted_zone_name=self.hosted_zone_name,
                                             keypair=self.keypair,
                                             cd_service_role_arn=self.code_deploy_service_role
                                             )
-        # Add ZD Autoscaling Units
-        self.add_units(self.zd_autoscaling_units, ZdAutoscalingUnit)
-
-        # Add Autoscaling Units
-        self.add_units(self.autoscaling_units, AutoscalingUnit)
-
-        # Add Database Units
-        self.add_units(self.database_units, DatabaseUnit)
-
-        # Add Unit flow
-        for unit_name in self.units:
-            dependencies = self.units[unit_name].get_dependencies()
-            for dependency in dependencies:
-                self.units[unit_name].add_unit_flow(self.units[dependency])
 
     def add_units(self, unit_list, unit_constructor):
         for unit in unit_list:  # type: dict
