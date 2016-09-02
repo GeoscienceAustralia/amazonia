@@ -2,11 +2,11 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
+from amazonia.classes.util import get_cf_friendly_name
 from nose.tools import *
 from troposphere import Tags, Ref
 
@@ -89,7 +89,6 @@ runcmd:
 def test_stack():
     """ Test stack structure
     """
-    title = 'app'
     stack = create_stack()
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
     assert_equals(stack.keypair, keypair)
@@ -113,9 +112,10 @@ def test_stack():
     assert_is(type(stack.public_route_table.VpcId), Ref)
     assert_is(type(stack.public_route_table.Tags), Tags)
 
-    assert_equals(stack.private_route_table.title, 'PriRt')
-    assert_is(type(stack.private_route_table.VpcId), Ref)
-    assert_is(type(stack.private_route_table.Tags), Tags)
+    for az in availability_zones:
+        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az)+'PriRt')
+        assert_is(type(stack.private_route_tables[az].VpcId), Ref)
+        assert_is(type(stack.private_route_tables[az].Tags), Tags)
 
     assert_equals(stack.nat.single.SourceDestCheck, 'false')
     assert_equals(stack.jump.single.SourceDestCheck, 'true')
@@ -151,6 +151,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -229,6 +230,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'database_units': [{'unit_title': 'db1',
                             'database_config': DatabaseConfig(
                                 db_instance_type=db_instance_type,
@@ -271,6 +273,7 @@ def test_duplicate_unit_names():
         'jump_instance_type': instance_type,
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
+        'nat_highly_available': False,
         'stack_hosted_zone_name': None,
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
@@ -332,6 +335,7 @@ def test_duplicate_unit_names():
         'jump_instance_type': instance_type,
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
+        'nat_highly_available': False,
         'stack_hosted_zone_name': None,
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
@@ -453,6 +457,7 @@ def create_stack():
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_alerting=nat_alerting,
+        nat_highly_available=False,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    loadbalancer_protocol=loadbalancer_protocol,
@@ -567,23 +572,23 @@ def create_stack():
                          }
                         ],
         cf_distribution_units=[{'unit_title': 'cfdist1',
-                                'cf_origins_config': [ CFOriginsConfig (
-                                        domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-                                        origin_id='S3-amazonia-elb-bucket',
-                                        origin_policy={
-                                            'is_s3' : True,
-                                            'origin_access_identity': 'originaccessid1'
-                                        }
-                                    ),
+                                'cf_origins_config': [CFOriginsConfig(
+                                    domain_name='amazonia-elb-bucket.s3.amazonaws.com',
+                                    origin_id='S3-amazonia-elb-bucket',
+                                    origin_policy={
+                                        'is_s3': True,
+                                        'origin_access_identity': 'originaccessid1'
+                                    }
+                                ),
                                     CFOriginsConfig(
                                         domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
                                         origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
                                         origin_policy={
-                                            'is_s3' : False,
-                                            'origin_protocol_policy' : 'https-only',
-                                            'http_port' : 80,
-                                            'https_port' : 443,
-                                            'origin_ssl_protocols' : ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
+                                            'is_s3': False,
+                                            'origin_protocol_policy': 'https-only',
+                                            'http_port': 80,
+                                            'https_port': 443,
+                                            'origin_ssl_protocols': ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
                                         }
                                     )
                                 ],
@@ -602,22 +607,22 @@ def create_stack():
                                     default_ttl=0,
                                     max_ttl=0,
                                     error_page_path='index.html',
-                                    acm_cert_arn = 'arn.acm.certificate',
-                                    minimum_protocol_version = 'TLSv1',
-                                    ssl_support_method = 'sni-only'
+                                    acm_cert_arn='arn.acm.certificate',
+                                    minimum_protocol_version='TLSv1',
+                                    ssl_support_method='sni-only'
                                 ),
-                                'cf_cache_behavior_config': [ CFCacheBehavior(
-                                        path_pattern='/index.html',
-                                        allowed_methods=['GET', 'HEAD'],
-                                        cached_methods=['GET', 'HEAD'],
-                                        target_origin_id='S3-bucket-id',
-                                        forward_cookies='all',
-                                        viewer_protocol_policy='allow-all',
-                                        min_ttl=0,
-                                        default_ttl=0,
-                                        max_ttl=0,
-                                        trusted_signers=['self']
-                                    ),
+                                'cf_cache_behavior_config': [CFCacheBehavior(
+                                    path_pattern='/index.html',
+                                    allowed_methods=['GET', 'HEAD'],
+                                    cached_methods=['GET', 'HEAD'],
+                                    target_origin_id='S3-bucket-id',
+                                    forward_cookies='all',
+                                    viewer_protocol_policy='allow-all',
+                                    min_ttl=0,
+                                    default_ttl=0,
+                                    max_ttl=0,
+                                    trusted_signers=['self']
+                                ),
                                     CFCacheBehavior(
                                         path_pattern='/login.js',
                                         allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
@@ -631,6 +636,6 @@ def create_stack():
                                         trusted_signers=['self']
                                     )
                                 ]
-        }]
+                                }]
     )
     return stack

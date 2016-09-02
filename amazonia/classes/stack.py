@@ -82,6 +82,7 @@ class Stack(object):
         self.public_route_table = None
         self.private_route_tables = {}
         self.nat = None
+        self.nat_gateways = []
         self.jump = None
         self.private_route = None
         self.public_route = None
@@ -185,6 +186,28 @@ class Stack(object):
         self.jump.add_egress(receiver=self.public_cidr, port='-1')
 
         if self.nat_highly_available:
+            for public_subnet in self.public_subnets:
+                az = public_subnet.AvailabilityZone
+                ip_address = self.template.add_resource(
+                    EIP(get_cf_friendly_name(az) + 'NatGwEip',
+                        DependsOn='AttachGateway',
+                        Domain='vpc'
+                        ))
+
+                nat_gateway = self.template.add_resource(NatGateway(get_cf_friendly_name(az) + 'NatGw',
+                                                                    AllocationId=GetAtt(ip_address, 'AllocationId'),
+                                                                    SubnetId=Ref(public_subnet),
+                                                                    DependsOn=self.gateway_attachment.title
+                                                                    ))
+                self.nat_gateways.append(nat_gateway)
+
+                self.template.add_resource(ec2.Route(get_cf_friendly_name(az) + 'PriRoute',
+                                                     NatGatewayId=Ref(nat_gateway),
+                                                     RouteTableId=Ref(self.private_route_tables[az]),
+                                                     DestinationCidrBlock=self.public_cidr['cidr'],
+                                                     DependsOn=self.gateway_attachment.title))
+
+        else:
             nat_config = SingleInstanceConfig(
                 keypair=self.keypair,
                 si_image_id=self.nat_image_id,
@@ -210,28 +233,6 @@ class Stack(object):
                                                      RouteTableId=Ref(self.private_route_tables[az]),
                                                      DestinationCidrBlock=self.public_cidr['cidr'],
                                                      DependsOn=self.gateway_attachment.title))
-        else:
-
-            for public_subnet in self.public_subnets:
-                az = public_subnet.az
-                ip_address = self.template.add_resource(
-                    EIP(az + 'NatGwEip',
-                        DependsOn='AttachGateway',
-                        Domain='vpc'
-                        ))
-
-                nat_gateway = self.template.add_resource(NatGateway(get_cf_friendly_name(az) + 'NatGw',
-                                                                    AllocationId=GetAtt(ip_address, 'AllocationId'),
-                                                                    SubnetId=Ref(public_subnet),
-                                                                    DependsOn=self.gateway_attachment.title
-                                                                    ))
-
-                self.template.add_resource(ec2.Route(get_cf_friendly_name(az) + 'PriRoute',
-                                                     NatGatewayId=Ref(nat_gateway),
-                                                     RouteTableId=Ref(self.private_route_tables[az]),
-                                                     DestinationCidrBlock=self.public_cidr['cidr'],
-                                                     DependsOn=self.gateway_attachment.title))
-
         # Add Public Route
         self.public_route = self.template.add_resource(ec2.Route('PubRoute',
                                                                  GatewayId=Ref(self.internet_gateway),
@@ -248,8 +249,8 @@ class Stack(object):
                                             public_cidr=self.public_cidr,
                                             stack_hosted_zone_name=self.hosted_zone_name,
                                             keypair=self.keypair,
-                                            cd_service_role_arn=self.code_deploy_service_role
-                                            )
+                                            cd_service_role_arn=self.code_deploy_service_role,
+                                            nat_gateways=self.nat_gateways)
 
     def add_units(self, unit_list, unit_constructor):
         for unit in unit_list:  # type: dict

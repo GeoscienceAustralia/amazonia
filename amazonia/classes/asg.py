@@ -65,7 +65,7 @@ class Asg(SecurityEnabledObject):
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
             HealthCheckType=asg_config.health_check_type,
             Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)],
-            DependsOn=network_config.nat.single.title
+            DependsOn=network_config.get_depends_on()
         ))
 
         # Set cloud formation update policy to update
