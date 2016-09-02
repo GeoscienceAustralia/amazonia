@@ -18,6 +18,14 @@ class InvalidYamlStructureError(Exception):
         self.value = value
 
 
+class InvalidYamlValueError(Exception):
+    """
+    Exception if YAML value is invalid
+    """
+    def __init__(self, value):
+        self.value = value
+
+
 class Yaml(object):
     """
     Setting these as class variables rather than instance variables so that they can be resolved and referred to
@@ -131,5 +139,5 @@ class Yaml(object):
         validator = cerberus.Validator()
 
         if not validator.validate(data, schema):
-            raise cerberus.ValidationError('Errors were found in the supplied Yaml values. See below errors: \n'
-                                           '{0}'.format(validator.errors))
+            raise InvalidYamlValueError('Errors were found in the supplied Yaml values. See below errors: \n'
+                                        '{0}'.format(validator.errors))
