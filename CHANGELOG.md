@@ -24,7 +24,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Updated relevant unit tests
 - Updated relevant systems tests
 
-
 ## [1.3.0] - 24/08/2016
 - Introducing SSLCertificateId for ELBs
 - Changing path2ping to elb_health_check and making it an explicit health check e.g. /index.html --> HTTP:80/index.html. Updates to app and default yamls required 
