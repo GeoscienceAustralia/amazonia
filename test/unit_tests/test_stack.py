@@ -1,5 +1,9 @@
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
+from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
@@ -125,7 +129,7 @@ def test_stack():
         private_subnet = stack.private_subnets[num]
         assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
 
-    assert_equals(len(stack.units), 4)
+    assert_equals(len(stack.units), 5)
 
 
 def test_duplicate_unit_names():
@@ -204,7 +208,8 @@ def test_duplicate_unit_names():
                                'dependencies': [],
                                }],
         'database_units': [],
-        'zd_autoscaling_units': []
+        'zd_autoscaling_units': [],
+        'cf_distribution_units': [],
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -251,7 +256,8 @@ def test_duplicate_unit_names():
                                 db_maintenance_window=db_maintenance_window,
                                 db_storage_type=db_storage_type
                             )
-                            }]
+                            }],
+        'cf_distribution_units': [],
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -311,7 +317,8 @@ def test_duplicate_unit_names():
                                 db_maintenance_window=db_maintenance_window,
                                 db_storage_type=db_storage_type
                             )
-                            }]
+                            }],
+        'cf_distribution_units': []
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -415,7 +422,8 @@ def test_duplicate_unit_names():
                                   }
                                  ],
         'autoscaling_units': [],
-        'database_units': []
+        'database_units': [],
+        'cf_distribution_units': []
     })
 
 
@@ -557,6 +565,72 @@ def create_stack():
                              db_storage_type=db_storage_type
                          )
                          }
-                        ]
+                        ],
+        cf_distribution_units=[{'unit_title': 'cfdist1',
+                                'cf_origins_config': [ CFOriginsConfig (
+                                        domain_name='amazonia-elb-bucket.s3.amazonaws.com',
+                                        origin_id='S3-amazonia-elb-bucket',
+                                        origin_policy={
+                                            'is_s3' : True,
+                                            'origin_access_identity': 'originaccessid1'
+                                        }
+                                    ),
+                                    CFOriginsConfig(
+                                        domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
+                                        origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
+                                        origin_policy={
+                                            'is_s3' : False,
+                                            'origin_protocol_policy' : 'https-only',
+                                            'http_port' : 80,
+                                            'https_port' : 443,
+                                            'origin_ssl_protocols' : ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
+                                        }
+                                    )
+                                ],
+                                'cf_distribution_config': CFDistributionConfig(
+                                    aliases=['www.test-stack.gadevs.ga', 'test-stack.gadevs.ga'],
+                                    comment='SysTestCFDistribution',
+                                    default_root_object='index.html',
+                                    enabled=True,
+                                    price_class='PriceClass_All',
+                                    target_origin_id='originId',
+                                    allowed_methods=['GET', 'HEAD'],
+                                    cached_methods=['GET', 'HEAD'],
+                                    trusted_signers=['self'],
+                                    viewer_protocol_policy='https-only',
+                                    min_ttl=0,
+                                    default_ttl=0,
+                                    max_ttl=0,
+                                    error_page_path='index.html',
+                                    acm_cert_arn = 'arn.acm.certificate',
+                                    minimum_protocol_version = 'TLSv1',
+                                    ssl_support_method = 'sni-only'
+                                ),
+                                'cf_cache_behavior_config': [ CFCacheBehavior(
+                                        path_pattern='/index.html',
+                                        allowed_methods=['GET', 'HEAD'],
+                                        cached_methods=['GET', 'HEAD'],
+                                        target_origin_id='S3-bucket-id',
+                                        forward_cookies='all',
+                                        viewer_protocol_policy='allow-all',
+                                        min_ttl=0,
+                                        default_ttl=0,
+                                        max_ttl=0,
+                                        trusted_signers=['self']
+                                    ),
+                                    CFCacheBehavior(
+                                        path_pattern='/login.js',
+                                        allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
+                                        cached_methods=['GET', 'HEAD'],
+                                        target_origin_id='www-origin',
+                                        forward_cookies='all',
+                                        viewer_protocol_policy='https-only',
+                                        min_ttl=0,
+                                        default_ttl=0,
+                                        max_ttl=0,
+                                        trusted_signers=['self']
+                                    )
+                                ]
+        }]
     )
     return stack
