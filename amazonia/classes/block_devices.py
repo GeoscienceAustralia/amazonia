@@ -18,9 +18,9 @@ class Bdm(object):
         :return Block Devices Mapping for ecc instances or autoscaling groups
         """
         self.trop_bdm = []
-        self.bdm = self.block_device_mappings(title, block_devices_config)
+        self.block_device_mappings = self.set_block_device_mappings(title, block_devices_config)
 
-    def block_device_mappings(self, title, block_devices_config):
+    def set_block_device_mappings(self, title, block_devices_config):
         virtual_count = 0
         for number, block_device in enumerate(block_devices_config):
             bdm = BlockDeviceMapping('{0}BlockDevice{1}'.format(title, number),

@@ -132,7 +132,8 @@ class Asg(SecurityEnabledObject):
 
         # If block devices have been configured
         if asg_config.block_devices_config is not None:
-            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config).bdm
+            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config)\
+                .block_device_mappings
 
         return launch_config_title
 
