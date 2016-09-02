@@ -34,6 +34,6 @@ class NetworkConfig(object):
         :return: title to use in depends on
         """
         if self.nat_highly_available:
-            return self.nat_gateways[0].title
+            return [nat_gateway.title for nat_gateway in self.nat_gateways]
         else:
             return self.nat.single.title
