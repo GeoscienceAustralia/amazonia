@@ -5,9 +5,8 @@ import os
 import yaml
 from amazonia.classes.asg_config import InvalidAsgConfigError
 from amazonia.classes.util import InsecureVariableError
-from amazonia.classes.yaml import Yaml
+from amazonia.classes.yaml import Yaml, InvalidYamlValueError
 from amazonia.classes.yaml_fields import YamlFields
-from cerberus import ValidationError
 from nose.tools import *
 
 default_data = None
@@ -142,12 +141,12 @@ def test_validate_cidr_yaml():
     invalid_vpc_cidr_data = open_yaml_file('test_yaml_invalid_vpc_cidr.yaml')
     invalid_home_cidrs_data = open_yaml_file('test_yaml_invalid_home_cidrs.yaml')
     invalid_home_cidr_title_data = open_yaml_file('test_yaml_invalid_home_cidr_title.yaml')
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
-                                            'default_data': default_data})
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
-                                            'default_data': default_data})
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
-                                            'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_vpc_cidr_data,
+                                                  'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_home_cidrs_data,
+                                                  'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_home_cidr_title_data,
+                                                  'default_data': default_data})
 
 
 @with_setup(setup_resources)
@@ -160,12 +159,12 @@ def test_get_invalid_values_yaml():
     invalid_stack_data = open_yaml_file('test_yaml_invalid_key_stack.yaml')
     invalid_autoscaling_unit_data = open_yaml_file('test_yaml_invalid_key_autoscaling_unit.yaml')
     invalid_database_unit_data = open_yaml_file('test_yaml_invalid_key_database_unit.yaml')
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_stack_data,
-                                            'default_data': default_data})
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
-                                            'default_data': default_data})
-    assert_raises(ValidationError, Yaml, **{'user_stack_data': invalid_database_unit_data,
-                                            'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_stack_data,
+                                                  'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_autoscaling_unit_data,
+                                                  'default_data': default_data})
+    assert_raises(InvalidYamlValueError, Yaml, **{'user_stack_data': invalid_database_unit_data,
+                                                  'default_data': default_data})
 
 
 @with_setup(setup_resources)
