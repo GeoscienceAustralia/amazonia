@@ -2,7 +2,6 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
@@ -139,6 +138,7 @@ class YamlFields(object):
         'jump_instance_type',
         'nat_image_id',
         'nat_instance_type',
+        'nat_highly_available',
         'home_cidrs',
         'stack_hosted_zone_name',
         'cf_distribution_units',
