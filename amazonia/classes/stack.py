@@ -190,7 +190,7 @@ class Stack(object):
                 az = public_subnet.AvailabilityZone
                 ip_address = self.template.add_resource(
                     EIP(get_cf_friendly_name(az) + 'NatGwEip',
-                        DependsOn='AttachGateway',
+                        DependsOn=self.gateway_attachment.title,
                         Domain='vpc'
                         ))
 
