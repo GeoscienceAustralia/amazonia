@@ -2,10 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.3] - 2/09/2016
+- Change Cerberus.ValidationError to Amazonia.Yaml.InvalidYamlValueError
+- Added support for Cloudfront distributions
+- Updated defaults.yaml for Cloudfront
+- Created and updated relevant unit and systems tests
 
 ## [1.3.2] - 31/08/2016
 - Updated Parameter name for RDS 
-
 
 ## [1.3.1] - 31/08/2016
 - Added UpdatePolicy to Autoscaling Groups to ensure changes to autoscaling groups or launch config will correctly update instances.
@@ -19,7 +23,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added simple_scaling_policy_config
 - Updated relevant unit tests
 - Updated relevant systems tests
-
 
 ## [1.3.0] - 24/08/2016
 - Introducing SSLCertificateId for ELBs

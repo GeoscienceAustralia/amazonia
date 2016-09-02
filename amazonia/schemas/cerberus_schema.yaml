@@ -134,7 +134,7 @@ elb_config: &elb_config
     ssl_certificate_id: # A string containing the arn of the ssl certificate id
       type: 'string'
       nullable: True
-      regex: '^arn:aws:'
+      regex: '^arn:aws:.*'
 
 simple_scaling_policy_config: &simple_scaling_policy_config
   type: 'dict'
