@@ -42,7 +42,8 @@ def main():
         stack_hosted_zone_name=None,
         keypair=None,
         cd_service_role_arn=None,
-        nat_highly_available=False
+        nat_highly_available=False,
+        nat_gateways=[]
     )
 
     database_config = DatabaseConfig(

@@ -65,7 +65,8 @@ runcmd:
         stack_hosted_zone_name=None,
         keypair='pipeline',
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
-        nat_highly_available=False
+        nat_highly_available=False,
+        nat_gateways=[]
     )
 
     block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',

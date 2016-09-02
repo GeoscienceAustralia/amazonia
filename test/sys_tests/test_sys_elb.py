@@ -67,7 +67,8 @@ def main():
         public_cidr=None,
         keypair=None,
         cd_service_role_arn=None,
-        nat_highly_available=False
+        nat_highly_available=False,
+        nat_gateways=[]
     )
     elb_config1 = ElbConfig(
         instance_port=['80'],

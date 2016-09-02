@@ -83,7 +83,8 @@ runcmd:
         stack_hosted_zone_name=None,
         keypair='pipeline',
         cd_service_role_arn=service_role_arn,
-        nat_highly_available=False
+        nat_highly_available=False,
+        nat_gateways=[]
     )
     elb_config = ElbConfig(
         instance_protocol=['HTTP'],

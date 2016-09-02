@@ -80,7 +80,8 @@ runcmd:
                                    stack_hosted_zone_name=None,
                                    cd_service_role_arn=cd_service_role_arn,
                                    keypair='pipeline',
-                                   nat_highly_available=False)
+                                   nat_highly_available=False,
+                                   nat_gateways=[])
     loadbalancer_protocol = ['HTTP']
     instance_protocol = ['HTTP']
     instance_port = ['80']
