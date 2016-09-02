@@ -21,33 +21,11 @@ class ApiGateway(object):
                                              )
 
         for method_config in method_configs:
-            resource = self.template.add_resource(Resource(
-                                                           '{0}{1}'.format(self.api.title, method_config.method_name),
-                                                           ParentId=GetAtt(self.api.title, 'RootResourceId'),
-                                                           RestApiId=Ref(self.api),
-                                                           PathPart=method_config.method_name
-                                                           )
-                                                 )
 
+            resource = self.create_resource(method_config)
             self.get_responses(method_config)
 
-            integration = Integration(
-                                      '{0}Integration'.format(method_config.method_name),
-                                      Credentials='',
-                                      Type='AWS',
-                                      IntegrationHttpMethod=method_config.httpmethod,
-                                      IntegrationResponses=self.integration_responses,
-                                      RequestTemplates=method_config.request.templates,
-                                      Uri=Join('',
-                                              [
-                                                'arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/',
-                                                method_config.lambda_arn,
-                                                '/invocations'
-                                              ]
-                                              )
-                                     )
-
-            integration.resource['PassthroughBehavior'] = "WHEN_NO_TEMPLATES"
+            integration = self.create_integration(method_config)
 
             method = Method(
                             '{0}Method'.format(method_config.method_name),
@@ -61,6 +39,42 @@ class ApiGateway(object):
                             )
             self.methods.append(method)
             self.template.add_resource(method)
+
+    def create_resource(self, method_config):
+        """
+
+        :param method_config:
+        :return:
+        """
+
+        return self.template.add_resource(Resource(
+                                                   '{0}{1}'.format(self.api.title, method_config.method_name),
+                                                   ParentId=GetAtt(self.api.title, 'RootResourceId'),
+                                                   RestApiId=Ref(self.api),
+                                                   PathPart=method_config.method_name
+                                                   )
+                                         )
+
+    def create_integration(self, method_config):
+        integration = Integration(
+                                  '{0}Integration'.format(method_config.method_name),
+                                  Credentials='',
+                                  Type='AWS',
+                                  IntegrationHttpMethod=method_config.httpmethod,
+                                  IntegrationResponses=self.integration_responses,
+                                  RequestTemplates=method_config.request.templates,
+                                  Uri=Join('',
+                                              [
+                                                'arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/',
+                                                method_config.lambda_arn,
+                                                '/invocations'
+                                              ]
+                                          )
+                                 )
+
+        integration.resource['PassthroughBehavior'] = "WHEN_NO_TEMPLATES"
+
+        return integration
 
     def get_responses(self, method_config):
         """
