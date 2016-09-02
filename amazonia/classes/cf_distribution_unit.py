@@ -118,6 +118,8 @@ class CFDistributionUnit(object):
     def add_default_cache_behavior(self, title, cf_distribution_config):
         """
         Create Cloudfront DefaultCacheBehavior object
+        :param title: Title of this Cloudfront distribution
+        :param cf_distribution_config: Object containing the default cache behavior of this distribution
         :return: Returns the created DefaultCacheBehavior object
         """
         return cloudfront.DefaultCacheBehavior(
