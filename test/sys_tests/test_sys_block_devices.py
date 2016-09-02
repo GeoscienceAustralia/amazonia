@@ -52,7 +52,8 @@ def main():
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair='pipeline',
-        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole'
+        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
+        nat_highly_available=False
     )
 
     block_devices_config = [

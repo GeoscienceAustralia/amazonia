@@ -32,7 +32,7 @@ runcmd:
                             Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname'])),
                             DependsOn=vpc.title))
 
-    gateway_attachment = template.add_resource(
+    template.add_resource(
         ec2.VPCGatewayAttachment(internet_gateway.title + 'Atch',
                                  VpcId=Ref(vpc),
                                  InternetGatewayId=Ref(internet_gateway),
@@ -82,7 +82,8 @@ runcmd:
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         stack_hosted_zone_name=None,
         keypair='pipeline',
-        cd_service_role_arn=service_role_arn
+        cd_service_role_arn=service_role_arn,
+        nat_highly_available=False
     )
     elb_config = ElbConfig(
         instance_protocol=['HTTP'],

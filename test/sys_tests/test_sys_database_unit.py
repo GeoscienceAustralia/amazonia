@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
-from troposphere import ec2, Ref, Tags, Template
-
+from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
 from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.database_config import DatabaseConfig
+from troposphere import ec2, Ref, Tags, Template
 
 
 def main():
@@ -15,10 +14,10 @@ def main():
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway',
                                                                  Tags=Tags(Name='MyInternetGateway')))
 
-    gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
-                                                                        InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc),
-                                                                        DependsOn=internet_gateway.title))
+    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
+                                                   InternetGatewayId=Ref(internet_gateway),
+                                                   VpcId=Ref(vpc),
+                                                   DependsOn=internet_gateway.title))
 
     private_subnets = [template.add_resource(ec2.Subnet('MyPubSub1',
                                                         AvailabilityZone='ap-southeast-2a',
@@ -42,7 +41,8 @@ def main():
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair=None,
-        cd_service_role_arn=None
+        cd_service_role_arn=None,
+        nat_highly_available=False
     )
 
     database_config = DatabaseConfig(

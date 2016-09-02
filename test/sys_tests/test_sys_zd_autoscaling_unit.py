@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 
-from troposphere import ec2, Ref, Template, Join, Tags
-
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
-from amazonia.classes.block_devices_config import BlockDevicesConfig
-from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from troposphere import ec2, Ref, Template, Join, Tags
 
 
 def main():
@@ -33,7 +32,7 @@ runcmd:
                             Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', 'igname'])),
                             DependsOn=vpc.title))
 
-    gateway_attachment = template.add_resource(
+    template.add_resource(
         ec2.VPCGatewayAttachment(internet_gateway.title + 'Atch',
                                  VpcId=Ref(vpc),
                                  InternetGatewayId=Ref(internet_gateway),
@@ -80,7 +79,8 @@ runcmd:
                                    jump=jump,
                                    stack_hosted_zone_name=None,
                                    cd_service_role_arn=cd_service_role_arn,
-                                   keypair='pipeline')
+                                   keypair='pipeline',
+                                   nat_highly_available=False)
     loadbalancer_protocol = ['HTTP']
     instance_protocol = ['HTTP']
     instance_port = ['80']
