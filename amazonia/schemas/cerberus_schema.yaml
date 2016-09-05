@@ -346,6 +346,16 @@ cf_distribution_config: &cf_distribution_config
       nullable: True
       schema:
         type: 'string'
+    forward_cookies:
+      type: 'string'
+      nullable: True
+      empty: True
+    forwarded_headers:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+        nullable: True
     viewer_protocol_policy:
       type: 'string'
       nullable: True
@@ -422,6 +432,7 @@ cf_origins_config: &cf_origins_config
 
 cf_cache_behavior_config: &cf_cache_behavior_config
     type: 'dict'
+    nullable: True
     schema:
       path_pattern:
         type: 'string'
@@ -454,6 +465,12 @@ cf_cache_behavior_config: &cf_cache_behavior_config
         type: 'string'
         nullable: True
         empty: True
+      forwarded_headers:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+          nullable: True
       viewer_protocol_policy:
         type: 'string'
         nullable: True
