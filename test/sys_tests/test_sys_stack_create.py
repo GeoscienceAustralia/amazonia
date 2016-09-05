@@ -64,7 +64,7 @@ def create_and_delete_stack(cf_client, stack_name, s3_bucket, s3_key, cf_paramet
     """
     template_url = \
         'https://s3-ap-southeast-2.amazonaws.com/' + s3_bucket + '/' + s3_key
-    time_delay = 11
+    time_delay = 20
 
     create_response = cf_client.create_stack(
         StackName=stack_name,

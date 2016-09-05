@@ -186,7 +186,8 @@ runcmd:
                              db_storage_type=None
                          )
                          }],
-        cf_distribution_units=[]
+        cf_distribution_units=[],
+        api_gateway_units=[]
 
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
