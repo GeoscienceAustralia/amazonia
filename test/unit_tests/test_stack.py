@@ -1,3 +1,5 @@
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
@@ -5,11 +7,9 @@ from amazonia.classes.cf_distribution_config import CFDistributionConfig
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
-from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.util import get_cf_friendly_name
-
 from nose.tools import *
 from troposphere import Tags, Ref
 
@@ -132,7 +132,7 @@ def test_stack():
         private_subnet = stack.private_subnets[num]
         assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
 
-    assert_equals(len(stack.units), 6)
+    assert_equals(len(stack.units), 7)
 
 
 def test_highly_available_nat_stack():
@@ -163,7 +163,8 @@ def test_highly_available_nat_stack():
         autoscaling_units=[],
         database_units=[],
         cf_distribution_units=[],
-        api_gateway_units=[]
+        api_gateway_units=[],
+        lambda_units=[]
     )
 
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
@@ -287,7 +288,8 @@ def test_duplicate_unit_names():
         'database_units': [],
         'zd_autoscaling_units': [],
         'cf_distribution_units': [],
-        'api_gateway_units': []
+        'api_gateway_units': [],
+        'lambda_units': []
     })
 
 
@@ -522,6 +524,21 @@ def create_stack():
                                     )]
                                 )
                             ]
-                            }]
+                            }],
+        lambda_units=[{'unit_title': 'lambda1',
+                       'dependencies': ['db1'],
+                       'lambda_config': LambdaConfig(
+                           lambda_s3_bucket='bucket_name',
+                           lambda_s3_key='key_name',
+                           lambda_description='blah',
+                           lambda_function_name='my_function',
+                           lambda_handler='main',
+                           lambda_memory_size=128,
+                           lambda_role_arn='test_arn',
+                           lambda_runtime='python2.7',
+                           lambda_timeout=1
+                       )
+                       }
+                      ]
     )
     return stack

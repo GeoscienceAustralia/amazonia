@@ -3,6 +3,8 @@
 from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from troposphere import ec2, Ref, Tags, Template
 
 
@@ -32,12 +34,34 @@ def main():
                                                         VpcId=Ref(vpc),
                                                         CidrBlock='10.0.3.0/24'))]
 
+    public_subnets = [template.add_resource(ec2.Subnet('MySubnet2',
+                                                       AvailabilityZone='ap-southeast-2a',
+                                                       VpcId=Ref(vpc),
+                                                       CidrBlock='10.0.2.0/24'))]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=internet_gateway.title,
+        alert=None,
+        alert_emails=None,
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        is_nat=True
+    )
+    nat = SingleInstance(title='nat',
+                         template=template,
+                         single_instance_config=single_instance_config
+                         )
+
     network_config = NetworkConfig(
         public_subnets=None,
         vpc=vpc,
         private_subnets=private_subnets,
         jump=None,
-        nat=None,
+        nat=nat,
         public_cidr=None,
         stack_hosted_zone_name=None,
         keypair=None,

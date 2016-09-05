@@ -17,6 +17,7 @@ class LambdaUnit(SecurityEnabledObject):
         :param lambda_config: object containing lambda related variablea
         """
         self.title = unit_title + 'Lambda'
+        self.public_cidr = network_config.public_cidr
         self.dependencies = dependencies
 
         super(LambdaUnit, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
@@ -33,6 +34,11 @@ class LambdaUnit(SecurityEnabledObject):
                      Timeout=lambda_config.lambda_timeout,
                      VpcConfig=VPCConfig(SubnetIds=[Ref(x) for x in network_config.private_subnets],
                                          SecurityGroupIds=[Ref(self.security_group)])))
+
+        if network_config.nat_highly_available:
+            self.add_egress(receiver=self.public_cidr, port='-1')  # All Traffic to Nat gateways
+        else:
+            self.add_flow(receiver=network_config.nat, port='-1')  # All Traffic to Nat
 
     def get_dependencies(self):
         """

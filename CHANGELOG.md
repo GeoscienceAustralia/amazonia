@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.5] - 7/09/2016
+- Adding support for lambda units
+
 ## [1.3.4] - 6/09/2016
 - Add Forwarded Headers support to Cloudfront distributions
 - Added support for Api Gateway creation
