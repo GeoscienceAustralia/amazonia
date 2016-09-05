@@ -178,8 +178,7 @@ class YamlFields(object):
         'database_units',
         'iam_instance_profile_arn',
         'owner_emails',
-        'nat_alerting',
-        'amz_version'
+        'nat_alerting'
     ]
 
     # autoscaling unit parameter field list
