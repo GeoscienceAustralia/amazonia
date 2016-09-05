@@ -573,7 +573,7 @@ amz_version:
   type:
     - 'string'
     - 'integer'
-  nullable: True
+  required: False
   empty: True
 
 zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units

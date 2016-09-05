@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - As per suggestions, get_cf_friendly_name now uses a combination of inflection and regex to split words then convert to snek_kes
 - Updated block device mapping variable from bdm to block_device_mappings to reflect suggestions from pycharm and sonarqube
 - Improved code coverage with encrypted ebs volumes and a bad defaults test
+- Introduced amz_version for tracking version used for users
 
 ## [1.3.3] - 2/09/2016
 - Change Cerberus.ValidationError to Amazonia.Yaml.InvalidYamlValueError
