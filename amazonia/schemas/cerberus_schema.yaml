@@ -597,65 +597,79 @@ cf_distribution_units:  # A list of Cloudfront distributions to create. Origins,
           *cf_origins_config # list of dictionaries containing origins that this distribution is linked to
       cf_distribution_config: *cf_distribution_config  # dictionary containing default cache behavior for this distribution
 
-apis: # A list of api gateway definitions to create.
-  type: 'list'
-  nullable: True
-  schema:
-    type: 'dict'
-    schema:
-      api_title:  # A string containing the title of this api.
-        type: 'string'
-        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-        empty: False
-        nullable: True
-      method_config: *method_configs # A list of method_configs for this api
-
-method_config: &method_config # The config for an api method
-  type: 'list'
-  nullable: True
-  schema:
-    type: 'dict'
-    method_name: # The name for this specific method
-      type: 'string'
-      regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
-      empty: False
-    lambda_arn: # an ARN that points to a specific Lambda functions for the api to call
-      type: 'string'
-      regex: '^arn:aws:*' # matches an aws ARN that points to a specific Lambda function for the api to call
-      empty: False
-    httpmethod: # The http method type for this method to respond to. eg 'POST' 'OPTIONS' 'GET' etc
-      type: 'string'
-      empty: False
-    authorizationtype: # The type of authorization to use for this method.
-      type: 'string'
-      empty: False
-    request: *request_config # A single request_config object for this api
-    responses: *response_config # A list of response_configs for this api
-
 request_config: &request_config # The config for a request to be used in an api object
   type: 'dict'
   nullable: True
   schema:
     templates:
-      type: 'string'
-      nullable: True
+      type: 'dict'
+      nullable: False
     parameters:
-      type: 'string'
-      nullable: True
+      type: 'dict'
+      nullable: False
 
 response_config: &response_config # A list of responses to be used in an api object
   type: 'dict'
   nullable: True
   schema:
     templates:
-      type: 'string'
-      nullable: True
+      type: 'dict'
+      nullable: False
     parameters:
+      type: 'dict'
+      nullable: False
+    selectionpattern:
       type: 'string'
       nullable: True
     statuscode:
       type: 'string'
-      nullable: True
+      nullable: False
     models:
+      type: 'dict'
+      nullable: False
+
+method_config: &method_config # The config for an api method
+  type: 'dict'
+  nullable: True
+  schema:
+    method_name: # The name for this specific method
       type: 'string'
-      nullable: True
+      regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+      empty: False
+      nullable: False
+    lambda_arn: # an ARN that points to a specific Lambda functions for the api to call
+      type: 'string'
+      regex: '^arn:aws:.*' # matches an aws ARN that points to a specific Lambda function for the api to call
+      empty: False
+      nullable: False
+    httpmethod: # The http method type for this method to respond to. eg 'POST' 'OPTIONS' 'GET' etc
+      type: 'string'
+      empty: False
+      nullable: False
+    authorizationtype: # The type of authorization to use for this method.
+      type: 'string'
+      empty: False
+      nullable: False
+    request_config: *request_config # A single request_config object for this api
+    response_config: # A list of response_config for this api
+      type: 'list'
+      empty: False
+      nullable: False
+      schema: *response_config
+
+api_gateway_units: # A list of api gateway definitions to create.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:  # A string containing the title of this api.
+        type: 'string'
+        regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+        empty: False
+        nullable: False
+      method_config:
+        type: 'list'
+        empty: False
+        nullable: False
+        schema: *method_config # A list of method_config for this api
