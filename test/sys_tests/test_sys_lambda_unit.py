@@ -58,8 +58,8 @@ def main():
         lambda_timeout=1
     )
 
-    # Test RDS
-    LambdaUnit(unit_title='MyDb',
+    # Test Lambda
+    LambdaUnit(unit_title='MyLambda',
                network_config=network_config,
                template=template,
                dependencies=[],
