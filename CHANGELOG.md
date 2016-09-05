@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.3.4] - 6/09/2016
 - Add Forwarded Headers support to Cloudfront distributions
+- Added support for Api Gateway creation
 
 ## [1.3.3] - 2/09/2016
 - Change Cerberus.ValidationError to Amazonia.Yaml.InvalidYamlValueError
