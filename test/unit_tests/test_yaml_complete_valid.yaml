@@ -15,6 +15,7 @@ jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
 nat_image_id: 'ami-53371f30'
 nat_instance_type: 't2.micro'
+nat_highly_available: true
 home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'

@@ -13,7 +13,7 @@ from troposphere import ec2, Ref, Template
 
 
 def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
-               hosted_zone_name=None, elb_health_check='HTTP:80/index.html', stack_hosted_zone_name=None,
+               hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
@@ -62,9 +62,11 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         nat=nat,
         private_subnets=private_subnets,
         public_cidr=None,
-        stack_hosted_zone_name=stack_hosted_zone_name,
+        stack_hosted_zone_name=None,
         cd_service_role_arn=None,
-        keypair=None
+        keypair=None,
+        nat_highly_available=False,
+        nat_gateways=None
     )
     elb_config = ElbConfig(
         instance_port=[instanceport],

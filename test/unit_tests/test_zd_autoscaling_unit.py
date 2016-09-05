@@ -75,7 +75,9 @@ runcmd:
                                    public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
                                    stack_hosted_zone_name=None,
                                    keypair='pipeline',
-                                   cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK')
+                                   cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
+                                   nat_highly_available=False,
+                                   nat_gateways=None)
     elb_config = ElbConfig(elb_log_bucket=None,
                            loadbalancer_protocol=['HTTP'],
                            instance_protocol=['HTTP'],

@@ -42,7 +42,7 @@ class Elb(SecurityEnabledObject):
                              SecurityGroups=[Ref(self.security_group)],
                              Subnets=[Ref(x) for x in subnets],
                              Tags=Tags(Name=self.title),
-                             DependsOn=network_config.nat.single.title))
+                             DependsOn=network_config.get_depends_on()))
 
         for listener in self.trop_elb.Listeners:
             if elb_config.ssl_certificate_id and listener.Protocol == 'HTTPS':

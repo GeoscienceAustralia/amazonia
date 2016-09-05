@@ -18,6 +18,7 @@ setup(
         'pyyaml',
         'cerberus',
         'flask',
-        'flask_cors'
+        'flask_cors',
+        'inflection'
     ]
 )
