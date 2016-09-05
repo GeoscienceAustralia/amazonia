@@ -2,11 +2,12 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from nose.tools import *
 from troposphere import Tags, Ref
 
@@ -129,7 +130,7 @@ def test_stack():
         private_subnet = stack.private_subnets[num]
         assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
 
-    assert_equals(len(stack.units), 5)
+    assert_equals(len(stack.units), 6)
 
 
 def test_duplicate_unit_names():
@@ -210,6 +211,7 @@ def test_duplicate_unit_names():
         'database_units': [],
         'zd_autoscaling_units': [],
         'cf_distribution_units': [],
+        'api_gateway_units': []
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -258,6 +260,7 @@ def test_duplicate_unit_names():
                             )
                             }],
         'cf_distribution_units': [],
+        'api_gateway_units': []
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -318,7 +321,8 @@ def test_duplicate_unit_names():
                                 db_storage_type=db_storage_type
                             )
                             }],
-        'cf_distribution_units': []
+        'cf_distribution_units': [],
+        'api_gateway_units': []
     })
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -423,7 +427,8 @@ def test_duplicate_unit_names():
                                  ],
         'autoscaling_units': [],
         'database_units': [],
-        'cf_distribution_units': []
+        'cf_distribution_units': [],
+        'api_gateway_units': []
     })
 
 
@@ -631,6 +636,27 @@ def create_stack():
                                         trusted_signers=['self']
                                     )
                                 ]
+        }],
+        api_gateway_units=[{'unit_title': 'test',
+                            'method_config': [
+                                ApiGatewayMethodConfig(
+                                    method_name='login',
+                                    lambda_arn='arn:aws:123456789',
+                                    httpmethod='POST',
+                                    authorizationtype='NONE',
+                                    request_config=ApiGatewayRequestConfig(
+                                        templates={'application/json': ''},
+                                        parameters={'somemapping': 'somefield'}
+                                    ),
+                                    response_config=[ApiGatewayResponseConfig(
+                                        templates={'application/json': ''},
+                                        parameters={'somemapping': 'somefield'},
+                                        statuscode='200',
+                                        models={'application/json': 'Empty'},
+                                        selectionpattern=''
+                                    )]
+                                )
+                            ]
         }]
     )
     return stack

@@ -1,17 +1,17 @@
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
-from amazonia.classes.api_gateway import ApiGateway
-from troposphere import Template, Ref, Join, GetAtt
+from amazonia.classes.api_gateway import ApiGatewayUnit
+from troposphere import Template, Ref, Join
 from nose.tools import *
 
 
 template = apiname = methodname = lambda_arn = httpmethod = authorizationtype = request_template = request_parameters =\
-    response_template = response_parameters = response_models = statuscode = None
+    response_template = response_parameters = response_models = selection_pattern = statuscode = None
 
 
 def setup_resources():
     global template, apiname, methodname, lambda_arn, httpmethod, authorizationtype, request_template,\
-        request_parameters, response_template, response_parameters, response_models, statuscode
+        request_parameters, response_template, response_parameters, response_models, selection_pattern, statuscode
 
     template = Template()
     apiname = 'test0'
@@ -23,9 +23,10 @@ def setup_resources():
     request_template = {'application/json': """{ "username": $input.json('$.username')}"""}
     request_parameters = {'method.request.header.Origin': "$input.params('Origin')"}
     response_template = {'application/json': ''}
-    response_parameters = {'method.response.header.Set-COokie': 'integration.response.body.TESTVALUE'}
+    response_parameters = {'method.response.header.Set-Cookie': 'integration.response.body.TESTVALUE'}
     response_models = {'application/json': 'Empty'}
     statuscode = '200'
+    selection_pattern = ''
 
 
 @with_setup(setup_resources())
@@ -48,6 +49,7 @@ def test_response_config():
 
     assert_equals(response.templates, response_template)
     assert_equals(response.parameters, response_parameters)
+    assert_equals(response.selectionpattern, selection_pattern)
     assert_equals(response.statuscode, statuscode)
     assert_equals(response.models, response_models)
 
@@ -164,6 +166,7 @@ def create_response_config():
 
     return ApiGatewayResponseConfig(templates=response_template,
                                     parameters=response_parameters,
+                                    selectionpattern=selection_pattern,
                                     statuscode=statuscode,
                                     models=response_models)
 
@@ -179,8 +182,8 @@ def create_method_config(request, responses):
 
     return ApiGatewayMethodConfig(method_name=methodname,
                                   lambda_arn=lambda_arn,
-                                  request=request,
-                                  responses=responses,
+                                  request_config=request,
+                                  response_config=responses,
                                   httpmethod=httpmethod,
                                   authorizationtype=authorizationtype)
 
@@ -193,5 +196,5 @@ def create_api(method_config):
     :return: an Api gateway object
     """
 
-    return ApiGateway(apiname, template, [method_config])
+    return ApiGatewayUnit(apiname, template, [method_config], None)
 
