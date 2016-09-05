@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.3.4] - 6/09/2016
 - Add Forwarded Headers support to Cloudfront distributions
+- Added new parameter to stack 'nat_highly_available', allowing users to use a classic single nat or one nat_gateway per AZ
+- Added new features to network_config object: nat_highly_available, nat_gateways and a function that returns either a single string or list of strings for troposphere resources to use in depends on (ie depends on 'nat' or depends on ['nat gw1', 'nat gw2', 'nat gw3']
+- As per suggestions, get_cf_friendly_name now uses a combination of inflection and regex to split words then convert to snek_kes
+- Updated block device mapping variable from bdm to block_device_mappings to reflect suggestions from pycharm and sonarqube
+- Improved code coverage with encrypted ebs volumes and a bad defaults test
 
 ## [1.3.3] - 2/09/2016
 - Change Cerberus.ValidationError to Amazonia.Yaml.InvalidYamlValueError

@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
+from amazonia.classes.hosted_zone import HostedZone
 from troposphere import ec2, Ref, Tags, Template, GetAtt
 from troposphere import elasticloadbalancing as elb
-
-from amazonia.classes.hosted_zone import HostedZone
 
 
 def main():
@@ -16,16 +15,16 @@ def main():
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway',
                                                                  Tags=Tags(Name='MyInternetGateway')))
 
-    gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
-                                                                        InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc),
-                                                                        DependsOn=internet_gateway.title))
+    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
+                                                   InternetGatewayId=Ref(internet_gateway),
+                                                   VpcId=Ref(vpc),
+                                                   DependsOn=internet_gateway.title))
 
     security_group = template.add_resource(ec2.SecurityGroup(
         'mySecGroup',
         GroupDescription='Security group',
         VpcId=Ref(vpc),
-        ))
+    ))
 
     template.add_resource(ec2.SecurityGroupEgress(
         'mySecGroupOut',
@@ -87,7 +86,7 @@ def main():
             SubnetId=Ref(public_subnets[0]))],
         SourceDestCheck=True,
         DependsOn=internet_gateway.title
-        ))
+    ))
 
     public_hz = HostedZone(template=template, domain='mypublic.hz', title='public')
     public_hz.add_record_set('publicrecord', ip=GetAtt(ec2_instance, 'PublicIp'))
@@ -96,6 +95,7 @@ def main():
     private_hz.add_record_set('privaterecord', elb=load_balancer)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
+
 
 if __name__ == '__main__':
     main()

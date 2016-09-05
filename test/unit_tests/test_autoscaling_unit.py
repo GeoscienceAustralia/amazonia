@@ -61,7 +61,9 @@ def setup_resources():
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         stack_hosted_zone_name=None,
         cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
-        keypair='pipeline'
+        keypair='pipeline',
+        nat_highly_available=False,
+        nat_gateways=None
     )
 
     block_devices_config = [BlockDevicesConfig(
