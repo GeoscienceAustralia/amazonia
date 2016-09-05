@@ -12,7 +12,7 @@ build:
 
 .PHONEY:
 install:
-	pip3 install -e . --user
+	pip3 install -e . --user --upgrade
 
 .PHONEY:
 uninstall:
