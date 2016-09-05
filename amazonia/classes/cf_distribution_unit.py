@@ -62,7 +62,7 @@ class CFDistributionUnit(object):
                 s3_origin_config=cloudfront.S3Origin()
 
                 # Ensure variables exist
-                if hasattr(origin, 'origin_access_identity'):
+                if origin.origin_access_identity:
                     s3_origin_config.OriginAccessIdentity=origin.origin_access_identity
 
                 created_origin = cloudfront.Origin(
@@ -76,14 +76,14 @@ class CFDistributionUnit(object):
                 custom_origin_config = cloudfront.CustomOrigin()
 
                 # Ensure variables exist
-                if hasattr(origin, 'http_port'):
+                if origin.http_port:
                     custom_origin_config.HTTPPort=origin.http_port
-                if hasattr(origin, 'https_port'):
+                if origin.https_port:
                     custom_origin_config.HTTPSPort=origin.https_port
-                if hasattr(origin, 'origin_protocol_policy'):
+                if origin.origin_protocol_policy:
                     custom_origin_config.OriginProtocolPolicy=origin.origin_protocol_policy
                 # TODO: Uncomment when pip troposphere supports OriginSSLProtocols
-                #if hasattr(origin, 'origin_ssl_protocols'):
+                #if origin.origin_ssl_protocols:
                     #custom_origin_config.OriginSSLProtocols=origin.origin_ssl_protocols
 
                 created_origin = cloudfront.Origin(
