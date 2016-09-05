@@ -69,13 +69,13 @@ elb_config:
   ssl_certificate_id:
 
 # Block device configs
-block_devices_config:
-  device_name: '/dev/xvda'
-  ebs_volume_size: '8'
-  ebs_volume_type: 'standard'
-  ebs_encrypted: False
-  ebs_snapshot_id:
-  virtual_name: False
+#block_devices_config:
+#  device_name: '/dev/xvda'
+#  ebs_volume_size: '8'
+#  ebs_volume_type: 'standard'
+#  ebs_encrypted: False
+#  ebs_snapshot_id:
+#  virtual_name: False
 
 # Simple scaling policy:
 simple_scaling_policy_config:
@@ -137,8 +137,6 @@ cf_distribution_config:
   enabled: True
   price_class: 'PriceClass_All'
   target_origin_id:
-  forward_cookies: 'all'
-  forwarded_headers:
   allowed_methods:
    - 'GET'
    - 'HEAD'
@@ -179,7 +177,6 @@ cf_cache_behavior_config:
     - 'HEAD'
    target_origin_id:
    forward_cookies: 'all'
-   forwarded_headers:
    viewer_protocol_policy: 'https-only'
    min_ttl: 0
    default_ttl: 0
@@ -187,30 +184,3 @@ cf_cache_behavior_config:
    trusted_signers:
     - 'self'
    path_pattern:
-
-request_config: &request_config
-  templates:
-    application/json: ''
-  parameters:
-    method.request.header.Origin: "$input.params('Origin')"
-
-response_config: &response_config
-  templates:
-    application/json: ''
-  parameters:
-    method.response.header.Set-Cookie: 'integration.response.body.GETCOOKIE'
-  selectionpattern: ''
-  statuscode: '200'
-  models:
-    application/json: 'Empty'
-
-method_config:
-  method_name: 'login'
-  lambda_arn: 'arn:aws:lambda:ap-southeast-2:1234567890:function:test'
-  httpmethod: 'POST'
-  authorizationtype: 'NONE'
-  request_config: *request_config
-  response_config:
-    - *response_config
-
-api_gateway_units:

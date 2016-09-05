@@ -8,6 +8,8 @@ from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
+from amazonia.classes.util import get_cf_friendly_name
+
 from nose.tools import *
 from troposphere import Tags, Ref
 
@@ -90,7 +92,6 @@ runcmd:
 def test_stack():
     """ Test stack structure
     """
-    title = 'app'
     stack = create_stack()
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
     assert_equals(stack.keypair, keypair)
@@ -114,9 +115,10 @@ def test_stack():
     assert_is(type(stack.public_route_table.VpcId), Ref)
     assert_is(type(stack.public_route_table.Tags), Tags)
 
-    assert_equals(stack.private_route_table.title, 'PriRt')
-    assert_is(type(stack.private_route_table.VpcId), Ref)
-    assert_is(type(stack.private_route_table.Tags), Tags)
+    for az in availability_zones:
+        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRt')
+        assert_is(type(stack.private_route_tables[az].VpcId), Ref)
+        assert_is(type(stack.private_route_tables[az].Tags), Tags)
 
     assert_equals(stack.nat.single.SourceDestCheck, 'false')
     assert_equals(stack.jump.single.SourceDestCheck, 'true')
@@ -133,8 +135,81 @@ def test_stack():
     assert_equals(len(stack.units), 6)
 
 
+def test_highly_available_nat_stack():
+    """ Test for nat gateway configuration"""
+    global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
+        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
+        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
+        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
+        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
+
+    stack = Stack(
+        code_deploy_service_role=code_deploy_service_role,
+        keypair=keypair,
+        availability_zones=availability_zones,
+        vpc_cidr=vpc_cidr,
+        public_cidr=public_cidr,
+        home_cidrs=home_cidrs,
+        jump_image_id=jump_image_id,
+        jump_instance_type=instance_type,
+        nat_image_id=nat_image_id,
+        nat_instance_type=instance_type,
+        stack_hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        owner_emails=owner_emails,
+        nat_alerting=nat_alerting,
+        nat_highly_available=True,
+        zd_autoscaling_units=[],
+        autoscaling_units=[],
+        database_units=[],
+        cf_distribution_units=[],
+        api_gateway_units=[]
+    )
+
+    assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
+    assert_equals(stack.keypair, keypair)
+    assert_equals(stack.availability_zones, availability_zones)
+    assert_equals(stack.vpc_cidr, vpc_cidr)
+    [assert_equals(stack.home_cidrs[num], home_cidrs[num]) for num in range(len(home_cidrs))]
+    assert_equals(stack.public_cidr, {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
+
+    assert_equals(stack.vpc.title, 'Vpc')
+    assert_equals(stack.vpc.CidrBlock, vpc_cidr)
+    assert_is(type(stack.vpc.Tags), Tags)
+
+    assert_equals(stack.internet_gateway.title, 'Ig')
+    assert_is(type(stack.internet_gateway.Tags), Tags)
+
+    assert_equals(stack.gateway_attachment.title, 'IgAtch')
+    assert_is(type(stack.gateway_attachment.VpcId), Ref)
+    assert_is(type(stack.gateway_attachment.InternetGatewayId), Ref)
+
+    assert_equals(stack.public_route_table.title, 'PubRt')
+    assert_is(type(stack.public_route_table.VpcId), Ref)
+    assert_is(type(stack.public_route_table.Tags), Tags)
+
+    for az in availability_zones:
+        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRt')
+        assert_is(type(stack.private_route_tables[az].VpcId), Ref)
+        assert_is(type(stack.private_route_tables[az].Tags), Tags)
+
+    assert_equals(len(stack.nat_gateways), len(availability_zones))
+    assert_equals(stack.jump.single.SourceDestCheck, 'true')
+
+    for num in range(len(availability_zones)):
+        # For public subnets
+        public_subnet = stack.public_subnets[num]
+        assert_equals(public_subnet.CidrBlock, ''.join(['10.0.', str(num), '.0/24']))
+
+        # For private subnets
+        private_subnet = stack.private_subnets[num]
+        assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
+
+    assert_equals(len(stack.units), 0)
+
+
 def test_duplicate_unit_names():
-    """ Test 4 different variations of duplicate unit names
+    """ Test for duplicate unit names
     """
 
     assert_raises(DuplicateUnitNameError, Stack, **{
@@ -152,6 +227,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -231,6 +307,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'database_units': [{'unit_title': 'db1',
                             'database_config': DatabaseConfig(
                                 db_instance_type=db_instance_type,
@@ -278,6 +355,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'zd_autoscaling_units': [],
         'autoscaling_units': [{'unit_title': 'app1',
                                'elb_config': ElbConfig(
@@ -340,6 +418,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
+        'nat_highly_available': False,
         'zd_autoscaling_units': [{'unit_title': 'zdapp1',
                                   'elb_config': ElbConfig(
                                       loadbalancer_protocol=loadbalancer_protocol,
@@ -431,7 +510,6 @@ def test_duplicate_unit_names():
         'api_gateway_units': []
     })
 
-
 def create_stack():
     """
     Helper function to create a stack with default values
@@ -458,6 +536,7 @@ def create_stack():
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_alerting=nat_alerting,
+        nat_highly_available=False,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    loadbalancer_protocol=loadbalancer_protocol,
@@ -572,23 +651,24 @@ def create_stack():
                          }
                         ],
         cf_distribution_units=[{'unit_title': 'cfdist1',
-                                'cf_origins_config': [ CFOriginsConfig (
-                                        domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-                                        origin_id='S3-amazonia-elb-bucket',
-                                        origin_policy={
-                                            'is_s3' : True,
-                                            'origin_access_identity': 'originaccessid1'
-                                        }
-                                    ),
+                                'cf_origins_config': [CFOriginsConfig(
+                                    domain_name='amazonia-elb-bucket.s3.amazonaws.com',
+                                    origin_id='S3-amazonia-elb-bucket',
+                                    origin_policy={
+                                        'is_s3': True,
+                                        'origin_access_identity': 'originaccessid1'
+                                    }
+                                ),
                                     CFOriginsConfig(
-                                        domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
+                                        domain_name=
+                                        'amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
                                         origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
                                         origin_policy={
-                                            'is_s3' : False,
-                                            'origin_protocol_policy' : 'https-only',
-                                            'http_port' : 80,
-                                            'https_port' : 443,
-                                            'origin_ssl_protocols' : ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
+                                            'is_s3': False,
+                                            'origin_protocol_policy': 'https-only',
+                                            'http_port': 80,
+                                            'https_port': 443,
+                                            'origin_ssl_protocols': ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
                                         }
                                     )
                                 ],
@@ -603,36 +683,36 @@ def create_stack():
                                     cached_methods=['GET', 'HEAD'],
                                     trusted_signers=['self'],
                                     forward_cookies='all',
-                                    forwarded_headers=['Accept','Set-Cookie'],
+                                    forwarded_headers=['Accept', 'Set-Cookie'],
                                     viewer_protocol_policy='https-only',
                                     min_ttl=0,
                                     default_ttl=0,
                                     max_ttl=0,
                                     error_page_path='index.html',
-                                    acm_cert_arn = 'arn.acm.certificate',
-                                    minimum_protocol_version = 'TLSv1',
-                                    ssl_support_method = 'sni-only'
+                                    acm_cert_arn='arn.acm.certificate',
+                                    minimum_protocol_version='TLSv1',
+                                    ssl_support_method='sni-only'
                                 ),
-                                'cf_cache_behavior_config': [ CFCacheBehavior(
-                                        path_pattern='/index.html',
-                                        allowed_methods=['GET', 'HEAD'],
-                                        cached_methods=['GET', 'HEAD'],
-                                        target_origin_id='S3-bucket-id',
-                                        forward_cookies='all',
-                                        forwarded_headers=['Accept','Set-Cookie'],
-                                        viewer_protocol_policy='allow-all',
-                                        min_ttl=0,
-                                        default_ttl=0,
-                                        max_ttl=0,
-                                        trusted_signers=['self']
-                                    ),
+                                'cf_cache_behavior_config': [CFCacheBehavior(
+                                    path_pattern='/index.html',
+                                    allowed_methods=['GET', 'HEAD'],
+                                    cached_methods=['GET', 'HEAD'],
+                                    target_origin_id='S3-bucket-id',
+                                    forward_cookies='all',
+                                    forwarded_headers=['Accept', 'Set-Cookie'],
+                                    viewer_protocol_policy='allow-all',
+                                    min_ttl=0,
+                                    default_ttl=0,
+                                    max_ttl=0,
+                                    trusted_signers=['self']
+                                ),
                                     CFCacheBehavior(
                                         path_pattern='/login.js',
                                         allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
                                         cached_methods=['GET', 'HEAD'],
                                         target_origin_id='www-origin',
                                         forward_cookies='all',
-                                        forwarded_headers=['Accept','Set-Cookie'],
+                                        forwarded_headers=['Accept', 'Set-Cookie'],
                                         viewer_protocol_policy='https-only',
                                         min_ttl=0,
                                         default_ttl=0,

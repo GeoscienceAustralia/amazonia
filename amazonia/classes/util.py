@@ -1,6 +1,6 @@
 import logging
 import re
-
+import inflection
 import yaml
 
 logging.basicConfig(
@@ -14,7 +14,8 @@ def get_cf_friendly_name(resource_name):
     :param resource_name: input name, potentially containing unfriendly characters like spaces, dashes, underscores etc
     :return: return clean string
     """
-    return re.sub(r'\W+', '', resource_name)
+    split_string = re.findall(r"\w+", resource_name)
+    return inflection.camelize('_'.join(split_string))
 
 
 def read_yaml(user_yaml):

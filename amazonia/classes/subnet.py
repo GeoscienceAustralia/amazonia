@@ -21,12 +21,13 @@ class Subnet(object):
         self.template = template
         self.cidr = cidr
         self.vpc = vpc
+        self.az = az
         self.pub_or_pri = 'Public' if is_public else 'Private'
 
         # Create Subnet
         subnet_title = self.pub_or_pri + 'Subnet' + az[-1:].upper()
         self.trop_subnet = self.template.add_resource(ec2.Subnet(subnet_title,
-                                                                 AvailabilityZone=az,
+                                                                 AvailabilityZone=self.az,
                                                                  VpcId=Ref(self.vpc),
                                                                  CidrBlock=self.cidr,
                                                                  Tags=Tags(Name=Join('',

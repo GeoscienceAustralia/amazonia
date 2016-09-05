@@ -564,6 +564,10 @@ nat_alerting: # A True/False advising whether or not to alert on the NAT instanc
   type: 'boolean'
   nullable: False
   empty: False
+nat_highly_available: # A True/False advising whether or not to use a single NAT instance or a series of NAT gateways
+  type: 'boolean'
+  nullable: False
+  empty: False
 
 zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'

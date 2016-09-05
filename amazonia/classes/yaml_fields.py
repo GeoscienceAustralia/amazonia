@@ -168,6 +168,7 @@ class YamlFields(object):
         'jump_instance_type',
         'nat_image_id',
         'nat_instance_type',
+        'nat_highly_available',
         'home_cidrs',
         'stack_hosted_zone_name',
         'cf_distribution_units',

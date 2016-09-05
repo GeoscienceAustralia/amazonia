@@ -1,22 +1,21 @@
 #!/usr/bin/python3
 
-from nose.tools import *
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
 from amazonia.classes.cf_origins_config import CFOriginsConfig
-from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
-from troposphere import Template, cloudfront
+from nose.tools import *
+
 
 def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.com'),
                                   comment='UnitTestCFDistConfig',
                                   default_root_object='index.html',
                                   enabled=True, price_class='PriceClass_All',
                                   target_origin_id='originId',
-                                  allowed_methods=('GET','HEAD'),
-                                  cached_methods=('GET','HEAD'),
+                                  allowed_methods=('GET', 'HEAD'),
+                                  cached_methods=('GET', 'HEAD'),
                                   trusted_signers=('self'),
                                   forward_cookies='*',
-                                  forwarded_headers=('Accept','Set-Cookie'),
+                                  forwarded_headers=('Accept', 'Set-Cookie'),
                                   viewer_protocol_policy='https-only',
                                   min_ttl=0, default_ttl=0, max_ttl=0,
                                   error_page_path='index.html',
@@ -68,8 +67,9 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
 
     return cf_distribution_config
 
+
 def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_id='S3-bucket-id',
-                   is_s3=True, origin_access_identity = 'originaccessid1'):
+                     is_s3=True, origin_access_identity='originaccessid1'):
     """
     Create an S3Origin object
     :param domain_name: The DNS name of the S3 bucket or HTTP server which this distribution will point to
@@ -78,7 +78,6 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
     :param origin_access_identity: The Cloudfront origin access identity to associate with the origin
     :return: Instance of S3Origin object
     """
-    template = Template()
 
     origin = CFOriginsConfig(
         domain_name=domain_name,
@@ -93,12 +92,12 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
 
 
 def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-                        origin_id='S3-bucket-id',
-                        is_s3=False,
-                        origin_protocol_policy='https-only',
-                        http_port='80',
-                        https_port='443',
-                        origin_ssl_protocols=('TLSv1', 'TLSv1.1', 'TLSv1.2')):
+                         origin_id='S3-bucket-id',
+                         is_s3=False,
+                         origin_protocol_policy='https-only',
+                         http_port='80',
+                         https_port='443',
+                         origin_ssl_protocols=('TLSv1', 'TLSv1.1', 'TLSv1.2')):
     """
     Create a CustomOrigin object
     :param domain_name: The DNS name of the S3 bucket or HTTP server which this distribution will point to
@@ -110,7 +109,6 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
     :param origin_ssl_protocols: The SSL protocols to be used when establishing an HTTPS connection with the origin
     :return: Instance of CustomOrigin object
     """
-    template = Template()
 
     origin = CFOriginsConfig(
         domain_name=domain_name,
@@ -126,12 +124,13 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
 
     return origin
 
+
 def create_cache_behavior(path_pattern='/index.html',
                           allowed_methods=('GET', 'POST'),
                           cached_methods=('GET', 'POST'),
                           target_origin_id='S3-bucket-id',
                           forward_cookies='all',
-                          forwarded_headers=('Accept','Set-Cookie'),
+                          forwarded_headers=('Accept', 'Set-Cookie'),
                           viewer_protocol_policy='allow-all',
                           min_ttl=0,
                           default_ttl=0,
@@ -146,6 +145,8 @@ def create_cache_behavior(path_pattern='/index.html',
     :param min_ttl: The minimum amount of time objects should stay in the cache
     :param default_ttl: The default amount of time objects stay in the cache
     :param max_ttl: The maximum amount of time objects should stay in the cache
+    :param forward_cookies: boolean to forward cookies to origin
+    :param trusted_signers: list of identifies that are trusted to sign cookies on behalf of this behavior
     :return: Instance of CacheBehavior object
     """
     cache_behavior = CFCacheBehavior(
@@ -163,6 +164,7 @@ def create_cache_behavior(path_pattern='/index.html',
     )
 
     return cache_behavior
+
 
 def test_s3_origin():
     """
@@ -182,6 +184,7 @@ def test_s3_origin():
     assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
     assert_equal(origin_access_identity, helper_cf_origin.origin_access_identity)
 
+
 def test_s3_origin_oai():
     """
     Test to check S3Origin object inputs match the created outputs
@@ -200,6 +203,7 @@ def test_s3_origin_oai():
     assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
     assert_equal(origin_access_identity, helper_cf_origin.origin_access_identity)
 
+
 def test_custom_origin():
     """
     Test to check CustomOrigin object inputs match the created outputs
@@ -213,12 +217,12 @@ def test_custom_origin():
     origin_ssl_protocols = ('TLSv1', 'TLSv1.1', 'TLSv1.2')
 
     helper_cf_origin = create_custom_origin(domain_name=domain_name,
-                                        is_s3=is_s3,
-                                        origin_protocol_policy=origin_protocol_policy,
-                                        http_port=http_port,
-                                        https_port=https_port,
-                                        origin_ssl_protocols=origin_ssl_protocols
-                                        )
+                                            is_s3=is_s3,
+                                            origin_protocol_policy=origin_protocol_policy,
+                                            http_port=http_port,
+                                            https_port=https_port,
+                                            origin_ssl_protocols=origin_ssl_protocols
+                                            )
 
     assert_equal(domain_name, helper_cf_origin.domain_name)
     assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
@@ -226,6 +230,7 @@ def test_custom_origin():
     assert_equal(http_port, helper_cf_origin.http_port)
     assert_equal(https_port, helper_cf_origin.https_port)
     assert_equal(origin_ssl_protocols, helper_cf_origin.origin_ssl_protocols)
+
 
 def test_cf_cache_behavior():
     """
@@ -236,7 +241,7 @@ def test_cf_cache_behavior():
     cached_methods = ('GET', 'POST'),
     target_origin_id = 'S3-bucket-id'
     forward_cookies = 'all'
-    forwarded_headers = ('Accept','Set-Cookie')
+    forwarded_headers = ('Accept', 'Set-Cookie')
     viewer_protocol_policy = 'allow-all'
     min_ttl = 0
     default_ttl = 0
@@ -266,11 +271,11 @@ def test_cf_cache_behavior():
     assert_equal(max_ttl, helper_cf_cache_behavior.max_ttl)
     assert_equal(trusted_signers, helper_cf_cache_behavior.trusted_signers)
 
+
 def test_cf_distribution_config():
     """
     Test to check DistributionConfig object inputs match the created outputs
     """
-    template = Template()
 
     aliases = 'wwwelb.ap-southeast-2.elb.amazonaws.com'
     comment = 'UnitTestCFDistConfig'
@@ -282,7 +287,7 @@ def test_cf_distribution_config():
     cached_methods = ['GET', 'HEAD']
     trusted_signers = 'self'
     forward_cookies = 'all'
-    forwarded_headers = ('Accept','Set-Cookie')
+    forwarded_headers = ('Accept', 'Set-Cookie')
     viewer_protocol_policy = 'https-only'
     min_ttl = 0
     default_ttl = 0

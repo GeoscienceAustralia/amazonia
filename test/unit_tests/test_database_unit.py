@@ -1,8 +1,8 @@
+from amazonia.classes.database_config import DatabaseConfig
+from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
+from amazonia.classes.network_config import NetworkConfig
 from nose.tools import *
 from troposphere import ec2, Ref, Tags, Template, Join
-from amazonia.classes.database_config import DatabaseConfig
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
 
 template = network_config = database_config = None
 
@@ -17,10 +17,10 @@ def setup_resources():
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway',
                                                                  Tags=Tags(Name='MyInternetGateway')))
 
-    gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
-                                                                        InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc),
-                                                                        DependsOn=internet_gateway.title))
+    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
+                                                   InternetGatewayId=Ref(internet_gateway),
+                                                   VpcId=Ref(vpc),
+                                                   DependsOn=internet_gateway.title))
 
     private_subnets = [template.add_resource(ec2.Subnet('MyPrivSub1',
                                                         AvailabilityZone='ap-southeast-2a',
@@ -43,7 +43,9 @@ def setup_resources():
         nat=None,
         stack_hosted_zone_name=None,
         cd_service_role_arn=None,
-        keypair=None
+        keypair=None,
+        nat_highly_available=False,
+        nat_gateways=None
     )
 
     database_config = DatabaseConfig(
