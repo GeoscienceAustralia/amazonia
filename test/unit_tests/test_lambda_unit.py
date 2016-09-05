@@ -1,8 +1,10 @@
-from amazonia.classes.lambda_unit import LambdaUnit, InvalidFlowError
 from amazonia.classes.lambda_config import LambdaConfig
+from amazonia.classes.lambda_unit import LambdaUnit, InvalidFlowError
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from nose.tools import *
-from troposphere import ec2, Ref, Tags, Template, Join
+from troposphere import ec2, Ref, Tags, Template
 
 template = network_config = lambda_config = None
 
@@ -34,13 +36,34 @@ def setup_resources():
                                                         AvailabilityZone='ap-southeast-2c',
                                                         VpcId=Ref(vpc),
                                                         CidrBlock='10.0.3.0/24'))]
+    public_subnets = [ec2.Subnet('MySubnet2',
+                                 AvailabilityZone='ap-southeast-2a',
+                                 VpcId=Ref(vpc),
+                                 CidrBlock='10.0.2.0/24')]
+    single_instance_config = SingleInstanceConfig(
+        keypair='pipeline',
+        si_image_id='ami-53371f30',
+        si_instance_type='t2.nano',
+        vpc=vpc,
+        subnet=public_subnets[0],
+        instance_dependencies=vpc.title,
+        alert=False,
+        alert_emails=['some@email.com'],
+        hosted_zone_name=None,
+        iam_instance_profile_arn=None,
+        is_nat=True
+    )
+    nat = SingleInstance(title='Nat',
+                         template=template,
+                         single_instance_config=single_instance_config
+                         )
     network_config = NetworkConfig(
         public_cidr=None,
         vpc=vpc,
         public_subnets=None,
         private_subnets=private_subnets,
         jump=None,
-        nat=None,
+        nat=nat,
         stack_hosted_zone_name=None,
         cd_service_role_arn=None,
         keypair=None,
