@@ -6,7 +6,7 @@ from troposphere.awslambda import Code, VPCConfig, Function
 
 
 class LambdaUnit(SecurityEnabledObject):
-    def __init__(self, unit_title, template, network_config, lambda_config, dependencies):
+    def __init__(self, unit_title, template, dependencies, network_config, lambda_config):
         """
         Amazonia lambda unit definition
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
@@ -24,14 +24,15 @@ class LambdaUnit(SecurityEnabledObject):
         self.trop_lambda_function = template.add_resource(
             Function(self.title,
                      Code=Code(S3Bucket=lambda_config.lambda_s3_bucket, S3Key=lambda_config.lambda_s3_key),
-                     Description=lambda_config.description,
-                     FunctionName=lambda_config.function_name,
-                     Handler=lambda_config.handler,
-                     MemorySize=lambda_config.memory_size,
+                     Description=lambda_config.lambda_description,
+                     FunctionName=lambda_config.lambda_function_name,
+                     Handler=lambda_config.lambda_handler,
+                     MemorySize=lambda_config.lambda_memory_size,
                      Role=lambda_config.lambda_role_arn,
                      Runtime=lambda_config.lambda_runtime,
                      Timeout=lambda_config.lambda_timeout,
-                     VPCConfig=VPCConfig(SecurityGroupIds=[Ref(self.security_group)])))
+                     VpcConfig=VPCConfig(SubnetIds=[Ref(x) for x in network_config.private_subnets],
+                                         SecurityGroupIds=[Ref(self.security_group)])))
 
     def get_dependencies(self):
         """
