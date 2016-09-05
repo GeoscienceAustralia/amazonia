@@ -6,7 +6,10 @@ from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.util import get_cf_friendly_name
+
 from nose.tools import *
 from troposphere import Tags, Ref
 
@@ -129,7 +132,7 @@ def test_stack():
         private_subnet = stack.private_subnets[num]
         assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
 
-    assert_equals(len(stack.units), 5)
+    assert_equals(len(stack.units), 6)
 
 
 def test_highly_available_nat_stack():
@@ -159,8 +162,10 @@ def test_highly_available_nat_stack():
         zd_autoscaling_units=[],
         autoscaling_units=[],
         database_units=[],
-        cf_distribution_units=[]
+        cf_distribution_units=[],
+        api_gateway_units=[]
     )
+
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
     assert_equals(stack.keypair, keypair)
     assert_equals(stack.availability_zones, availability_zones)
@@ -282,6 +287,7 @@ def test_duplicate_unit_names():
         'database_units': [],
         'zd_autoscaling_units': [],
         'cf_distribution_units': [],
+        'api_gateway_units': []
     })
 
 
@@ -495,6 +501,27 @@ def create_stack():
                                         trusted_signers=['self']
                                     )
                                 ]
-                                }]
+                                }],
+        api_gateway_units=[{'unit_title': 'test',
+                            'method_config': [
+                                ApiGatewayMethodConfig(
+                                    method_name='login',
+                                    lambda_arn='arn:aws:123456789',
+                                    httpmethod='POST',
+                                    authorizationtype='NONE',
+                                    request_config=ApiGatewayRequestConfig(
+                                        templates={'application/json': ''},
+                                        parameters={'somemapping': 'somefield'}
+                                    ),
+                                    response_config=[ApiGatewayResponseConfig(
+                                        templates={'application/json': ''},
+                                        parameters={'somemapping': 'somefield'},
+                                        statuscode='200',
+                                        models={'application/json': 'Empty'},
+                                        selectionpattern=''
+                                    )]
+                                )
+                            ]
+                            }]
     )
     return stack

@@ -9,6 +9,7 @@ from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.util import get_cf_friendly_name
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from troposphere import Ref, Template, ec2, Tags, Join, GetAtt
 from troposphere.ec2 import EIP, NatGateway
 
@@ -17,7 +18,7 @@ class Stack(object):
     def __init__(self, amz_version, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, stack_hosted_zone_name,
-                 iam_instance_profile_arn, owner_emails,
+                 iam_instance_profile_arn, owner_emails, api_gateway_units,
                  nat_alerting, nat_highly_available):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
@@ -42,6 +43,7 @@ class Stack(object):
         maxsize, image_id, instance_type, userdata)
         :param database_units: list of database_unit dicts (db_instance_type, db_engine, db_port)
         :param cf_distribution_units: list of cf_distribution_unit dicts
+        :param api_gateway_units: list of api_gateway_unit dicts
         :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
         sets in.
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
@@ -71,6 +73,7 @@ class Stack(object):
         self.database_units = database_units if database_units else []
         self.cf_distribution_units = cf_distribution_units if cf_distribution_units else []
         self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
+        self.api_gateway_units = api_gateway_units if api_gateway_units else []
         self.iam_instance_profile_arn = iam_instance_profile_arn
 
         # initialize object references
@@ -103,6 +106,9 @@ class Stack(object):
 
         # Add Cloudfront Units
         self.add_units(self.cf_distribution_units, CFDistributionUnit)
+
+        # Add ApiGateway Units
+        self.add_units(self.api_gateway_units, ApiGatewayUnit)
 
         # Add Unit flow
         for unit_name in self.units:
