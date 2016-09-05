@@ -2,7 +2,7 @@
 
 
 class ApiGatewayMethodConfig(object):
-    def __init__(self, method_name, lambda_arn, request, responses, httpmethod, authorizationtype):
+    def __init__(self, method_name, lambda_arn, request_config, response_config, httpmethod, authorizationtype):
         """
         Simple config class for block device mappings for multiple disks
         AWS Cloud Formation Links:
@@ -14,8 +14,8 @@ class ApiGatewayMethodConfig(object):
 
         self.method_name = method_name
         self.lambda_arn = lambda_arn
-        self.request = request
-        self.responses = responses
+        self.request = request_config
+        self.responses = response_config
         self.httpmethod = httpmethod
         self.authorizationtype = authorizationtype
 
@@ -30,7 +30,7 @@ class ApiGatewayRequestConfig(object):
 
 
 class ApiGatewayResponseConfig(ApiGatewayRequestConfig):
-    def __init__(self, templates, parameters, statuscode, models):
+    def __init__(self, templates, parameters, statuscode, models, selectionpattern):
         """
 
         """
@@ -39,3 +39,4 @@ class ApiGatewayResponseConfig(ApiGatewayRequestConfig):
 
         self.statuscode = statuscode
         self.models = models
+        self.selectionpattern = selectionpattern

@@ -4,38 +4,39 @@ from troposphere import Ref, Join, GetAtt
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
 
 
-class ApiGateway(object):
-    def __init__(self, title, template, method_configs):
+class ApiGatewayUnit(object):
+    def __init__(self, unit_title, template, method_config, network_config):
         """
         """
-        self.title = title
+        self.title = unit_title
         self.template = template
         self.methods = []
         self.method_responses = []
         self.integration_responses = []
+        self.dependencies = []
 
         self.api = self.template.add_resource(RestApi(
-                                                      '{0}API'.format(title),
-                                                      Name=title
+                                                      '{0}API'.format(self.title),
+                                                      Name=self.title
                                                      )
                                              )
 
-        for method_config in method_configs:
+        for method in method_config:
 
-            resource = self.create_resource(method_config)
-            self.get_responses(method_config)
+            resource = self.create_resource(method)
+            self.get_responses(method)
 
-            integration = self.create_integration(method_config)
+            integration = self.create_integration(method)
 
             method = Method(
-                            '{0}Method'.format(method_config.method_name),
+                            '{0}Method'.format(method.method_name),
                             RestApiId=Ref(self.api),
-                            AuthorizationType=method_config.authorizationtype,
+                            AuthorizationType=method.authorizationtype,
                             ResourceId=Ref(resource),
-                            HttpMethod=method_config.httpmethod,
+                            HttpMethod=method.httpmethod,
                             Integration=integration,
                             MethodResponses=self.method_responses,
-                            RequestParameters=method_config.request.parameters
+                            RequestParameters=method.request.parameters
                             )
             self.methods.append(method)
             self.template.add_resource(method)
@@ -98,6 +99,13 @@ class ApiGateway(object):
                                     '{0}IntegrationResponse{1}'.format(method_config.method_name, number),
                                     StatusCode=response.statuscode,
                                     ResponseParameters=response.parameters,
-                                    ResponseTemplates=response.templates
+                                    ResponseTemplates=response.templates,
+                                    SelectionPattern=response.selectionpattern
                                    )
             )
+
+    def get_dependencies(self):
+        """
+        :return: returns an empty list as a cfdistribution has no upstream dependencies
+        """
+        return self.dependencies
