@@ -104,19 +104,29 @@ class CFDistributionUnit(object):
 
         for number, cache_behavior in enumerate(cf_cache_behavior_config):
 
+            if cache_behavior.forwarded_headers is None:
+                forwarded_values = cloudfront.ForwardedValues(
+                    Cookies=cloudfront.Cookies(
+                        Forward=cache_behavior.forward_cookies
+                    ),
+                    QueryString=False
+                )
+            else:
+                forwarded_values = cloudfront.ForwardedValues(
+                    Cookies=cloudfront.Cookies(
+                        Forward=cache_behavior.forward_cookies
+                    ),
+                    Headers=cache_behavior.forwarded_headers,
+                    QueryString=False
+                )
+
             created_cache_behavior = cloudfront.CacheBehavior(
                 '{0}CacheBehavior{1}'.format(title, number),
                 AllowedMethods=cache_behavior.allowed_methods,
                 CachedMethods=cache_behavior.cached_methods,
                 Compress=False,
                 TargetOriginId=cache_behavior.target_origin_id,
-                ForwardedValues=cloudfront.ForwardedValues(
-                    Cookies=cloudfront.Cookies(
-                        Forward=cache_behavior.forward_cookies
-                    ),
-                    Headers=cache_behavior.forwarded_headers,
-                    QueryString=False
-                ),
+                ForwardedValues=forwarded_values,
                 TrustedSigners=cache_behavior.trusted_signers,
                 ViewerProtocolPolicy=cache_behavior.viewer_protocol_policy,
                 MinTTL=cache_behavior.min_ttl,
@@ -135,13 +145,28 @@ class CFDistributionUnit(object):
         :param cf_distribution_config: Object containing the default cache behavior of this distribution
         :return: Returns the created DefaultCacheBehavior object
         """
+
+        if cf_distribution_config.forwarded_headers is None:
+            forwarded_values = cloudfront.ForwardedValues(
+                Cookies=cloudfront.Cookies(
+                    Forward=cf_distribution_config.forward_cookies
+                ),
+                QueryString=False
+            )
+        else:
+            forwarded_values = cloudfront.ForwardedValues(
+                Cookies=cloudfront.Cookies(
+                    Forward=cf_distribution_config.forward_cookies
+                ),
+                Headers=cf_distribution_config.forwarded_headers,
+                QueryString=False
+        )
+
         return cloudfront.DefaultCacheBehavior(
             TargetOriginId=cf_distribution_config.target_origin_id,
             CachedMethods=cf_distribution_config.cached_methods,
             Compress=False,
-            ForwardedValues=cloudfront.ForwardedValues(
-                QueryString=False
-            ),
+            ForwardedValues=forwarded_values,
             TrustedSigners=cf_distribution_config.trusted_signers,
             ViewerProtocolPolicy=cf_distribution_config.viewer_protocol_policy,
             MinTTL=cf_distribution_config.min_ttl,

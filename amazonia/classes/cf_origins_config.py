@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from troposphere import cloudfront
-import re
 
 class CFOriginsConfig(object):
     def __init__(self, domain_name, origin_id, origin_policy):
@@ -26,9 +25,6 @@ class CFOriginsConfig(object):
 
             self.origin_access_identity = origin_policy['origin_access_identity']
 
-            # Ensure OAI is prepended with required string
-            if not (re.search('origin-access-identity/cloudfront', self.origin_access_identity)):
-                self.origin_access_identity = 'origin-access-identity/cloudfront/' + self.origin_access_identity
         else:
             # Check if custom origin variables exist, and set them if they do
             self.origin_protocol_policy = origin_policy['origin_protocol_policy']

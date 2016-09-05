@@ -39,7 +39,7 @@ def main():
             cached_methods=['GET', 'HEAD'],
             target_origin_id='S3-bucket-id',
             forward_cookies='all',
-            forwarded_headers=[''],
+            forwarded_headers=[],
             viewer_protocol_policy='allow-all',
             min_ttl=0,
             default_ttl=0,

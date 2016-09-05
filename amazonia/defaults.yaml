@@ -138,7 +138,6 @@ cf_distribution_config:
   target_origin_id:
   forward_cookies: 'all'
   forwarded_headers:
-   - '*'
   allowed_methods:
    - 'GET'
    - 'HEAD'
@@ -180,7 +179,6 @@ cf_cache_behavior_config:
    target_origin_id:
    forward_cookies: 'all'
    forwarded_headers:
-     - '*'
    viewer_protocol_policy: 'https-only'
    min_ttl: 0
    default_ttl: 0
