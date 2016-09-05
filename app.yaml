@@ -1,0 +1,371 @@
+#
+# Test Stack User Yaml for Amazonia
+#
+keypair: 'sentinel'
+code_deploy_service_role: 'arn:aws:iam::400725546443:role/CodeDeployServiceRole'
+availability_zones:
+  - 'ap-southeast-2a'
+  - 'ap-southeast-2b'
+  - 'ap-southeast-2c'
+vpc_cidr: '10.0.0.0/16'
+public_cidr:
+  name: 'PublicIp'
+  cidr: '0.0.0.0/0'
+jump_image_id: ami-0c95b86f
+jump_instance_type: 't2.micro'
+nat_image_id: ami-162c0c75
+nat_instance_type: 't2.micro'
+home_cidrs:
+  - name: 'GA'
+    cidr: '192.104.44.129/32'
+stack_hosted_zone_name: 'sentinel.gadevs.ga.'
+owner_emails:
+  - 'cloudops-alerts@ga.gov.au'
+nat_alerting: true
+iam_instance_profile_arn: 'arn:aws:iam::400725546443:instance-profile/instance-iam-profile-InstanceProfile-CZXE5P03JJQE'
+autoscaling_units:
+  -
+    unit_title: 'appserver'
+    asg_config:
+      image_id: ami-b89aacdb
+      instance_type: 'm4.large'
+      iam_instance_profile_arn: 'arn:aws:iam::400725546443:instance-profile/instance-iam-profile-InstanceProfile-CZXE5P03JJQE'
+      minsize: '1'
+      maxsize: '1'
+      health_check_grace_period: '600'
+      health_check_type: 'ELB'
+      block_devices_config:
+        -
+          device_name: '/dev/xvda'
+          ebs_volume_size: '30'
+          ebs_volume_type: 'standard'
+          ebs_encrypted: False
+          ebs_snapshot_id: ''
+          virtual_name: False
+      sns_topic_arn: 'arn:aws:sns:ap-southeast-2:400725546443:sentinel-autoscaling-alerts'
+      sns_notification_types:
+        - 'autoscaling:EC2_INSTANCE_LAUNCH'
+        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+        - 'autoscaling:EC2_INSTANCE_TERMINATE'
+        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+      userdata: |
+            #cloud-config
+      
+              runcmd:
+                  - >-
+                      sudo ls /
+    elb_config:
+      unit_hosted_zone_name: 'sentinel.gadevs.ga.'
+      loadbalancer_protocol:
+        - 'TCP'
+      instance_protocol:
+        - 'TCP'
+      instance_port:
+        - '8080'
+      loadbalancer_port:
+        - '80'
+      elb_health_check: 'TCP:8080'
+      elb_log_bucket: 'ga-sentinel-elb-logs'
+      public_unit: true
+    dependencies:
+     - 'databasetest'
+  -
+    unit_title: 'appserverpublic'
+    asg_config:
+      image_id: ami-b89aacdb
+      instance_type: 'm4.large'
+      iam_instance_profile_arn: 'arn:aws:iam::400725546443:instance-profile/instance-iam-profile-InstanceProfile-CZXE5P03JJQE'
+      minsize: '1'
+      maxsize: '1'
+      health_check_grace_period: '600'
+      health_check_type: 'ELB'
+      block_devices_config:
+        -
+          device_name: '/dev/xvda'
+          ebs_volume_size: '30'
+          ebs_volume_type: 'standard'
+          ebs_encrypted: False
+          ebs_snapshot_id: ''
+          virtual_name: False
+      sns_topic_arn: 'arn:aws:sns:ap-southeast-2:400725546443:sentinel-autoscaling-alerts'
+      sns_notification_types:
+        - 'autoscaling:EC2_INSTANCE_LAUNCH'
+        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+        - 'autoscaling:EC2_INSTANCE_TERMINATE'
+        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+      userdata: |
+            #cloud-config
+      
+              runcmd:
+                  - >-
+                      sudo aws s3 cp s3://ga-sentinel-secure/staging/gen-historic-data.sh /tmp/gen-historic-data.sh
+                  - >-
+                      sudo chown tomcat:tomcat /tmp/gen-historic-data.sh
+                  - >-
+                      sudo chmod +x /tmp/gen-historic-data.sh
+                  - >-
+                      (crontab -u tomcat -l; echo "0 18 * * * /tmp/gen-historic-data.sh") | sudo crontab -u tomcat -
+    elb_config:
+      unit_hosted_zone_name: 'sentinel.gadevs.ga.'
+      loadbalancer_protocol:
+        - 'TCP'
+      instance_protocol:
+        - 'TCP'
+      instance_port:
+        - '8080'
+      loadbalancer_port:
+        - '80'
+      elb_health_check: 'TCP:8080'
+      elb_log_bucket: 'amazonia-elb-bucket'
+      public_unit: true
+    dependencies:
+     - 'databasetest'
+database_units:
+  -
+    unit_title: 'databasetest'
+    database_config:
+      db_instance_type: 'db.m4.xlarge'
+      db_engine: 'postgres'
+      db_port: '5432'
+      db_hdd_size: 150
+      db_snapshot_id: 
+      db_backup_window: '17:00-17:30'
+      db_backup_retention: '4'
+      db_maintenance_window: 'Mon:15:00-Mon:15:30'
+
+cf_distribution_units:
+
+  -
+    unit_title: 'files'
+    cf_origins_config:
+      -
+        domain_name: ga-sentinel-test.s3.amazonaws.com
+        origin_id: S3-ga-sentinel-test
+        origin_policy:
+          is_s3: True
+          origin_access_identity: ''
+    cf_distribution_config:
+      aliases:
+        - test-files.sentinel.gadevs.ga
+      comment: 'Test Sentinel Files Distribution'
+      target_origin_id: S3-ga-sentinel-test
+      forward_cookies: 'none'
+      viewer_protocol_policy: 'allow-all'
+      min_ttl: 0
+      default_ttl: 84600
+      max_ttl: 31536000
+  -
+    unit_title: 'filessecure'
+    cf_origins_config:
+      -
+        domain_name: ga-sentinel-secure-test.s3.amazonaws.com
+        origin_id: S3-ga-sentinel-secure-test
+        origin_policy:
+          is_s3: True
+          origin_access_identity: origin-access-identity/cloudfront/E2C9I05O2IT0C7
+      -
+        domain_name: iqdi2bwe6e.execute-api.ap-southeast-2.amazonaws.com
+        origin_id: Custom2-iqdi2bwe6e.execute-api.ap-southeast-2.amazonaws.com
+        origin_policy:
+          is_s3: False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+    cf_distribution_config:
+      aliases:
+        - test-files.sentinel-secure.gadevs.ga
+      comment: 'Test Sentinel Secure Files Distribution'
+      target_origin_id: S3-ga-sentinel-secure-test
+      forward_cookies: 'none'
+      viewer_protocol_policy: 'https-only'
+      min_ttl: 0
+      default_ttl: 84600
+      max_ttl: 31536000
+      error_page_path: '/index.html'
+    cf_cache_behavior_config:
+      -
+        path_pattern: '/login'
+        target_origin_id: Custom2-iqdi2bwe6e.execute-api.ap-southeast-2.amazonaws.com
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+        min_ttl: 0
+        default_ttl: 84600
+        max_ttl: 31536000
+        forward_cookies: 'all'
+      -
+        path_pattern: '/index.html'
+        target_origin_id: S3-ga-sentinel-secure-test
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'all'
+      -
+        path_pattern: '/list.js'
+        target_origin_id: S3-ga-sentinel-secure-test
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'all'
+
+  -
+    unit_title: 'www'
+    cf_origins_config:
+      -
+        domain_name: ga-sentinel-ui-test.s3.amazonaws.com
+        origin_id: S3-ga-sentinel-ui-test
+        origin_policy:
+          is_s3: True
+          origin_access_identity: ''
+      -
+        domain_name: sentinelt-sentinel-CV5XTCA39C5J-435341163.ap-southeast-2.elb.amazonaws.com
+        origin_id: ELB-sentinelt-sentinel-CV5XTCA39C5J-435341163
+        origin_policy:
+          is_s3: False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+    cf_distribution_config:
+      aliases:
+        - test-sentinel.gadevs.ga
+        - www.test-sentinel.gadevs.ga
+      comment: 'Test Sentinel WWW Distribution'
+      target_origin_id: S3-ga-sentinel-ui-test
+      forward_cookies: 'none'
+      viewer_protocol_policy: 'allow-all'
+      min_ttl: 0
+      default_ttl: 0
+      max_ttl: 0
+    cf_cache_behavior_config:
+      -
+        path_pattern: '/geoserver/*'
+        target_origin_id: ELB-sentinelt-sentinel-CV5XTCA39C5J-435341163
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'all'
+        forwarded_headers:
+         - '*'
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+
+  -
+    unit_title: 'wwwsecure'
+    cf_origins_config:
+      -
+        domain_name: ga-sentinel-ui-test.s3.amazonaws.com
+        origin_id: S3-ga-sentinel-ui-test
+        origin_policy:
+          is_s3: True
+          origin_access_identity: ''
+      -
+        domain_name: sentinelt-sentinel-1L842CMRKZEZS-1745793521.ap-southeast-2.elb.amazonaws.com
+        origin_id: ELB-sentinelt-sentinel-1L842CMRKZEZS-1745793521
+        origin_policy:
+          is_s3: False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+      -
+        domain_name: 27k6pg4v4m.execute-api.ap-southeast-2.amazonaws.com
+        origin_id: Custom2-27k6pg4v4m.execute-api.ap-southeast-2.amazonaws.com/prod
+        origin_policy:
+          is_s3: False
+          origin_protocol_policy: 'https-only'
+          http_port: 80
+          https_port: 443
+          origin_ssl_protocols:
+           - 'TLSv1'
+           - 'TLSv1.1'
+           - 'TLSv1.2'
+    cf_distribution_config:
+      aliases:
+        - test-sentinel-secure.gadevs.ga
+      comment: 'Test Sentinel WWW Secure Distribution'
+      target_origin_id: S3-ga-sentinel-ui-test
+      forward_cookies: 'none'
+      viewer_protocol_policy: 'allow-all'
+      min_ttl: 0
+      default_ttl: 0
+      max_ttl: 0
+    cf_cache_behavior_config:
+      -
+        path_pattern: '/geoserver/*'
+        target_origin_id: ELB-sentinelt-sentinel-1L842CMRKZEZS-1745793521
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'all'
+        forwarded_headers:
+         - '*'
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+      -
+        path_pattern: '/prod/login'
+        target_origin_id: Custom2-27k6pg4v4m.execute-api.ap-southeast-2.amazonaws.com/prod
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'all'
+        forwarded_headers:
+         - 'Accept'
+         - 'Accept-Charset'
+         - 'Accept-Datetime'
+         - 'Accept-Language'
+         - 'Authorization'
+         - 'Content-Type'
+         - 'Origin'
+         - 'Referer'
+         - 'Set-Cookie'
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
+      -
+        path_pattern: '/geoserver/j_spring_security_check'
+        target_origin_id: ELB-sentinelt-sentinel-1L842CMRKZEZS-1745793521
+        min_ttl: 0
+        default_ttl: 0
+        max_ttl: 0
+        forward_cookies: 'none'
+        allowed_methods:
+         - 'GET'
+         - 'POST'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'PUT'
+         - 'PATCH'
