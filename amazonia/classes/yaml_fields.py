@@ -176,6 +176,7 @@ class YamlFields(object):
         'zd_autoscaling_units',
         'autoscaling_units',
         'api_gateway_units',
+        'lambda_units',
         'database_units',
         'iam_instance_profile_arn',
         'owner_emails',
