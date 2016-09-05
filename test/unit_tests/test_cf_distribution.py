@@ -198,8 +198,7 @@ def test_s3_origin_oai():
 
     assert_equal(domain_name, helper_cf_origin.domain_name)
     assert_equal(is_s3, helper_cf_origin.origin_policy['is_s3'])
-    assert_equal('origin-access-identity/cloudfront/' + origin_access_identity,
-                 helper_cf_origin.origin_access_identity)
+    assert_equal(origin_access_identity, helper_cf_origin.origin_access_identity)
 
 def test_custom_origin():
     """
