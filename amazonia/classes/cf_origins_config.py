@@ -19,6 +19,11 @@ class CFOriginsConfig(object):
         self.domain_name = domain_name
         self.origin_id = origin_id
         self.origin_policy = origin_policy
+        self.origin_access_identity = None
+        self.origin_protocol_policy = None
+        self.http_port = None
+        self.https_port = None
+        self.origin_ssl_protocols = None
 
         if origin_policy['is_s3']:
             # Set S3 origin variables
