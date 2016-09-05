@@ -10,6 +10,9 @@ template = apiname = methodname = lambda_arn = httpmethod = authorizationtype = 
 
 
 def setup_resources():
+    """
+    Initialise resources before each test
+    """
     global template, apiname, methodname, lambda_arn, httpmethod, authorizationtype, request_template,\
         request_parameters, response_template, response_parameters, response_models, selection_pattern, statuscode
 
@@ -197,4 +200,3 @@ def create_api(method_config):
     """
 
     return ApiGatewayUnit(apiname, template, [method_config], None)
-

@@ -7,6 +7,20 @@ from troposphere.apigateway import RestApi, Resource, MethodResponse, Integratio
 class ApiGatewayUnit(object):
     def __init__(self, unit_title, template, method_config, network_config):
         """
+        This class creates an API Gateway object with one or multiple methods attached.
+        AWS Cloud Formation Links:
+        RestApi: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html
+        Resource: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-resource.html
+        Method: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html
+        Integration: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apitgateway-method-integration.html
+
+        Troposhere link:
+        https://github.com/cloudtools/troposphere/blob/master/troposphere/apigateway.py
+
+        :param unit_title: The title of the api gateway being created
+        :param template: the troposphere template object to update
+        :param method_config: a list of one or many ApiGatewayMethodConfig objects with data prefilled from yaml values
+        :param network_config: a Network Config object, currently unused but required while this is considered a 'unit'
         """
         self.title = unit_title
         self.template = template
@@ -14,6 +28,7 @@ class ApiGatewayUnit(object):
         self.method_responses = []
         self.integration_responses = []
         self.dependencies = []
+        self.network_config = network_config
 
         self.api = self.template.add_resource(RestApi(
                                                       '{0}API'.format(self.title),
@@ -43,9 +58,9 @@ class ApiGatewayUnit(object):
 
     def create_resource(self, method_config):
         """
-
-        :param method_config:
-        :return:
+        Creates a resource using a single provided ApiGatewayMethodConfig object.
+        :param method_config: a single ApiGatewayMethodConfig object
+        :return: a troposphere Resource object that links the API with methods
         """
 
         return self.template.add_resource(Resource(
@@ -57,6 +72,12 @@ class ApiGatewayUnit(object):
                                          )
 
     def create_integration(self, method_config):
+        """
+        Creates an integration object using a single provided ApiGatewayMethodConfig object.
+        :param method_config: a single ApiGatewayMethodConfig object
+        :return: a troposphere integration object
+        """
+
         integration = Integration(
                                   '{0}Integration'.format(method_config.method_name),
                                   Credentials='',
@@ -73,15 +94,17 @@ class ApiGatewayUnit(object):
                                           )
                                  )
 
+        # At time of creation of this class, the PassthroughBehavior parameter is not implemented for integrations
+        # in troposphere. The below assigns it for now. This can be reworked into the above troposphere object once
+        # troposphere is updated.
         integration.resource['PassthroughBehavior'] = "WHEN_NO_TEMPLATES"
 
         return integration
 
     def get_responses(self, method_config):
         """
-
-        :param method_config:
-        :return:
+        Creates a method and integration response object in troposphere from a provided ApiGatewayMethodConfig object.
+        :param method_config: a preconfigured ApiGatewayMethodConfig object
         """
 
         for number, response in enumerate(method_config.responses):
@@ -106,6 +129,6 @@ class ApiGatewayUnit(object):
 
     def get_dependencies(self):
         """
-        :return: returns an empty list as a cfdistribution has no upstream dependencies
+        :return: returns an empty list as an ApiGatewayUnit has no upstream dependencies
         """
         return self.dependencies

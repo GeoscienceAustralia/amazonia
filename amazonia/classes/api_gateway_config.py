@@ -4,12 +4,7 @@
 class ApiGatewayMethodConfig(object):
     def __init__(self, method_name, lambda_arn, request_config, response_config, httpmethod, authorizationtype):
         """
-        Simple config class for block device mappings for multiple disks
-        AWS Cloud Formation Links:
-        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html
-
-        Troposhere link:
-        https://github.com/cloudtools/troposphere/blob/master/troposphere/apigateway.py
+        This class is used to hold the configuration required for an API Gateway Method
         """
 
         self.method_name = method_name
@@ -23,7 +18,7 @@ class ApiGatewayMethodConfig(object):
 class ApiGatewayRequestConfig(object):
     def __init__(self, templates, parameters):
         """
-
+        This class is used to hold the configuration required for an Api Gateway Request.
         """
         self.templates = templates
         self.parameters = parameters
