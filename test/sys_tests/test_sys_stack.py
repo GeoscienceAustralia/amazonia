@@ -65,6 +65,7 @@ runcmd:
         vpc_cidr='10.0.0.0/16',
         jump_image_id=jump_image_id,
         jump_instance_type=instance_type,
+        nat_highly_available=True,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
         iam_instance_profile_arn=None,
@@ -166,7 +167,7 @@ runcmd:
                                 elb_health_check='HTTP:80/index.html',
                                 unit_hosted_zone_name='gadevs.ga.',
                                 elb_log_bucket=None,
-                                public_unit=True,
+                                public_unit=False,
                                 ssl_certificate_id=None
                             ),
                             'dependencies': []}
@@ -184,7 +185,8 @@ runcmd:
                              db_maintenance_window=None,
                              db_storage_type=None
                          )
-                         }]
+                         }],
+        cf_distribution_units=[]
 
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))

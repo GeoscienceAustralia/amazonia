@@ -23,7 +23,7 @@ def test_block_device_mappings():
         BlockDevicesConfig(device_name='/dev/sda1',
                            ebs_volume_size=None,
                            ebs_volume_type=None,
-                           ebs_encrypted=False,
+                           ebs_encrypted=True,
                            ebs_snapshot_id=None,
                            virtual_name=True),
         BlockDevicesConfig(device_name='/dev/sda2',

@@ -97,7 +97,11 @@ class Yaml(object):
                 value = cofm.constructor(**complex_params)
         # if simple field, return the user value or if not set the corresponding default value
         else:
-            value = user_values.get(current_key, default_values[current_key])
+            if default_values is not None and current_key in default_values:
+                value = user_values.get(current_key, default_values[current_key])
+            else:
+                raise InvalidYamlStructureError('Error: could not find field {0} in default values {1}'
+                                                .format(current_key, default_values))
         return value
 
     def get_complex_params(self, current_key, nested_user_values, complex_key_list, default_values):

@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 
-from troposphere import ec2, Ref, Tags, Template, route53
-
 from amazonia.classes.elb import Elb
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from troposphere import ec2, Ref, Tags, Template, route53
 
 
 def main():
@@ -24,10 +23,10 @@ def main():
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway',
                                                                  Tags=Tags(Name='MyInternetGateway')))
 
-    gateway_attachment = template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
-                                                                        InternetGatewayId=Ref(internet_gateway),
-                                                                        VpcId=Ref(vpc),
-                                                                        DependsOn=internet_gateway.title))
+    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment',
+                                                   InternetGatewayId=Ref(internet_gateway),
+                                                   VpcId=Ref(vpc),
+                                                   DependsOn=internet_gateway.title))
 
     public_subnets = [template.add_resource(ec2.Subnet('MyPubSub1',
                                                        AvailabilityZone='ap-southeast-2a',
@@ -67,7 +66,9 @@ def main():
         nat=nat,
         public_cidr=None,
         keypair=None,
-        cd_service_role_arn=None
+        cd_service_role_arn=None,
+        nat_highly_available=False,
+        nat_gateways=[]
     )
     elb_config1 = ElbConfig(
         instance_port=['80'],

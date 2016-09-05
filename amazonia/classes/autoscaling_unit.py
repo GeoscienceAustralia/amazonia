@@ -31,10 +31,14 @@ class AutoscalingUnit(object):
             asg_config=asg_config,
             load_balancers=[self.elb.trop_elb]
         )
-        [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
-         self.loadbalancer_port]
+        if elb_config.public_unit:
+            [self.elb.add_ingress(sender=self.public_cidr, port=loadbalancerport) for loadbalancerport in
+             self.loadbalancer_port]
         [self.elb.add_flow(receiver=self.asg, port=instanceport) for instanceport in elb_config.instance_port]
-        self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic between autoscaling groups and Nats
+        if network_config.nat_highly_available:
+            self.asg.add_egress(receiver=self.public_cidr, port='-1')  # All Traffic to Nat gateways
+        else:
+            self.asg.add_flow(receiver=network_config.nat, port='-1')  # All Traffic to Nat
         network_config.jump.add_flow(receiver=self.asg, port='22')
 
     def get_dependencies(self):

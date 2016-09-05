@@ -5,7 +5,7 @@ import os
 import yaml
 from amazonia.classes.asg_config import InvalidAsgConfigError
 from amazonia.classes.util import InsecureVariableError
-from amazonia.classes.yaml import Yaml, InvalidYamlValueError
+from amazonia.classes.yaml import Yaml, InvalidYamlValueError, InvalidYamlStructureError
 from amazonia.classes.yaml_fields import YamlFields
 from nose.tools import *
 
@@ -192,3 +192,13 @@ def test_invalid_min_max_asg():
 
     assert_raises(InvalidAsgConfigError, Yaml, **{'user_stack_data': invalid_min_max_stack_data,
                                                   'default_data': default_data})
+
+@with_setup(setup_resources)
+def test_bad_defaults():
+    """
+    Test case of missing defualt settings
+    """
+    bad_default_data = open_yaml_file('test_yaml_bad_defaults.yaml')
+    valid_stack_data = open_yaml_file('test_yaml_complete_valid.yaml')
+    assert_raises(InvalidYamlStructureError, Yaml, **{'user_stack_data': valid_stack_data,
+                                                  'default_data': bad_default_data})
