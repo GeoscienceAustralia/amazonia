@@ -6,6 +6,8 @@ from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
 
 
 class ComplexObjectFieldMapping(object):
@@ -94,6 +96,31 @@ class YamlFields(object):
         'ssl_support_method'
     ]
 
+    # api_method_config field list
+    api_method_config = [
+        'method_name',
+        'lambda_arn',
+        'httpmethod',
+        'authorizationtype',
+        'request_config',
+        'response_config'
+    ]
+
+    # api_request_config field list
+    api_request_config = [
+        'templates',
+        'parameters'
+    ]
+
+    # api_response_config field list
+    api_response_config = [
+        'templates',
+        'parameters',
+        'selectionpattern',
+        'statuscode',
+        'models'
+    ]
+
     # cloudfront origins config key list
     cf_origins_config_key_list = [
         'domain_name',
@@ -147,6 +174,7 @@ class YamlFields(object):
         'cf_distribution_units',
         'zd_autoscaling_units',
         'autoscaling_units',
+        'api_gateway_units',
         'database_units',
         'iam_instance_profile_arn',
         'owner_emails',
@@ -184,6 +212,12 @@ class YamlFields(object):
         'green_asg_config'
     ]
 
+    # api parameter field list
+    api_gateway_unit_key_list = [
+        'unit_title',
+        'method_config',
+    ]
+
     # config classes
     complex_object_field_mapping = {
         'elb_config':
@@ -213,5 +247,13 @@ class YamlFields(object):
         'cf_distribution_config':
             ComplexObjectFieldMapping(CFDistributionConfig, False, cf_distribution_config_key_list),
         'cf_origins_config':
-            ComplexObjectFieldMapping(CFOriginsConfig, True, cf_origins_config_key_list)
+            ComplexObjectFieldMapping(CFOriginsConfig, True, cf_origins_config_key_list),
+        'api_gateway_units':
+            ComplexObjectFieldMapping(dict, True, api_gateway_unit_key_list),
+        'method_config':
+            ComplexObjectFieldMapping(ApiGatewayMethodConfig, True, api_method_config),
+        'request_config':
+            ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, api_request_config),
+        'response_config':
+            ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, api_response_config)
     }
