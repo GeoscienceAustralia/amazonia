@@ -570,9 +570,7 @@ nat_highly_available: # A True/False advising whether or not to use a single NAT
   nullable: False
   empty: False
 amz_version:
-  type:
-    - 'string'
-    - 'integer'
+  nullable: True
   required: False
   empty: True
 

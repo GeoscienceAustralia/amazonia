@@ -15,7 +15,7 @@ from troposphere.ec2 import EIP, NatGateway
 
 
 class Stack(object):
-    def __init__(self, amz_version, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
+    def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, stack_hosted_zone_name,
                  iam_instance_profile_arn, owner_emails, api_gateway_units,
@@ -26,7 +26,6 @@ class Stack(object):
         AWS CloudFormation -
          http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
-        :param amz_version: Version of Amazonia, not currently used
         :param code_deploy_service_role: ARN to code deploy IAM role
         :param keypair: ssh keypair to be used throughout stack
         :param availability_zones: availability zones to use
@@ -54,7 +53,6 @@ class Stack(object):
 
         super(Stack, self).__init__()
         # set parameters
-        self.amz_version = amz_version
         self.code_deploy_service_role = code_deploy_service_role
         self.keypair = keypair
         self.availability_zones = availability_zones
