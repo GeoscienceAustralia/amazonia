@@ -187,3 +187,30 @@ cf_cache_behavior_config:
    trusted_signers:
     - 'self'
    path_pattern:
+
+request_config: &request_config
+  templates:
+    application/json: ''
+  parameters:
+    method.request.header.Origin: "$input.params('Origin')"
+
+response_config: &response_config
+  templates:
+    application/json: ''
+  parameters:
+    method.response.header.Set-Cookie: 'integration.response.body.GETCOOKIE'
+  selectionpattern: ''
+  statuscode: '200'
+  models:
+    application/json: 'Empty'
+
+method_config:
+  method_name: 'login'
+  lambda_arn: 'arn:aws:lambda:ap-southeast-2:1234567890:function:test'
+  httpmethod: 'POST'
+  authorizationtype: 'NONE'
+  request_config: *request_config
+  response_config:
+    - *response_config
+
+api_gateway_units:
