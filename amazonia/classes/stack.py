@@ -9,7 +9,7 @@ from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.util import get_cf_friendly_name
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
-from amazonia.classes.api_gateway import ApiGatewayUnit
+from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from troposphere import Ref, Template, ec2, Tags, Join, GetAtt
 from troposphere.ec2 import EIP, NatGateway
 

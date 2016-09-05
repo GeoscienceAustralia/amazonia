@@ -2,7 +2,7 @@
 
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
-from amazonia.classes.api_gateway import ApiGatewayUnit
+from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from troposphere import Template
 
 
