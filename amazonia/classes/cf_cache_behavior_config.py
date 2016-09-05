@@ -3,8 +3,8 @@
 
 class CFCacheBehavior(object):
     def __init__(self, path_pattern, allowed_methods, cached_methods, target_origin_id,
-                 forward_cookies, viewer_protocol_policy, min_ttl, default_ttl, max_ttl,
-                 trusted_signers):
+                 forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl, default_ttl,
+                 max_ttl, trusted_signers):
         """
         Class containing cache behavior details for a Cloudfront origin
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachebehavior.html
@@ -15,6 +15,8 @@ class CFCacheBehavior(object):
         :param allowed_methods: List of HTTP methods that can be passed to the origin
         :param cached_methods: List of HTTP methods for which Cloudfront caches responses
         :param target_origin_id: Value of the unique ID for the default cache behavior of this distribution
+        :param forward_cookies: Which cookies to forward to the origin
+        :param forwarded_headers: List of headers to forward to the origin
         :param viewer_protocol_policy: The protocol that users can use to access origin files
         :param min_ttl: The minimum amount of time objects should stay in the cache
         :param default_ttl: The default amount of time objects stay in the cache
@@ -25,6 +27,7 @@ class CFCacheBehavior(object):
         self.cached_methods = cached_methods
         self.target_origin_id = target_origin_id
         self.forward_cookies = forward_cookies
+        self.forwarded_headers = forwarded_headers
         self.viewer_protocol_policy = viewer_protocol_policy
         self.min_ttl = min_ttl
         self.default_ttl = default_ttl

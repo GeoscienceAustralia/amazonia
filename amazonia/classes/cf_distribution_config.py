@@ -4,8 +4,9 @@
 class CFDistributionConfig(object):
     def __init__(self, aliases, comment, default_root_object, enabled, price_class,
                  target_origin_id, allowed_methods, cached_methods, trusted_signers,
-                 viewer_protocol_policy, min_ttl, default_ttl, max_ttl, error_page_path,
-                 acm_cert_arn, minimum_protocol_version, ssl_support_method):
+                 forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl,
+                 default_ttl, max_ttl, error_page_path, acm_cert_arn, minimum_protocol_version,
+                 ssl_support_method):
         """
         Class containing configuration details for a Cloudfront Distribution
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
@@ -21,6 +22,8 @@ class CFDistributionConfig(object):
         :param allowed_methods: List of HTTP methods that can be passed to the origin
         :param cached_methods: List of HTTP methods for which Cloudfront caches responses
         :param trusted_signers: List of AWS accounts that can create signed URLs in order to access private content
+        :param forward_cookies: Which cookies to forward to the origin
+        :param forwarded_headers: List of headers to forward to the origin
         :param viewer_protocol_policy: The protocol that users can use to access origin files
         :param min_ttl: The minimum amount of time objects should stay in the cache
         :param default_ttl: The default amount of time objects stay in the cache
@@ -40,6 +43,8 @@ class CFDistributionConfig(object):
         self.allowed_methods = allowed_methods
         self.cached_methods = cached_methods
         self.trusted_signers = trusted_signers
+        self.forward_cookies = forward_cookies
+        self.forwarded_headers = forwarded_headers
         self.viewer_protocol_policy = viewer_protocol_policy
         self.min_ttl = min_ttl
         self.default_ttl = default_ttl
