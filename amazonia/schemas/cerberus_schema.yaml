@@ -134,7 +134,7 @@ elb_config: &elb_config
     ssl_certificate_id: # A string containing the arn of the ssl certificate id
       type: 'string'
       nullable: True
-      regex: '^arn:aws:'
+      regex: '^arn:aws:.*'
 
 simple_scaling_policy_config: &simple_scaling_policy_config
   type: 'dict'
@@ -291,6 +291,191 @@ database_config: &database_config
       nullable: True
       regex: '^(standard|gp2)$'
 
+cf_distribution_config: &cf_distribution_config
+  type: 'dict'
+  nullable: True
+  schema:
+    aliases:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    comment:
+      type: 'string'
+      nullable: True
+    default_root_object:
+      type: 'string'
+      nullable: True
+    enabled:
+      type: 'boolean'
+      nullable: True
+      empty: True
+    price_class:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'PriceClass_All'
+       - 'PriceClass_200'
+       - 'PriceClass_100'
+    target_origin_id:
+      nullable: True
+      type: 'string'
+    allowed_methods:
+      nullable: True
+      type: 'list'
+      schema:
+        type: 'string'
+        allowed:
+         - 'GET'
+         - 'HEAD'
+         - 'DELETE'
+         - 'OPTIONS'
+         - 'POST'
+         - 'PUT'
+         - 'PATCH'
+    cached_methods:
+      nullable: True
+      type: 'list'
+      schema:
+        type: 'string'
+        allowed:
+         - 'GET'
+         - 'HEAD'
+    trusted_signers:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
+    viewer_protocol_policy:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'allow-all'
+       - 'redirect-to-https'
+       - 'https-only'
+    min_ttl:
+      nullable: True
+      type: 'number'
+    default_ttl:
+      nullable: True
+      type: 'number'
+    max_ttl:
+      nullable: True
+      type: 'number'
+    error_page_path:
+      type: 'string'
+      nullable: True
+    acm_cert_arn:
+      type: 'string'
+      nullable: True
+    minimum_protocol_version:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'TLSv1'
+       - 'TLSv1.1'
+       - 'TLSv1.2'
+    ssl_support_method:
+      type: 'string'
+      nullable: True
+      allowed:
+       - 'sni-only'
+       - 'vip'
+
+cf_origins_config: &cf_origins_config
+    type: 'dict'
+    schema:
+      domain_name:
+        type: 'string'
+        nullable: True
+      origin_id:
+        type: 'string'
+        nullable: True
+      origin_policy:
+        nullable: True
+        type: 'dict'
+        schema:
+          is_s3:
+            type: 'boolean'
+            nullable: True
+          origin_access_identity:
+            type: 'string'
+            nullable: True
+          origin_protocol_policy:
+            type: 'string'
+            nullable: True
+          http_port:
+            nullable: True
+            type: 'number'
+          https_port:
+            nullable: True
+            type: 'number'
+          origin_ssl_protocols:
+            nullable: True
+            type: 'list'
+            schema:
+              type: 'string'
+              allowed:
+               - 'TLSv1'
+               - 'TLSv1.1'
+               - 'TLSv1.2'
+
+cf_cache_behavior_config: &cf_cache_behavior_config
+    type: 'dict'
+    schema:
+      path_pattern:
+        type: 'string'
+        nullable: True
+      allowed_methods:
+        nullable: True
+        type: 'list'
+        schema:
+          type: 'string'
+          allowed:
+           - 'GET'
+           - 'HEAD'
+           - 'DELETE'
+           - 'OPTIONS'
+           - 'POST'
+           - 'PUT'
+           - 'PATCH'
+      cached_methods:
+        nullable: True
+        type: 'list'
+        schema:
+          type: 'string'
+          allowed:
+           - 'GET'
+           - 'HEAD'
+      target_origin_id:
+        nullable: True
+        type: 'string'
+      forward_cookies:
+        type: 'string'
+        nullable: True
+        empty: True
+      viewer_protocol_policy:
+        type: 'string'
+        nullable: True
+        allowed:
+         - 'allow-all'
+         - 'redirect-to-https'
+         - 'https-only'
+      min_ttl:
+        nullable: True
+        type: 'number'
+      default_ttl:
+        nullable: True
+        type: 'number'
+      max_ttl:
+        nullable: True
+        type: 'number'
+      trusted_signers:
+        type: 'list'
+        nullable: True
+        schema:
+          type: 'string'
+
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
   empty: False
@@ -394,3 +579,20 @@ database_units: # A list of database units to create. Security groups, Database 
     schema:
       unit_title: *unit_title # A string containing the title of this autoscaling unit.
       database_config: *database_config #nested dictionary containing database specific configuration
+
+cf_distribution_units:  # A list of Cloudfront distributions to create. Origins, cache behaviors, default cache behavior will be created for each of these units
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:  *unit_title # A string containing the title of this distribution unit.
+      cf_cache_behavior_config:
+        type: 'list'
+        schema:
+          *cf_cache_behavior_config # list of dictionaries containing cache behavior for this distribution
+      cf_origins_config:
+        type: 'list'
+        schema:
+          *cf_origins_config # list of dictionaries containing origins that this distribution is linked to
+      cf_distribution_config: *cf_distribution_config  # dictionary containing default cache behavior for this distribution
