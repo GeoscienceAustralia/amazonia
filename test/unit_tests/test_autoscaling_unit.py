@@ -1,13 +1,12 @@
-from nose.tools import *
-from troposphere import ec2, Ref, Template
-
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.autoscaling_unit import AutoscalingUnit
+from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.block_devices_config import BlockDevicesConfig
+from nose.tools import *
+from troposphere import ec2, Ref, Template
 
 template = network_config = elb_config = asg_config = None
 

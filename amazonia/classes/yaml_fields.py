@@ -8,6 +8,7 @@ from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
 from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
+from amazonia.classes.lambda_config import LambdaConfig
 
 
 class ComplexObjectFieldMapping(object):
@@ -175,6 +176,7 @@ class YamlFields(object):
         'zd_autoscaling_units',
         'autoscaling_units',
         'api_gateway_units',
+        'lambda_units',
         'database_units',
         'iam_instance_profile_arn',
         'owner_emails',
@@ -215,7 +217,27 @@ class YamlFields(object):
     # api parameter field list
     api_gateway_unit_key_list = [
         'unit_title',
-        'method_config',
+        'method_config'
+    ]
+
+    # lambda unit parameter field list
+    lambda_unit_key_list = [
+        'unit_title',
+        'dependencies',
+        'lambda_config'
+    ]
+
+    # lambda config field list
+    lambda_config_key_list = [
+        'lambda_s3_bucket',
+        'lambda_s3_key',
+        'lambda_description',
+        'lambda_function_name',
+        'lambda_handler',
+        'lambda_memory_size',
+        'lambda_role_arn',
+        'lambda_runtime',
+        'lambda_timeout'
     ]
 
     # config classes
@@ -255,5 +277,9 @@ class YamlFields(object):
         'request_config':
             ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, api_request_config),
         'response_config':
-            ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, api_response_config)
+            ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, api_response_config),
+        'lambda_units':
+            ComplexObjectFieldMapping(dict, True, lambda_unit_key_list),
+        'lambda_config':
+            ComplexObjectFieldMapping(LambdaConfig, False, lambda_config_key_list),
     }
