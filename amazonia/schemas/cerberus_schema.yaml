@@ -494,6 +494,54 @@ cf_cache_behavior_config: &cf_cache_behavior_config
         schema:
           type: 'string'
 
+lambda_config: &lambda_config
+  type: 'dict'
+  nullable: True
+  schema:
+    lambda_s3_bucket: # S3 bucket name containing lambda function code.
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_s3_key: # S3 key name of lambda function code.
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_description: # Plain text description of lambda function
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_function_name: # Lambda function name
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_handler: # Main or entry method of lambda function code
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_memory_size: # The memory size for the Lambda function
+      type: 'number'
+      nullable: False
+      min: 128
+      max: 1536
+    lambda_role_arn: # ARN for lambda IAM role
+      type: 'string'
+      nullable: True
+      empty: False
+    lambda_runtime: # lambda engine to execute function within
+      type: 'string'
+      nullable: True
+      empty: False
+      allowed:
+         - 'nodejs'
+         - 'nodejs4.3'
+         - 'java8'
+         - 'python2.7'
+    lambda_timeout: # time to allow function to run before forcibly terminating
+      type: 'number'
+      nullable: False
+      min: 1
+      max: 300
+
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
   empty: False
@@ -574,6 +622,16 @@ amz_version:
   required: False
   empty: True
 
+lambda_units:  # A list of lambda functions to create.
+  type: 'list'
+  nullable: True
+  schema:
+    type: 'dict'
+    schema:
+      unit_title:  *unit_title # A string containing the title of this autoscaling unit.
+      dependencies: *dependencies # A list of strings with the titles of objects that this autoscaling unit depends on. eg: your autoscaling group may have userdata that needs internet access, therefore they have a dependency on your NAT.
+      lambda_config: *lambda_config #nested dictionary containing lambda specific configuration
+
 zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'
   nullable: True
@@ -615,12 +673,10 @@ cf_distribution_units:  # A list of Cloudfront distributions to create. Origins,
       unit_title:  *unit_title # A string containing the title of this distribution unit.
       cf_cache_behavior_config:
         type: 'list'
-        schema:
-          *cf_cache_behavior_config # list of dictionaries containing cache behavior for this distribution
+        schema: *cf_cache_behavior_config # list of dictionaries containing cache behavior for this distribution
       cf_origins_config:
         type: 'list'
-        schema:
-          *cf_origins_config # list of dictionaries containing origins that this distribution is linked to
+        schema: *cf_origins_config # list of dictionaries containing origins that this distribution is linked to
       cf_distribution_config: *cf_distribution_config  # dictionary containing default cache behavior for this distribution
 
 request_config: &request_config # The config for a request to be used in an api object

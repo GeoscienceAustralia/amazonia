@@ -39,6 +39,18 @@ database_units:
 unit_title: 'defaulttitle'
 dependencies:
 
+# Lambda unit default values
+lambda_config:
+  lambda_s3_bucket:
+  lambda_s3_key:
+  lambda_description:
+  lambda_function_name:
+  lambda_handler:
+  lambda_memory_size: 128
+  lambda_role_arn:
+  lambda_runtime: 'python2.7'
+  lambda_timeout: 1
+
 # Database unit default values
 database_config:
   db_instance_type: 'db.t2.small'
@@ -215,3 +227,5 @@ method_config:
     - *response_config
 
 api_gateway_units:
+
+lambda_units:
