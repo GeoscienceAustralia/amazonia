@@ -220,7 +220,7 @@ response_config: &response_config
 
 method_config:
   method_name: 'login'
-  lambda_arn: 'arn:aws:lambda:ap-southeast-2:1234567890:function:test'
+  lambda_unit: 'testlambda'
   httpmethod: 'POST'
   authorizationtype: 'NONE'
   request_config: *request_config

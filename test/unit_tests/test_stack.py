@@ -508,7 +508,7 @@ def create_stack():
                             'method_config': [
                                 ApiGatewayMethodConfig(
                                     method_name='login',
-                                    lambda_arn='arn:aws:123456789',
+                                    lambda_unit='lambda1',
                                     httpmethod='POST',
                                     authorizationtype='NONE',
                                     request_config=ApiGatewayRequestConfig(
