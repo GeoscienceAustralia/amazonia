@@ -151,14 +151,14 @@ class Stack(object):
                                      DependsOn=self.internet_gateway.title))
 
         # Add Public Route Table
-        public_rt_name = 'PubRt'
+        public_rt_name = 'PubRouteTable'
         self.public_route_table = self.template.add_resource(
             ec2.RouteTable(public_rt_name, VpcId=Ref(self.vpc),
                            Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', public_rt_name]))))
 
         # Add Public and Private Subnets and Private Route Table
         for az in self.availability_zones:
-            private_rt_name = get_cf_friendly_name(az) + 'PriRt'
+            private_rt_name = get_cf_friendly_name(az) + 'PriRouteTable'
             private_route_table = self.template.add_resource(
                 ec2.RouteTable(private_rt_name, VpcId=Ref(self.vpc),
                                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', private_rt_name]))))
