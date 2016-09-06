@@ -46,7 +46,8 @@
 #                       'database_units',
 #                       'iam_instance_profile_arn',
 #                       'owner_emails',
-#                       'nat_alerting']
+#                       'nat_alerting',
+#                       'amz_version']
 #     unit_key_list = {'autoscaling_units': ['unit_title',
 #                                            'userdata',
 #                                            'image_id',
@@ -607,6 +608,10 @@ nat_highly_available: # A True/False advising whether or not to use a single NAT
   type: 'boolean'
   nullable: False
   empty: False
+amz_version:
+  nullable: True
+  required: False
+  empty: True
 
 lambda_units:  # A list of lambda functions to create.
   type: 'list'

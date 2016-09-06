@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.3.5] - 7/09/2016
+## [1.3.5] - 6/09/2016
+- Introduced amz_version for tracking version used for users
 - Adding support for lambda units
 
 ## [1.3.4] - 6/09/2016
