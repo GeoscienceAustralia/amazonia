@@ -46,7 +46,8 @@
 #                       'database_units',
 #                       'iam_instance_profile_arn',
 #                       'owner_emails',
-#                       'nat_alerting']
+#                       'nat_alerting',
+#                       'amz_version']
 #     unit_key_list = {'autoscaling_units': ['unit_title',
 #                                            'userdata',
 #                                            'image_id',
@@ -568,6 +569,10 @@ nat_highly_available: # A True/False advising whether or not to use a single NAT
   type: 'boolean'
   nullable: False
   empty: False
+amz_version:
+  nullable: True
+  required: False
+  empty: True
 
 zd_autoscaling_units:  # A list of autoscaling groups to create. Load balancers, security groups, launch configurations, and autoscaling groups will be created for each of these units
   type: 'list'
