@@ -4,19 +4,18 @@ from troposphere import route53, Ref, Join, GetAtt
 
 
 class HostedZone(object):
-    def __init__(self, template, title, domain, vpcs=None):
+    def __init__(self, template, domain, vpcs=None):
         """
         Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
         AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
         Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
         :param template: The cloud formation template to add this hosted zone to.
-        :param title: A title to give the Hostedzone.
         :param domain: The domain you would like for your hosted zone. MUST be 'something.something' (eg 'example.com')
         :param vpcs: A list of VPCs to associate this hosted zone with (if none, a public hosted zone is created)
         """
 
         self.template = template
-        self.trop_hosted_zone = self.create_hosted_zone(title, domain, vpcs)
+        self.trop_hosted_zone = self.create_hosted_zone(domain, vpcs)
         self.recordsets = []
 
     @staticmethod
@@ -35,12 +34,11 @@ class HostedZone(object):
             VPCRegion=Ref("AWS::Region")
         )
 
-    def create_hosted_zone(self, title, domain, vpcs):
+    def create_hosted_zone(self, domain, vpcs):
         """
         Creates a route53 hosted zone object either public (vpcs=None) or private (vpcs=[vpc1,...])
         AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
         Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
-        :param title: A title to give the Hostedzone.
         :param domain: The domain you would like for your hosted zone. MUST be 'something.something' (eg 'example.com')
         :param vpcs: A list of VPCs to associate this hosted zone with (if none, a public hosted zone is created)
         """
@@ -63,7 +61,7 @@ class HostedZone(object):
             hz_vpcs = None
 
         hz = self.template.add_resource(route53.HostedZone(
-            title,
+            hz_type+'HostedZone',
             HostedZoneConfig=hz_config,
             Name=domain
         ))

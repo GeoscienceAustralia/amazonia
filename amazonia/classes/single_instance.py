@@ -103,7 +103,7 @@ runcmd:
         else:
             self.si_output(nat=True, subnet=single_instance_config.subnet)
 
-        if single_instance_config.hosted_zone_name:
+        if single_instance_config.public_hosted_zone_name:
             # Give the instance an Elastic IP Address
             self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
