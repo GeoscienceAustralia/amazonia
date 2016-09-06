@@ -521,6 +521,8 @@ lambda_config: &lambda_config
     lambda_memory_size: # The memory size for the Lambda function
       type: 'number'
       nullable: False
+      min: 128
+      max: 1536
     lambda_role_arn: # ARN for lambda IAM role
       type: 'string'
       nullable: True
@@ -529,9 +531,16 @@ lambda_config: &lambda_config
       type: 'string'
       nullable: True
       empty: False
+      allowed:
+         - 'nodejs'
+         - 'nodejs4.3'
+         - 'java8'
+         - 'python2.7'
     lambda_timeout: # time to allow function to run before forcibly terminating
       type: 'number'
       nullable: False
+      min: 1
+      max: 300
 
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
