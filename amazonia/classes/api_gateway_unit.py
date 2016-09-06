@@ -40,26 +40,6 @@ class ApiGatewayUnit(object):
         for method in self.method_config:
             self.dependencies.append(method.lambda_unit)
 
-        # for method in method_config:
-        #
-        #     resource = self.create_resource(method)
-        #     self.get_responses(method)
-        #
-        #     integration = self.create_integration(method)
-        #
-        #     method = Method(
-        #                     '{0}Method'.format(method.method_name),
-        #                     RestApiId=Ref(self.api),
-        #                     AuthorizationType=method.authorizationtype,
-        #                     ResourceId=Ref(resource),
-        #                     HttpMethod=method.httpmethod,
-        #                     Integration=integration,
-        #                     MethodResponses=self.method_responses,
-        #                     RequestParameters=method.request.parameters
-        #                     )
-        #     self.methods.append(method)
-        #     self.template.add_resource(method)
-
     def create_resource(self, method_config):
         """
         Creates a resource using a single provided ApiGatewayMethodConfig object.
@@ -73,12 +53,13 @@ class ApiGatewayUnit(object):
                                                    RestApiId=Ref(self.api),
                                                    PathPart=method_config.method_name
                                                    )
-                                         )
+                                          )
 
     def create_integration(self, method_config, lambda_arn):
         """
         Creates an integration object using a single provided ApiGatewayMethodConfig object.
         :param method_config: a single ApiGatewayMethodConfig object
+        :param lambda_arn: the ARN of a lambda function to point this integration at.
         :return: a troposphere integration object
         """
 
@@ -110,6 +91,9 @@ class ApiGatewayUnit(object):
         Creates a method and integration response object in troposphere from a provided ApiGatewayMethodConfig object.
         :param method_config: a preconfigured ApiGatewayMethodConfig object
         """
+
+        self.method_responses = []
+        self.integration_responses = []
 
         for number, response in enumerate(method_config.responses):
             self.method_responses.append(

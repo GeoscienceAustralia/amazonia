@@ -427,7 +427,7 @@ api_gateway_units:
     method_config:
       -
         method_name: 'login'
-        lambda_unit: 'testlambda'
+        lambda_unit: 'mylambda'
         httpmethod: 'POST'
         authorizationtype: 'NONE'
         request_config:
