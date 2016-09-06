@@ -29,6 +29,7 @@ class ApiGatewayUnit(object):
         self.integration_responses = []
         self.dependencies = []
         self.network_config = network_config
+        self.method_config = method_config
 
         self.api = self.template.add_resource(RestApi(
                                                       '{0}API'.format(self.title),
@@ -36,9 +37,8 @@ class ApiGatewayUnit(object):
                                                      )
                                              )
 
-        for method in method_config:
+        for method in self.method_config:
             self.dependencies.append(method.lambda_unit)
-
 
         # for method in method_config:
         #
@@ -64,7 +64,7 @@ class ApiGatewayUnit(object):
         """
         Creates a resource using a single provided ApiGatewayMethodConfig object.
         :param method_config: a single ApiGatewayMethodConfig object
-        :return: a troposphere Resource object that links the API with methods
+        :return: a troposphere Resource object that links the API with the method_config provided
         """
 
         return self.template.add_resource(Resource(
@@ -75,7 +75,7 @@ class ApiGatewayUnit(object):
                                                    )
                                          )
 
-    def create_integration(self, method_config):
+    def create_integration(self, method_config, lambda_arn):
         """
         Creates an integration object using a single provided ApiGatewayMethodConfig object.
         :param method_config: a single ApiGatewayMethodConfig object
@@ -92,7 +92,7 @@ class ApiGatewayUnit(object):
                                   Uri=Join('',
                                               [
                                                 'arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/',
-                                                method_config.lambda_arn,
+                                                lambda_arn,
                                                 '/invocations'
                                               ]
                                           )
@@ -130,6 +130,45 @@ class ApiGatewayUnit(object):
                                     SelectionPattern=response.selectionpattern
                                    )
             )
+
+    def add_method(self, resource, integration, method_config):
+        """
+        Creates a Method as a part of this api and adds it to the template.
+        :param resource: The resource that has been created for this api/method pair.
+        :param integration: An Integration object for this method.
+        :param method_config: The method_config object with details for the method.
+        """
+
+        method = Method(
+                             '{0}Method'.format(method_config.method_name),
+                             RestApiId=Ref(self.api),
+                             AuthorizationType=method_config.authorizationtype,
+                             ResourceId=Ref(resource),
+                             HttpMethod=method_config.httpmethod,
+                             Integration=integration,
+                             MethodResponses=self.method_responses,
+                             RequestParameters=method_config.request.parameters
+                             )
+
+        self.method_responses = []
+        self.integration_responses = []
+
+        self.methods.append(method)
+        self.template.add_resource(method)
+
+    def add_unit_flow(self, other_unit):
+        """
+        Creates a method that points at the other_unit object (other_unit should be a lambda_unit)
+        :param other_unit: for this class, other unit should always be a lambda unit
+        """
+        lambda_title = other_unit.trop_lambda_function.title
+
+        for method in self.method_config:
+            if method.lambda_unit == lambda_title[:-6]:
+                resource = self.create_resource(method)
+                self.get_responses(method)
+                integration = self.create_integration(method, GetAtt(lambda_title, 'Arn'))
+                self.add_method(resource, integration, method)
 
     def get_dependencies(self):
         """

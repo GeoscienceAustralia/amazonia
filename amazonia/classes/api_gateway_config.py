@@ -2,13 +2,13 @@
 
 
 class ApiGatewayMethodConfig(object):
-    def __init__(self, method_name, lambda_arn, request_config, response_config, httpmethod, authorizationtype):
+    def __init__(self, method_name, lambda_unit, request_config, response_config, httpmethod, authorizationtype):
         """
         This class is used to hold the configuration required for an API Gateway Method
         """
 
         self.method_name = method_name
-        self.lambda_arn = lambda_arn
+        self.lambda_unit = lambda_unit
         self.request = request_config
         self.responses = response_config
         self.httpmethod = httpmethod
