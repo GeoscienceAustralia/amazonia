@@ -10,7 +10,7 @@ def main():
     template = Template()
     apiname = 'test'
     methodname = 'login'
-    lambda_arn = 'arn:aws:lambda:ap-southeast-2:123456789:function:test'
+    lambda_unit = 'testlambda'
     httpmethod = 'POST'
     authorizationtype = 'NONE'
 
@@ -36,7 +36,7 @@ def main():
                                                 models=response_models,
                                                 selectionpattern=selectionpattern)
     method_config = ApiGatewayMethodConfig(method_name=methodname,
-                                           lambda_arn=lambda_arn,
+                                           lambda_unit=lambda_unit,
                                            request_config=request_config,
                                            response_config=[response_config1, response_config2],
                                            httpmethod=httpmethod,
