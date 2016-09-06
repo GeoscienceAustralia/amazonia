@@ -111,12 +111,12 @@ def test_stack():
     assert_is(type(stack.gateway_attachment.VpcId), Ref)
     assert_is(type(stack.gateway_attachment.InternetGatewayId), Ref)
 
-    assert_equals(stack.public_route_table.title, 'PubRt')
+    assert_equals(stack.public_route_table.title, 'PubRouteTable')
     assert_is(type(stack.public_route_table.VpcId), Ref)
     assert_is(type(stack.public_route_table.Tags), Tags)
 
     for az in availability_zones:
-        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRt')
+        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRouteTable')
         assert_is(type(stack.private_route_tables[az].VpcId), Ref)
         assert_is(type(stack.private_route_tables[az].Tags), Tags)
 
@@ -185,12 +185,12 @@ def test_highly_available_nat_stack():
     assert_is(type(stack.gateway_attachment.VpcId), Ref)
     assert_is(type(stack.gateway_attachment.InternetGatewayId), Ref)
 
-    assert_equals(stack.public_route_table.title, 'PubRt')
+    assert_equals(stack.public_route_table.title, 'PubRouteTable')
     assert_is(type(stack.public_route_table.VpcId), Ref)
     assert_is(type(stack.public_route_table.Tags), Tags)
 
     for az in availability_zones:
-        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRt')
+        assert_equals(stack.private_route_tables[az].title, get_cf_friendly_name(az) + 'PriRouteTable')
         assert_is(type(stack.private_route_tables[az].VpcId), Ref)
         assert_is(type(stack.private_route_tables[az].Tags), Tags)
 
