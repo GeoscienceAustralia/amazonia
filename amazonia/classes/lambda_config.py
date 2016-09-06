@@ -1,3 +1,12 @@
+
+class InvalidLambdaConfigError(Exception):
+    """
+    Exception if invalid properties are supplied
+    """
+    def __init__(self, value):
+        self.value = value
+
+
 class LambdaConfig(object):
     def __init__(self, lambda_s3_bucket, lambda_s3_key, lambda_description, lambda_function_name, lambda_handler,
                  lambda_memory_size, lambda_role_arn, lambda_runtime, lambda_timeout):
@@ -22,3 +31,8 @@ class LambdaConfig(object):
         self.lambda_role_arn = lambda_role_arn
         self.lambda_runtime = lambda_runtime
         self.lambda_timeout = lambda_timeout
+
+        # Validate that minsize is less than maxsize
+        if self.lambda_memory_size % 64 != 0:
+            raise InvalidLambdaConfigError('Lambda unit memory size ({0}) must be multiple of 64'
+                                           .format(self.lambda_memory_size))

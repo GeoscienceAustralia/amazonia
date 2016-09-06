@@ -1,4 +1,4 @@
-from amazonia.classes.lambda_config import LambdaConfig
+from amazonia.classes.lambda_config import LambdaConfig, InvalidLambdaConfigError
 from amazonia.classes.lambda_unit import LambdaUnit, InvalidFlowError
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
@@ -82,6 +82,20 @@ def setup_resources():
         lambda_runtime='python2.7',
         lambda_timeout=1
     )
+
+
+def test_invalid_lambda_memory_size():
+    assert_raises(InvalidLambdaConfigError, LambdaConfig, **{
+        'lambda_memory_size': 129,
+        'lambda_s3_bucket': 'bucket_name',
+        'lambda_s3_key': 'key_name',
+        'lambda_description': 'blah',
+        'lambda_function_name': 'my_function',
+        'lambda_handler': 'main',
+        'lambda_role_arn': 'test_arn',
+        'lambda_runtime': 'python2.7',
+        'lambda_timeout': 1
+    })
 
 
 @with_setup(setup_resources)
