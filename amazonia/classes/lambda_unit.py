@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from troposphere import Ref
-from troposphere.awslambda import Code, VPCConfig, Function
+from troposphere import Ref, GetAtt
+from troposphere.awslambda import Code, VPCConfig, Function, Permission
+from troposphere.events import Rule, Target
 
 
 class LambdaUnit(SecurityEnabledObject):
-    def __init__(self, unit_title, template, dependencies, network_config, lambda_config):
+    def __init__(self, unit_title, template, dependencies, network_config, lambda_config, ):
         """
         Amazonia lambda unit definition
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
@@ -39,6 +40,31 @@ class LambdaUnit(SecurityEnabledObject):
             self.add_egress(receiver=self.public_cidr, port='-1')  # All Traffic to Nat gateways
         else:
             self.add_flow(receiver=network_config.nat, port='-1')  # All Traffic to Nat
+
+        if lambda_config.lambda_schedule:
+
+            self.trop_cw_rule = template.add_resource(
+                Rule(
+                    self.title + 'Rule',
+                    Name=unit_title + 'Rule',
+                    ScheduleExpression=lambda_config.lambda_schedule,
+                    State='ENABLED',
+                    Targets=[Target(
+                        Arn=GetAtt(self.trop_lambda_function, 'Arn'),
+                        Id=unit_title
+                    )]
+                )
+            )
+
+            self.trop_cw_permission = template.add_resource(
+                Permission(
+                    self.title + 'RulePermission',
+                    Action='lambda:InvokeFunction',
+                    FunctionName=GetAtt(self.trop_lambda_function, 'Arn'),
+                    Principal='events.amazonaws.com',
+                    SourceArn=GetAtt(self.trop_cw_rule, 'Arn')
+                )
+            )
 
     def get_dependencies(self):
         """

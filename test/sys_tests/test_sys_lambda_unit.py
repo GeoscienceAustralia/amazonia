@@ -79,7 +79,8 @@ def main():
         lambda_memory_size=128,
         lambda_role_arn='',
         lambda_runtime='',
-        lambda_timeout=1
+        lambda_timeout=1,
+        lambda_schedule='cron(0 14 * * *)'
     )
 
     # Test Lambda

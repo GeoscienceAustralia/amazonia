@@ -50,6 +50,7 @@ lambda_config:
   lambda_role_arn:
   lambda_runtime: 'python2.7'
   lambda_timeout: 1
+  lambda_schedule:
 
 # Database unit default values
 database_config:
