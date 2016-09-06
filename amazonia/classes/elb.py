@@ -17,6 +17,7 @@ class Elb(SecurityEnabledObject):
         :param elb_config: object containing elb related variables
         """
         self.title = title + 'Elb'
+        self.elb_r53 = None
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
         listener_tuples = zip(elb_config.loadbalancer_port,
                               elb_config.instance_port,
@@ -57,8 +58,8 @@ class Elb(SecurityEnabledObject):
                                          '-',
                                          self.title])
             )
-        self.elb_r53 = None
-        if elb_config.unit_hosted_zone_name:
+
+        if network_config.public_hosted_zone_name:
             self.create_r53_record(elb_config.unit_hosted_zone_name)
         else:
             self.template.add_output(Output(

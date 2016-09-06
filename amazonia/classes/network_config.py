@@ -1,6 +1,6 @@
 class NetworkConfig(object):
     def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, keypair, cd_service_role_arn,
-                 stack_hosted_zone_name, nat_highly_available, nat_gateways):
+                 public_hosted_zone_name, private_hosted_zone, nat_highly_available, nat_gateways):
         """
         Simple config class to contain networking related parameters
         :param public_cidr: Public cidr pattern
@@ -9,7 +9,8 @@ class NetworkConfig(object):
         :param private_subnets: subnets to autoscale instances in
         :param nat: nat instance for outbound traffic
         :param jump: jump instance for inbound ssh
-        :param stack_hosted_zone_name: Route53 hosted zone name string for Route53 record sets
+        :param public_hosted_zone_name: Route53 hosted zone name string for public Route53 record sets
+        :param private_hosted_zone: Route53 hosted zone name to add private Route53 record sets
         :param keypair: Instance Keypair for ssh e.g. 'pipeline' or 'mykey'
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
         :param nat_highly_available: using a nat gateway instead of a NAT
@@ -21,7 +22,8 @@ class NetworkConfig(object):
         self.private_subnets = private_subnets
         self.nat = nat
         self.jump = jump
-        self.stack_hosted_zone_name = stack_hosted_zone_name
+        self.public_hosted_zone_name = public_hosted_zone_name
+        self.private_hosted_zone = private_hosted_zone
         self.keypair = keypair
         self.cd_service_role_arn = cd_service_role_arn
         self.nat_highly_available = nat_highly_available

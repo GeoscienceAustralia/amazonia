@@ -26,7 +26,8 @@ nat_instance_type: 't2.micro'
 home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'
-stack_hosted_zone_name:
+public_hosted_zone_name:
+private_hosted_zone_name: 'private.lan.'
 owner_emails:
 nat_alerting: false
 iam_instance_profile_arn:
