@@ -100,7 +100,7 @@ class YamlFields(object):
     # api_method_config field list
     api_method_config = [
         'method_name',
-        'lambda_arn',
+        'lambda_unit',
         'httpmethod',
         'authorizationtype',
         'request_config',
