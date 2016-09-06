@@ -1,33 +1,5 @@
-amz_version: 1.3.6
-keypair: 'sentinel'
+amz_version: 1.3.5
+keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 autoscaling_units:
   -
     unit_title: 'app1'
-
-lambda_units:
- -
-  unit_title: 'syncAHIHotspots2TEST'
-  lambda_config:
-    lambda_s3_bucket: ga-sentinel-staging-test
-    lambda_s3_key: 'lambda/sentinel-lambda-1.0-SNAPSHOT.jar'
-    lambda_description: 'Sync AHI hotspot files from BOM to S3'
-    lambda_function_name: 'syncAHIHotspots2TEST'
-    lambda_handler: 'au.gov.ga.sentinel.lambda.SyncAHIHotspots::process'
-    lambda_memory_size: 512
-    lambda_role_arn: arn:aws:iam::400725546443:role/lambda_basic_vpc_execution_with_s3
-    lambda_runtime: 'java8'
-    lambda_timeout: 300
-    lambda_schedule: 'cron(0/5 * * * ? *)'
- -
-  unit_title: 'syncAHIHotspots3TEST'
-  lambda_config:
-    lambda_s3_bucket: ga-sentinel-staging-test
-    lambda_s3_key: 'lambda/sentinel-lambda-1.0-SNAPSHOT.jar'
-    lambda_description: 'Sync AHI hotspot files from BOM to S3'
-    lambda_function_name: 'syncAHIHotspots3TEST'
-    lambda_handler: 'au.gov.ga.sentinel.lambda.SyncAHIHotspots::process'
-    lambda_memory_size: 512
-    lambda_role_arn: arn:aws:iam::400725546443:role/lambda_basic_vpc_execution_with_s3
-    lambda_runtime: 'java8'
-    lambda_timeout: 300
-    lambda_schedule: 'rate(5 minutes)'
