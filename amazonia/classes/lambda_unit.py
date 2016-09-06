@@ -18,7 +18,7 @@ class LambdaUnit(SecurityEnabledObject):
         """
         self.title = unit_title + 'Lambda'
         self.public_cidr = network_config.public_cidr
-        self.dependencies = dependencies
+        self.dependencies = dependencies if dependencies else []
 
         super(LambdaUnit, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
 
