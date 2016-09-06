@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.3.5] - 6/09/2016
 - Introduced amz_version for tracking version used for users
 - Adding support for lambda units
+- Renamed CF resource for PubRT to PubRouteTable. Stacks will need to be recreated
+- Renamed CF resource for PriRT to PriRouteTable. Stacks will need to be recreated
 
 ## [1.3.4] - 6/09/2016
 - Add Forwarded Headers support to Cloudfront distributions
