@@ -5,7 +5,7 @@ from troposphere import Template, Ref, Join
 from nose.tools import *
 
 
-template = apiname = methodname = lambda_arn = httpmethod = authorizationtype = request_template = request_parameters =\
+template = apiname = methodname = lambda_unit = httpmethod = authorizationtype = request_template = request_parameters =\
     response_template = response_parameters = response_models = selection_pattern = statuscode = None
 
 
@@ -13,13 +13,13 @@ def setup_resources():
     """
     Initialise resources before each test
     """
-    global template, apiname, methodname, lambda_arn, httpmethod, authorizationtype, request_template,\
+    global template, apiname, methodname, lambda_unit, httpmethod, authorizationtype, request_template,\
         request_parameters, response_template, response_parameters, response_models, selection_pattern, statuscode
 
     template = Template()
     apiname = 'test0'
     methodname = 'login0'
-    lambda_arn = 'arn:aws:lambda:ap-southeast-2:123456789:function:test'
+    lambda_unit = 'testlambda'
     httpmethod = 'POST'
     authorizationtype = 'NONE'
 
@@ -68,7 +68,7 @@ def test_method_config():
     method = create_method_config(request, [response])
 
     assert_equals(method.method_name, methodname)
-    assert_equals(method.lambda_arn, lambda_arn)
+    assert_equals(method.lambda_unit, lambda_unit)
     assert_equals(method.request, request)
     assert_equals(method.responses, [response])
     assert_equals(method.httpmethod, httpmethod)
@@ -184,7 +184,7 @@ def create_method_config(request, responses):
     """
 
     return ApiGatewayMethodConfig(method_name=methodname,
-                                  lambda_arn=lambda_arn,
+                                  lambda_unit=lambda_unit,
                                   request_config=request,
                                   response_config=responses,
                                   httpmethod=httpmethod,
