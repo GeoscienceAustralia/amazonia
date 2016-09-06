@@ -37,24 +37,28 @@ class ApiGatewayUnit(object):
                                              )
 
         for method in method_config:
+            self.dependencies.append(method.lambda_unit)
 
-            resource = self.create_resource(method)
-            self.get_responses(method)
 
-            integration = self.create_integration(method)
-
-            method = Method(
-                            '{0}Method'.format(method.method_name),
-                            RestApiId=Ref(self.api),
-                            AuthorizationType=method.authorizationtype,
-                            ResourceId=Ref(resource),
-                            HttpMethod=method.httpmethod,
-                            Integration=integration,
-                            MethodResponses=self.method_responses,
-                            RequestParameters=method.request.parameters
-                            )
-            self.methods.append(method)
-            self.template.add_resource(method)
+        # for method in method_config:
+        #
+        #     resource = self.create_resource(method)
+        #     self.get_responses(method)
+        #
+        #     integration = self.create_integration(method)
+        #
+        #     method = Method(
+        #                     '{0}Method'.format(method.method_name),
+        #                     RestApiId=Ref(self.api),
+        #                     AuthorizationType=method.authorizationtype,
+        #                     ResourceId=Ref(resource),
+        #                     HttpMethod=method.httpmethod,
+        #                     Integration=integration,
+        #                     MethodResponses=self.method_responses,
+        #                     RequestParameters=method.request.parameters
+        #                     )
+        #     self.methods.append(method)
+        #     self.template.add_resource(method)
 
     def create_resource(self, method_config):
         """
@@ -129,6 +133,6 @@ class ApiGatewayUnit(object):
 
     def get_dependencies(self):
         """
-        :return: returns an empty list as an ApiGatewayUnit has no upstream dependencies
+        :return: ist of other unit's this unit is dependant upon
         """
         return self.dependencies

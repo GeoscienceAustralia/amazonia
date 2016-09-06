@@ -663,9 +663,8 @@ method_config: &method_config # The config for an api method
       regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
       empty: False
       nullable: False
-    lambda_arn: # an ARN that points to a specific Lambda functions for the api to call
+    lambda_unit: # the title of a lambda unit to associate this method with.
       type: 'string'
-      regex: '^arn:aws:.*' # matches an aws ARN that points to a specific Lambda function for the api to call
       empty: False
       nullable: False
     httpmethod: # The http method type for this method to respond to. eg 'POST' 'OPTIONS' 'GET' etc
