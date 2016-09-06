@@ -187,8 +187,8 @@ runcmd:
                          )
                          }],
         cf_distribution_units=[],
-        api_gateway_units=[]
-
+        api_gateway_units=[],
+        lambda_units=[]
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 

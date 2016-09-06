@@ -455,3 +455,19 @@ api_gateway_units:
             statuscode: '403'
             models:
               application/json: 'Empty'
+
+lambda_units:
+ -
+  unit_title: 'mylambda'
+  lambda_config:
+    lambda_s3_bucket: 'bucket_name'
+    lambda_s3_key: 'key_name'
+    lambda_description: 'blah'
+    lambda_function_name: 'my_function'
+    lambda_handler: 'main'
+    lambda_memory_size: 128
+    lambda_role_arn: 'test_arn'
+    lambda_runtime: 'python2.7'
+    lambda_timeout: 1
+  dependencies:
+     - 'db1'

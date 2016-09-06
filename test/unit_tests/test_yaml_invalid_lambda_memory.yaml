@@ -1,0 +1,8 @@
+#
+# Test Stack Yaml for Amazonia
+#
+
+lambda_units:
+  -
+    lambda_config:
+      lambda_memory_size: 129
