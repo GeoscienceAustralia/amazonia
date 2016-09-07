@@ -129,10 +129,12 @@ def main():
         lambda_config=lambda_config
     )
 
-    ApiGatewayUnit(unit_title=apiname,
-                   template=template,
-                   method_config=[method_config],
-                   network_config=None).add_unit_flow(lambda_unit)
+    apigw = ApiGatewayUnit(unit_title=apiname,
+                           template=template,
+                           method_config=[method_config],
+                           network_config=None)
+
+    apigw.add_unit_flow(lambda_unit)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
