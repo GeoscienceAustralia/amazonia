@@ -47,7 +47,7 @@ def main():
         instance_dependencies=internet_gateway.title,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -63,7 +63,8 @@ def main():
         jump=None,
         nat=nat,
         public_cidr=None,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         keypair=None,
         cd_service_role_arn=None,
         nat_highly_available=False,

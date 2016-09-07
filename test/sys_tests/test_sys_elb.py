@@ -2,10 +2,11 @@
 
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.hosted_zone import HostedZone
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-from troposphere import ec2, Ref, Tags, Template, route53
+from troposphere import ec2, Ref, Tags, Template
 
 
 def main():
@@ -13,13 +14,7 @@ def main():
     vpc = template.add_resource(ec2.VPC('MyVPC',
                                         CidrBlock='10.0.0.0/16'))
 
-    hosted_zone = template.add_resource(route53.HostedZone('MyHostedZone',
-                                                           HostedZoneConfig=route53.HostedZoneConfiguration(
-                                                               Comment='MyHostedZone'),
-                                                           Name='myhostedzone.test.ga.',
-                                                           VPCs=[route53.HostedZoneVPCs(VPCId=Ref(vpc),
-                                                                                        VPCRegion='ap-southeast-2')]))
-
+    private_hosted_zone = HostedZone(template, 'myhostedzone.test.ga.', vpcs=[vpc])
     internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway',
                                                                  Tags=Tags(Name='MyInternetGateway')))
 
@@ -40,6 +35,18 @@ def main():
                                                        AvailabilityZone='ap-southeast-2c',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.3.0/24'))]
+    private_subnets = [template.add_resource(ec2.Subnet('MyPrivSub1',
+                                                        AvailabilityZone='ap-southeast-2a',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.4.0/24')),
+                       template.add_resource(ec2.Subnet('MyPrivSub2',
+                                                        AvailabilityZone='ap-southeast-2b',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.5.0/24')),
+                       template.add_resource(ec2.Subnet('MyPrivSub3',
+                                                        AvailabilityZone='ap-southeast-2c',
+                                                        VpcId=Ref(vpc),
+                                                        CidrBlock='10.0.6.0/24'))]
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -49,7 +56,7 @@ def main():
         instance_dependencies=vpc.title,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -60,8 +67,9 @@ def main():
     network_config = NetworkConfig(
         vpc=vpc,
         public_subnets=public_subnets,
-        stack_hosted_zone_name=hosted_zone.Name,
-        private_subnets=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=private_hosted_zone,
+        private_subnets=private_subnets,
         jump=None,
         nat=nat,
         public_cidr=None,
@@ -77,8 +85,7 @@ def main():
         instance_protocol=['HTTP'],
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
-        public_unit=True,
-        unit_hosted_zone_name=None,
+        public_unit=False,
         ssl_certificate_id=None
     )
     elb_config2 = ElbConfig(
@@ -89,8 +96,17 @@ def main():
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
-        unit_hosted_zone_name=None,
         ssl_certificate_id='arn:aws:acm::tester'
+    )
+    elb_config3 = ElbConfig(
+        instance_port=['80'],
+        loadbalancer_port=['80'],
+        loadbalancer_protocol=['HTTP'],
+        instance_protocol=['HTTP'],
+        elb_health_check='HTTP:80/index.html',
+        elb_log_bucket='my-s3-bucket',
+        public_unit=True,
+        ssl_certificate_id=None
     )
 
     Elb(title='MyUnit1',
@@ -102,6 +118,12 @@ def main():
     Elb(title='MyUnit2',
         network_config=network_config,
         elb_config=elb_config2,
+        template=template
+        )
+    network_config.public_hosted_zone_name = 'myhostedzone.test.ga.'
+    Elb(title='MyUnit3',
+        network_config=network_config,
+        elb_config=elb_config3,
         template=template
         )
 

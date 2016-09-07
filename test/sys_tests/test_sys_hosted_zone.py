@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.hosted_zone import HostedZone
-from troposphere import ec2, Ref, Tags, Template, GetAtt
+from troposphere import ec2, Ref, Tags, Template
 from troposphere import elasticloadbalancing as elb
 
 
@@ -57,23 +57,23 @@ def main():
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.3.0/24'))]
 
-    load_balancer = template.add_resource(elb.LoadBalancer('myLoadBalancer',
-                                                           CrossZone=True,
-                                                           HealthCheck=elb.HealthCheck(Target='HTTP:80/index.html',
-                                                                                       HealthyThreshold='10',
-                                                                                       UnhealthyThreshold='2',
-                                                                                       Interval='300',
-                                                                                       Timeout='60'),
-                                                           Listeners=[elb.Listener(LoadBalancerPort='80',
-                                                                                   Protocol='HTTP',
-                                                                                   InstancePort='80',
-                                                                                   InstanceProtocol='HTTP')],
-                                                           Scheme='internet-facing',
-                                                           SecurityGroups=[Ref(security_group)],
-                                                           Subnets=[Ref(subnet) for subnet in public_subnets]
-                                                           ))
+    template.add_resource(elb.LoadBalancer('myLoadBalancer',
+                                           CrossZone=True,
+                                           HealthCheck=elb.HealthCheck(Target='HTTP:80/index.html',
+                                                                       HealthyThreshold='10',
+                                                                       UnhealthyThreshold='2',
+                                                                       Interval='300',
+                                                                       Timeout='60'),
+                                           Listeners=[elb.Listener(LoadBalancerPort='80',
+                                                                   Protocol='HTTP',
+                                                                   InstancePort='80',
+                                                                   InstanceProtocol='HTTP')],
+                                           Scheme='internet-facing',
+                                           SecurityGroups=[Ref(security_group)],
+                                           Subnets=[Ref(subnet) for subnet in public_subnets]
+                                           ))
 
-    ec2_instance = template.add_resource(ec2.Instance(
+    template.add_resource(ec2.Instance(
         'myinstance',
         KeyName='INSERT_YOUR_KEYPAIR_HERE',
         ImageId='ami-dc361ebf',
@@ -88,11 +88,9 @@ def main():
         DependsOn=internet_gateway.title
     ))
 
-    public_hz = HostedZone(template=template, domain='mypublic.hz', title='public')
-    public_hz.add_record_set('publicrecord', ip=GetAtt(ec2_instance, 'PublicIp'))
+    HostedZone(template=template, domain='mypublic.hz', vpcs=None)
 
-    private_hz = HostedZone(template=template, domain='myprivate.hz', title='private', vpcs=[vpc])
-    private_hz.add_record_set('privaterecord', elb=load_balancer)
+    HostedZone(template=template, domain='myprivate.hz', vpcs=[vpc])
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
