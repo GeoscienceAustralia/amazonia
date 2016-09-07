@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.lambda_unit import LambdaUnit
-from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from troposphere import Template, ec2, Ref, Tags
 
 
@@ -134,7 +134,7 @@ def main():
     apigw = ApiGatewayUnit(unit_title=apiname,
                            template=template,
                            method_config=[method_config],
-                           network_config=None)
+                           network_config=None, deployment_config=None)
 
     apigw.add_unit_flow(lambda_unit)
 

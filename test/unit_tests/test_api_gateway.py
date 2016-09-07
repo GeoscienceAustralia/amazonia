@@ -1,16 +1,15 @@
-from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_unit import ApiGatewayUnit
-from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.lambda_config import LambdaConfig
+from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-from troposphere import Template, ec2, Ref, Join, Tags, GetAtt
 from nose.tools import *
+from troposphere import Template, ec2, Ref, Join, Tags
 
-
-template = apiname = methodname = httpmethod = authorizationtype = request_template = request_parameters =\
+template = apiname = methodname = httpmethod = authorizationtype = request_template = request_parameters = \
     response_template = response_parameters = response_models = selection_pattern = statuscode = lambda_title = None
 
 
@@ -18,7 +17,7 @@ def setup_resources():
     """
     Initialise resources before each test
     """
-    global template, apiname, methodname, httpmethod, authorizationtype, request_template, lambda_title,\
+    global template, apiname, methodname, httpmethod, authorizationtype, request_template, lambda_title, \
         request_parameters, response_template, response_parameters, response_models, selection_pattern, statuscode
 
     template = None
@@ -27,7 +26,7 @@ def setup_resources():
     methodname = 'login0'
     httpmethod = 'POST'
     authorizationtype = 'NONE'
-    lambda_title= 'lambdatest1'
+    lambda_title = 'lambdatest1'
     request_template = {'application/json': """{ "username": $input.json('$.username')}"""}
     request_parameters = {'method.request.header.Origin': "$input.params('Origin')"}
     response_template = {'application/json': ''}
@@ -102,7 +101,7 @@ def test_creation_of_method():
     global apiname, methodname, lambda_title
     apiname = 'test1'
     methodname = 'login1'
-    lambda_title = lambda_title + '1'
+    lambda_title += '1'
     request = create_request_config()
     response = create_response_config()
     method = create_method_config(request, [response])
@@ -137,7 +136,7 @@ def test_creation_of_integration():
     global apiname, methodname, lambda_title
     apiname = 'test2'
     methodname = 'login2'
-    lambda_title = lambda_title + '2'
+    lambda_title += '2'
     request = create_request_config()
     response = create_response_config()
     method = create_method_config(request, [response])
@@ -160,6 +159,7 @@ def test_creation_of_integration():
     assert_equals(integration_response.ResponseParameters, response_parameters)
     assert_equals(integration_response.ResponseTemplates, response_template)
 
+
 @with_setup(setup_resources())
 def test_creation_of_deployment():
     """
@@ -174,9 +174,9 @@ def test_creation_of_deployment():
     method = create_method_config(request, [response])
     api = create_api(method)
     deployment = ApiGatewayDeploymentConfig(
-                                  apiname=api.api.title,
-                                  stagename='Test'
-                                 )
+        apiname=api.api.title,
+        stagename='Test'
+    )
     api.add_deployment(deployment)
 
     assert_equals(api.deployments[0].title, '{0}{1}Deployment'.format(apiname, deployment.stagename))
@@ -281,7 +281,7 @@ def add_lambda(num):
         instance_dependencies=vpc.title,
         alert=False,
         alert_emails=['some@email.com'],
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -297,7 +297,8 @@ def add_lambda(num):
         private_subnets=private_subnets,
         jump=None,
         nat=nat,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,

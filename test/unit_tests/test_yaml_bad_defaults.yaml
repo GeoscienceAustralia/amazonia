@@ -55,7 +55,6 @@ database_config:
 # (ZD) Autoscaling unit default values
 # ELB default values
 elb_config:
-  unit_hosted_zone_name:
   loadbalancer_protocol:
     - 'HTTP'
   instance_protocol:
