@@ -7,13 +7,14 @@ from troposphere.events import Rule, Target
 
 
 class LambdaUnit(SecurityEnabledObject):
-    def __init__(self, unit_title, template, dependencies, network_config, lambda_config, ):
+    def __init__(self, unit_title, template, dependencies, network_config, lambda_config):
         """
         Amazonia lambda unit definition
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/awslambda.py
         :param unit_title: Title of the autoscaling application e.g 'webApp1', 'api2' or 'dataprocessing'
         :param template: Troposphere stack to append resources to
+        :param dependencies: list of unit names this unit needs access to
         :param network_config: object containing network related variables
         :param lambda_config: object containing lambda related variablea
         """
