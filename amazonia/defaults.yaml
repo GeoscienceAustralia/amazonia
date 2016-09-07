@@ -227,6 +227,10 @@ method_config:
   response_config:
     - *response_config
 
+deployment_config:
+  apiname: 'myApi'
+  stagename: 'TEST'
+
 api_gateway_units:
 
 lambda_units:
