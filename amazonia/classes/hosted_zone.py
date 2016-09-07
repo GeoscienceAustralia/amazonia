@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
 from troposphere import route53, Ref, Join
+from troposphere.route53 import HostedZoneVPCs
 
 
 class HostedZone(object):
-    def __init__(self, template, domain, vpcs=None):
+    def __init__(self, template, domain, vpcs):
         """
         Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
         AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
@@ -58,6 +59,8 @@ class HostedZone(object):
         ))
 
         if vpcs:
-            hz.VPCs = vpcs
+            hz.VPCs = []
+            for vpc in vpcs:
+                hz.VPCs.append(HostedZoneVPCs(VPCId=Ref(vpc), VPCRegion=Ref('AWS::Region')))
 
         return hz

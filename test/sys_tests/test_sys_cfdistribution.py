@@ -1,33 +1,32 @@
 #!/usr/bin/python3
 
-from troposphere import cloudfront, Ref, Tags, Template
-
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
-from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
+from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_distribution_unit import CFDistributionUnit
+from amazonia.classes.cf_origins_config import CFOriginsConfig
+from troposphere import Template
 
 
 def main():
     template = Template()
 
-    origins = [ CFOriginsConfig (
-            domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-            origin_id='S3-amazonia-elb-bucket',
-            origin_policy={
-                'is_s3' : True,
-                'origin_access_identity': 'originaccessid1'
-            }
-        ),
+    origins = [CFOriginsConfig(
+        domain_name='amazonia-elb-bucket.s3.amazonaws.com',
+        origin_id='S3-amazonia-elb-bucket',
+        origin_policy={
+            'is_s3': True,
+            'origin_access_identity': 'originaccessid1'
+        }
+    ),
         CFOriginsConfig(
             domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
             origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
             origin_policy={
-                'is_s3' : False,
-                'origin_protocol_policy' : 'https-only',
-                'http_port' : 80,
-                'https_port' : 443,
-                'origin_ssl_protocols' : ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
+                'is_s3': False,
+                'origin_protocol_policy': 'https-only',
+                'http_port': 80,
+                'https_port': 443,
+                'origin_ssl_protocols': ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
             }
         )
     ]
@@ -70,14 +69,14 @@ def main():
     ]
 
     distribution_config = CFDistributionConfig(
-        aliases=['www.test-stack.gadevs.ga','test-stack.gadevs.ga'],
+        aliases=['www.test-stack.gadevs.ga', 'test-stack.gadevs.ga'],
         comment='SysTestCFDistribution',
         default_root_object='index.html',
         enabled=True,
         price_class='PriceClass_All',
         target_origin_id='originId',
-        allowed_methods=['GET','HEAD'],
-        cached_methods=['GET','HEAD'],
+        allowed_methods=['GET', 'HEAD'],
+        cached_methods=['GET', 'HEAD'],
         trusted_signers=['self'],
         forward_cookies='all',
         forwarded_headers=[''],
@@ -92,11 +91,11 @@ def main():
     )
 
     CFDistributionUnit(unit_title='cfdist',
-                    template=template,
-                    network_config=[],
-                    cf_origins_config=origins,
-                    cf_cache_behavior_config=cache_behavior,
-                    cf_distribution_config=distribution_config)
+                       template=template,
+                       network_config=[],
+                       cf_origins_config=origins,
+                       cf_cache_behavior_config=cache_behavior,
+                       cf_distribution_config=distribution_config)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 
