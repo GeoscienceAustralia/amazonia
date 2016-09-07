@@ -14,6 +14,7 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
                                   allowed_methods=('GET', 'HEAD'),
                                   cached_methods=('GET', 'HEAD'),
                                   trusted_signers=('self'),
+                                  query_string=True,
                                   forward_cookies='*',
                                   forwarded_headers=('Accept', 'Set-Cookie'),
                                   viewer_protocol_policy='https-only',
@@ -33,6 +34,7 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
     :param allowed_methods: List of HTTP methods that can be passed to the origin
     :param cached_methods: List of HTTP methods for which Cloudfront caches responses
     :param trusted_signers: List of AWS accounts that can create signed URLs in order to access private content
+    :param query_string: indicates whether to forward query strings to the origin
     :param viewer_protocol_policy: The protocol that users can use to access origin files
     :param min_ttl: The minimum amount of time objects should stay in the cache
     :param default_ttl: The default amount of time objects stay in the cache
@@ -53,6 +55,7 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
         allowed_methods=allowed_methods,
         cached_methods=cached_methods,
         trusted_signers=trusted_signers,
+        query_string=query_string,
         forward_cookies=forward_cookies,
         forwarded_headers=forwarded_headers,
         viewer_protocol_policy=viewer_protocol_policy,
@@ -82,6 +85,7 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
     origin = CFOriginsConfig(
         domain_name=domain_name,
         origin_id=origin_id,
+        origin_path='',
         origin_policy={
             'is_s3': is_s3,
             'origin_access_identity': origin_access_identity
@@ -113,6 +117,7 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
     origin = CFOriginsConfig(
         domain_name=domain_name,
         origin_id=origin_id,
+        origin_path='/path',
         origin_policy={
             'is_s3': is_s3,
             'origin_protocol_policy': origin_protocol_policy,
@@ -135,7 +140,8 @@ def create_cache_behavior(path_pattern='/index.html',
                           min_ttl=0,
                           default_ttl=0,
                           max_ttl=0,
-                          trusted_signers=('self')):
+                          trusted_signers=('self'),
+                          query_string=True):
     """
     :param path_pattern: The pattern to which this cache behavior applies
     :param allowed_methods: List of HTTP methods that can be passed to the origin
@@ -147,6 +153,7 @@ def create_cache_behavior(path_pattern='/index.html',
     :param max_ttl: The maximum amount of time objects should stay in the cache
     :param forward_cookies: boolean to forward cookies to origin
     :param trusted_signers: list of identifies that are trusted to sign cookies on behalf of this behavior
+    :param query_string: indicates whether to forward query strings to the origin
     :return: Instance of CacheBehavior object
     """
     cache_behavior = CFCacheBehavior(
@@ -160,7 +167,8 @@ def create_cache_behavior(path_pattern='/index.html',
         min_ttl=min_ttl,
         default_ttl=default_ttl,
         max_ttl=max_ttl,
-        trusted_signers=trusted_signers
+        trusted_signers=trusted_signers,
+        query_string=query_string
     )
 
     return cache_behavior
@@ -247,6 +255,7 @@ def test_cf_cache_behavior():
     default_ttl = 0
     max_ttl = 0
     trusted_signers = ('self')
+    query_string = True
 
     helper_cf_cache_behavior = create_cache_behavior(path_pattern=path_pattern,
                                                      allowed_methods=allowed_methods,
@@ -258,7 +267,8 @@ def test_cf_cache_behavior():
                                                      min_ttl=min_ttl,
                                                      default_ttl=default_ttl,
                                                      max_ttl=max_ttl,
-                                                     trusted_signers=trusted_signers)
+                                                     trusted_signers=trusted_signers,
+                                                     query_string=query_string)
 
     assert_equal(path_pattern, helper_cf_cache_behavior.path_pattern)
     assert_equal(allowed_methods, helper_cf_cache_behavior.allowed_methods)
@@ -270,6 +280,7 @@ def test_cf_cache_behavior():
     assert_equal(default_ttl, helper_cf_cache_behavior.default_ttl)
     assert_equal(max_ttl, helper_cf_cache_behavior.max_ttl)
     assert_equal(trusted_signers, helper_cf_cache_behavior.trusted_signers)
+    assert_equal(query_string, helper_cf_cache_behavior.query_string)
 
 
 def test_cf_distribution_config():
