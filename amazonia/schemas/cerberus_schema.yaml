@@ -541,6 +541,10 @@ lambda_config: &lambda_config
       nullable: False
       min: 1
       max: 300
+    lambda_schedule: # rate or cron expression defining how often to execute the function
+      type: 'string'
+      nullable: True
+      regex: '^(cron|rate)\(.*' # matches a string beginning with cron( or rate(
 
 keypair: # A string containing the Key Pair to use for ssh access to your instances.
   type: 'string'
