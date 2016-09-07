@@ -9,7 +9,7 @@ class InvalidLambdaConfigError(Exception):
 
 class LambdaConfig(object):
     def __init__(self, lambda_s3_bucket, lambda_s3_key, lambda_description, lambda_function_name, lambda_handler,
-                 lambda_memory_size, lambda_role_arn, lambda_runtime, lambda_timeout):
+                 lambda_memory_size, lambda_role_arn, lambda_runtime, lambda_timeout, lambda_schedule):
         """
         Config object for lambda units
         :param lambda_s3_bucket: s3 bucket containing lambda function code
@@ -21,6 +21,7 @@ class LambdaConfig(object):
         :param lambda_role_arn: arn for iam role to run lambda as
         :param lambda_runtime: nodejs | nodejs4.3 | java8 | python2.7
         :param lambda_timeout: execution time at which Lambda should terminate the function. Minimum of 1.
+        :param lambda_schedule: rate or cron expression defining how often the lambda should be executed
         """
         self.lambda_s3_bucket = lambda_s3_bucket
         self.lambda_s3_key = lambda_s3_key
@@ -31,6 +32,7 @@ class LambdaConfig(object):
         self.lambda_role_arn = lambda_role_arn
         self.lambda_runtime = lambda_runtime
         self.lambda_timeout = lambda_timeout
+        self.lambda_schedule = lambda_schedule
 
         # Validate that minsize is less than maxsize
         if self.lambda_memory_size % 64 != 0:

@@ -80,7 +80,8 @@ def setup_resources():
         lambda_memory_size=128,
         lambda_role_arn='test_arn',
         lambda_runtime='python2.7',
-        lambda_timeout=1
+        lambda_timeout=1,
+        lambda_schedule='cron(0/5 * * * ? *)'
     )
 
 
@@ -94,7 +95,8 @@ def test_invalid_lambda_memory_size():
         'lambda_handler': 'main',
         'lambda_role_arn': 'test_arn',
         'lambda_runtime': 'python2.7',
-        'lambda_timeout': 1
+        'lambda_timeout': 1,
+        'lambda_schedule': 'cron(0/5 * * * ? *)'
     })
 
 
@@ -119,6 +121,7 @@ def test_lambda():
     assert_equals(my_lambda.trop_lambda_function.Role, 'test_arn')
     assert_equals(my_lambda.trop_lambda_function.Runtime, 'python2.7')
     assert_equals(my_lambda.trop_lambda_function.Timeout, 1)
+    assert_equals(my_lambda.trop_cw_rule.ScheduleExpression, 'cron(0/5 * * * ? *)')
     assert_equals(len(my_lambda.trop_lambda_function.VpcConfig.SubnetIds), 3)
     assert_equals(len(my_lambda.trop_lambda_function.VpcConfig.SecurityGroupIds), 1)
     assert_raises(InvalidFlowError, my_lambda.add_unit_flow, **{'receiver': my_lambda})

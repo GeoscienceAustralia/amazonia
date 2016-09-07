@@ -523,7 +523,8 @@ def create_stack():
                                         selectionpattern=''
                                     )]
                                 )
-                            ]
+                            ],
+                            'deployment_config': []
                             }],
         lambda_units=[{'unit_title': 'lambda1',
                        'dependencies': ['db1'],
@@ -536,7 +537,8 @@ def create_stack():
                            lambda_memory_size=128,
                            lambda_role_arn='test_arn',
                            lambda_runtime='python2.7',
-                           lambda_timeout=1
+                           lambda_timeout=1,
+                           lambda_schedule='cron(0/5 * * * ? *)'
                        )
                        }
                       ]
