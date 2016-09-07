@@ -244,7 +244,8 @@ class YamlFields(object):
         'lambda_memory_size',
         'lambda_role_arn',
         'lambda_runtime',
-        'lambda_timeout'
+        'lambda_timeout',
+        'lambda_schedule'
     ]
 
     # config classes
