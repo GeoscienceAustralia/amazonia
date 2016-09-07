@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.3.6] - 7/09/2016
-- Allow for Lambdas to have no dependencies
+- Allow for Lambdas to have no dependencies, and for them to have Cloudwatch event triggers
 - Added add unit flow function to Api Gateway class to enable lambda unit integration.
 - Added deployments to Api Gateway class.
 
