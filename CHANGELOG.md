@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.3.6] - 7/09/2016
 - Allow for Lambdas to have no dependencies
 - Added add unit flow function to Api Gateway class to enable lambda unit integration.
+- Added deployments to Api Gateway class.
 
 ## [1.3.5] - 6/09/2016
 - Introduced amz_version for tracking version used for users
