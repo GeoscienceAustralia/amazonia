@@ -137,7 +137,7 @@ class Stack(object):
                     Name=Join('', [Ref('AWS::StackName'), '-', vpc_name])
                 )
             ))
-        self.private_hosted_zone = HostedZone(self.template, self.private_hosted_zone, vpcs=[self.vpc])
+        self.private_hosted_zone = HostedZone(self.template, self.private_hosted_zone_name, vpcs=[self.vpc])
         ig_name = 'Ig'
         self.internet_gateway = self.template.add_resource(
             ec2.InternetGateway(ig_name,

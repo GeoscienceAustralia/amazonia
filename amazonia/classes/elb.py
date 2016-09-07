@@ -64,7 +64,7 @@ class Elb(SecurityEnabledObject):
         if not elb_config.public_unit:
             self.create_r53_record(network_config.private_hosted_zone.domain)
         elif network_config.public_hosted_zone_name:
-            self.create_r53_record(elb_config.unit_hosted_zone_name)
+            self.create_r53_record(network_config.public_hosted_zone_name)
         else:
             self.template.add_output(Output(
                 self.trop_elb.title,
@@ -77,15 +77,20 @@ class Elb(SecurityEnabledObject):
         Function to create r53 recourdset to associate with ELB
         :param hosted_zone_name: R53 hosted zone to create record in
         """
-
+        if self.elb_config.public_unit:
+            name = Join('', [Ref('AWS::StackName'),
+                             '-',
+                             self.title,
+                             '.',
+                             hosted_zone_name])
+        else:
+            name = Join('', [self.title,
+                             '.',
+                             hosted_zone_name])
         self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
             self.title + 'R53',
-                RecordSets=[route53.RecordSet(
-                Name=Join('', [Ref('AWS::StackName'),
-                               '-',
-                               self.title,
-                               '.',
-                               hosted_zone_name]),
+            RecordSets=[route53.RecordSet(
+                Name=name,
                 AliasTarget=route53.AliasTarget(dnsname=GetAtt(self.trop_elb, 'DNSName'),
                                                 hostedzoneid=GetAtt(self.trop_elb, 'CanonicalHostedZoneNameID')),
                 Type='A')]))

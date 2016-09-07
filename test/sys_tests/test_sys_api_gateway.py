@@ -119,7 +119,8 @@ def main():
         lambda_memory_size=128,
         lambda_role_arn='test_arn',
         lambda_runtime='python2.7',
-        lambda_timeout=1
+        lambda_timeout=1,
+        lambda_schedule=None
     )
 
     lambda_unit = LambdaUnit(
