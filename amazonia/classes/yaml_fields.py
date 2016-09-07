@@ -6,7 +6,7 @@ from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
 from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
 from amazonia.classes.lambda_config import LambdaConfig
 
@@ -122,6 +122,12 @@ class YamlFields(object):
         'models'
     ]
 
+    # api_stage_config field list
+    api_deployment_config = [
+        'apiname',
+        'stagename'
+    ]
+
     # cloudfront origins config key list
     cf_origins_config_key_list = [
         'domain_name',
@@ -217,7 +223,8 @@ class YamlFields(object):
     # api parameter field list
     api_gateway_unit_key_list = [
         'unit_title',
-        'method_config'
+        'method_config',
+        'deployment_config'
     ]
 
     # lambda unit parameter field list
@@ -278,6 +285,8 @@ class YamlFields(object):
             ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, api_request_config),
         'response_config':
             ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, api_response_config),
+        'deployment_config':
+            ComplexObjectFieldMapping(ApiGatewayDeploymentConfig, True, api_deployment_config),
         'lambda_units':
             ComplexObjectFieldMapping(dict, True, lambda_unit_key_list),
         'lambda_config':

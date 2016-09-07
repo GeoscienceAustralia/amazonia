@@ -738,6 +738,19 @@ method_config: &method_config # The config for an api method
       nullable: False
       schema: *response_config
 
+deployment_config: &deployment_config # The config for an api deployment
+  type: 'dict'
+  nullable: True
+  schema:
+    apiname: # The api unit_title to link this deployment to.
+      type: 'string'
+      empty: False
+      nullable: False
+    stagename: # the name of this stage (eg: PROD/TEST/DEV).
+      type: 'string'
+      empty: False
+      nullable: False
+
 api_gateway_units: # A list of api gateway definitions to create.
   type: 'list'
   nullable: True
@@ -754,3 +767,8 @@ api_gateway_units: # A list of api gateway definitions to create.
         empty: False
         nullable: False
         schema: *method_config # A list of method_config for this api
+      deployment_config:
+        type: 'list'
+        empty: False
+        nullable: False
+        schema: *deployment_config # A list of stage_config for this api
