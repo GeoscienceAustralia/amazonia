@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.7] - 8/09/2016
+- Replaced stack parameter stack_hosted_zone_name with public_hosted_zone_name
+- Stack now creates a discrete private hosted zone (configurable via private_hosted_zone_name, default 'private.lan.')
+- RDS creates R53 record in private hosted zone
+- Internal ELBs create R53 records in private hosted zone
+- Public ELBs now use stack public_hosted_zone_name, unit_hosted_zone_name removed
+
 ## [1.3.6] - 7/09/2016
 - Allow for Lambdas to have no dependencies, and for them to have Cloudwatch event triggers
 - Added add unit flow function to Api Gateway class to enable lambda unit integration.
