@@ -59,7 +59,9 @@ class Elb(SecurityEnabledObject):
                                          self.title])
             )
 
-        if network_config.public_hosted_zone_name:
+        if not elb_config.public_unit:
+            self.create_r53_record(network_config.private_hosted_zone.domain)
+        elif network_config.public_hosted_zone_name:
             self.create_r53_record(elb_config.unit_hosted_zone_name)
         else:
             self.template.add_output(Output(

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter
+from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter, route53
 
 
 class DatabaseUnit(SecurityEnabledObject):
@@ -56,11 +56,13 @@ class DatabaseUnit(SecurityEnabledObject):
         # Remove username and password if SnapshotID present
         if database_config.db_snapshot_id is None:
             self.username = self.template.add_parameter(Parameter(
-                self.title + 'MasterUsername', Type='String', Description='Master username of {0} RDS'.format(self.title),
+                self.title + 'MasterUsername', Type='String',
+                Description='Master username of {0} RDS'.format(self.title),
                 NoEcho=True))
 
             self.password = self.template.add_parameter(Parameter(
-                self.title + 'MasterPassword', Type='String', Description='Master password of {0} RDS'.format(self.title),
+                self.title + 'MasterPassword', Type='String',
+                Description='Master password of {0} RDS'.format(self.title),
                 NoEcho=True))
             rds_params['MasterUsername'] = Ref(self.username)
             rds_params['MasterUserPassword'] = Ref(self.password)
@@ -102,6 +104,30 @@ class DatabaseUnit(SecurityEnabledObject):
         """
         raise InvalidFlowError('Error: database_unit {0} may only be the destination of flow, not the originator.'
                                .format(self.title))
+
+    def create_r53_record(self, hosted_zone_name):
+
+        """
+        Function to create r53 recourdset to associate with ELB
+        :param hosted_zone_name: R53 hosted zone to create record in
+        """
+        self.elb_r53 = self.template.add_resource(route53.RecordSetGroup(
+            self.title + 'R53',
+            HostedZoneName=hosted_zone_name,
+            RecordSets=[route53.RecordSet(
+                Name=Join('', [Ref('AWS::StackName'),
+                               '-',
+                               self.title,
+                               '.',
+                               hosted_zone_name]),
+                ResourceRecords=[GetAtt(self.trop_db, 'Endpoint.Address')],
+                Type='CNAME')]))
+
+        self.template.add_output(Output(
+            self.title,
+            Description='URL of the {0} ELB'.format(self.title),
+            Value=Join('', ['http://', self.elb_r53.RecordSets[0].Name])
+        ))
 
 
 class InvalidFlowError(Exception):
