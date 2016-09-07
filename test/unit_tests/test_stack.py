@@ -523,7 +523,8 @@ def create_stack():
                                         selectionpattern=''
                                     )]
                                 )
-                            ]
+                            ],
+                            'deployment_config': []
                             }],
         lambda_units=[{'unit_title': 'lambda1',
                        'dependencies': ['db1'],
