@@ -122,7 +122,7 @@ def create_si(title, is_nat=False, alert=False, alert_emails=None):
     """
     vpc = 'vpc-12345'
     dependencies = 'igw-12345'
-    hosted_zone_name = None if is_nat else 'my.hostedzone.'
+    public_hosted_zone_name = None if is_nat else 'my.hostedzone.'
     template = Template()
     subnet = template.add_resource(ec2.Subnet('subnet12345',
                                               AvailabilityZone='ap-southeast-2a',
@@ -134,7 +134,7 @@ def create_si(title, is_nat=False, alert=False, alert_emails=None):
         si_instance_type='t2.nano',
         vpc=vpc,
         subnet=subnet,
-        hosted_zone_name=hosted_zone_name,
+        public_hosted_zone_name=public_hosted_zone_name,
         instance_dependencies=dependencies,
         is_nat=is_nat,
         iam_instance_profile_arn='my/instance-profile',

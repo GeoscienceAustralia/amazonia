@@ -67,7 +67,8 @@ def test_complete_valid_values():
     assert_equals(stack_input['jump_instance_type'], 't2.micro')
     assert_equals(stack_input['nat_image_id'], 'ami-53371f30')
     assert_equals(stack_input['nat_instance_type'], 't2.micro')
-    assert_equals(stack_input['stack_hosted_zone_name'], 'test.org.')
+    assert_equals(stack_input['public_hosted_zone_name'], 'test.org.')
+    assert_equals(stack_input['private_hosted_zone_name'], 'private.lan.')
     assert_equals(type(stack_input['home_cidrs']), list)
     assert_equals(len(stack_input['home_cidrs']), 1)
     assert_equals(type(stack_input['autoscaling_units']), list)
@@ -110,7 +111,6 @@ def test_complete_valid_values():
     assert_equals(autoscaling_unit_input['elb_config'].elb_log_bucket, 'elb_log_bucket')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])
-    assert_equals(autoscaling_unit_input['elb_config'].unit_hosted_zone_name, None)
 
     database_unit_input = stack_input['database_units'][0]
 
