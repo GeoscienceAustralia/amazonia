@@ -1,5 +1,5 @@
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
 from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.lambda_config import LambdaConfig
@@ -160,6 +160,31 @@ def test_creation_of_integration():
     assert_equals(integration_response.ResponseParameters, response_parameters)
     assert_equals(integration_response.ResponseTemplates, response_template)
 
+@with_setup(setup_resources())
+def test_creation_of_deployment():
+    """
+    Tests the creation of a demployment
+    """
+    global apiname, methodname, lambda_title
+
+    apiname = 'test3'
+    methodname = 'login3'
+    request = create_request_config()
+    response = create_response_config()
+    method = create_method_config(request, [response])
+    api = create_api(method)
+    deployment = ApiGatewayDeploymentConfig(
+                                  apiname=api.api.title,
+                                  stagename='Test'
+                                 )
+    api.add_deployment(deployment)
+
+    assert_equals(api.deployments[0].title, '{0}{1}Deployment'.format(apiname, deployment.stagename))
+    assert_equals(api.deployments[0].Description, '{0} Deployment created for APIGW {1}'.format(deployment.stagename,
+                                                                                                apiname))
+    assert_equals(type(api.deployments[0].RestApiId), Ref)
+    assert_equals(api.deployments[0].StageName, deployment.stagename)
+
 
 @with_setup(setup_resources())
 def create_request_config():
@@ -211,7 +236,7 @@ def create_api(method_config):
     :return: an Api gateway object
     """
 
-    return ApiGatewayUnit(apiname, template, [method_config], None)
+    return ApiGatewayUnit(apiname, template, [method_config], None, None)
 
 
 @with_setup(setup_resources())
@@ -288,7 +313,8 @@ def add_lambda(num):
         lambda_memory_size=128,
         lambda_role_arn='test_arn',
         lambda_runtime='python2.7',
-        lambda_timeout=1
+        lambda_timeout=1,
+        lambda_schedule='cron(0/5 * * * ? *)'
     )
 
     return LambdaUnit(
