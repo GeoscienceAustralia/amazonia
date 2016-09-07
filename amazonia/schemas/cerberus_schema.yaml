@@ -347,6 +347,9 @@ cf_distribution_config: &cf_distribution_config
       nullable: True
       schema:
         type: 'string'
+    query_string:
+      type: 'boolean'
+      nullable: True
     forward_cookies:
       type: 'string'
       nullable: True
@@ -400,6 +403,9 @@ cf_origins_config: &cf_origins_config
         type: 'string'
         nullable: True
       origin_id:
+        type: 'string'
+        nullable: True
+      origin_path:
         type: 'string'
         nullable: True
       origin_policy:
@@ -493,6 +499,9 @@ cf_cache_behavior_config: &cf_cache_behavior_config
         nullable: True
         schema:
           type: 'string'
+      query_string:
+        type: 'boolean'
+        nullable: True
 
 lambda_config: &lambda_config
   type: 'dict'

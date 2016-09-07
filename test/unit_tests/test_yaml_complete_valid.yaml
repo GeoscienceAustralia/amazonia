@@ -278,12 +278,14 @@ cf_distribution_units:
       -
         domain_name: 's3bucket.s3.amazonaws.com'
         origin_id: 'S3-s3bucket'
+        origin_path: '/'
         origin_policy:
           is_s3 : True
           origin_access_identity: 'origin-access-identity/cloudfront/ABCD1234ABCD1234'
       -
         domain_name: 'elbname-ABCD1234.ap-southeast-2.elb.amazonaws.com'
         origin_id: 'ELB-elbname-ABCD1234'
+        origin_path: '/path'
         origin_policy:
           is_s3 : False
           origin_protocol_policy: 'https-only'
@@ -315,11 +317,10 @@ cf_distribution_units:
        - 'HEAD'
       trusted_signers:
        - 'self'
+      query_string: True
       min_ttl: 0
       default_ttl: 0
       max_ttl: 0
-      trusted_signers:
-       - 'self'
       error_page_path: '404.html'
       acm_cert_arn: ''
       minimum_protocol_version: 'TLSv1'
@@ -346,18 +347,21 @@ cf_distribution_units:
         trusted_signers:
           - 'self'
         path_pattern: '/login'
+        query_string: True
   -
     unit_title: 'distribution2'
     cf_origins_config:
       -
         domain_name: 's3bucket.s3.amazonaws.com'
         origin_id: 'S3-s3bucket'
+        origin_path:
         origin_policy:
           is_s3 : True
           origin_access_identity: 'origin-access-identity/cloudfront/ABCD1234ABCD1234'
       -
         domain_name: 'elbname-ABCD1234.ap-southeast-2.elb.amazonaws.com'
         origin_id: 'ELB-elbname-ABCD1234'
+        origin_path:
         origin_policy:
           is_s3 : False
           origin_protocol_policy: 'https-only'
@@ -389,11 +393,10 @@ cf_distribution_units:
        - 'HEAD'
       trusted_signers:
        - 'self'
+      query_string: False
       min_ttl: 0
       default_ttl: 0
       max_ttl: 0
-      trusted_signers:
-       - 'self'
       error_page_path: '404.html'
       acm_cert_arn: ''
       minimum_protocol_version: 'TLSv1'
@@ -419,6 +422,7 @@ cf_distribution_units:
         max_ttl: 84600
         trusted_signers:
           - 'self'
+        query_string: True
         path_pattern: '/login'
 
 api_gateway_units:

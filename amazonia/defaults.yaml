@@ -159,7 +159,7 @@ cf_distribution_config:
    - 'GET'
    - 'HEAD'
   trusted_signers:
-   - 'self'
+  query_string: True
   viewer_protocol_policy: 'https-only'
   min_ttl: 0
   default_ttl: 0
@@ -172,6 +172,7 @@ cf_distribution_config:
 cf_origins_config:
    domain_name:
    origin_id:
+   origin_path:
    origin_policy:
      is_s3:
      origin_access_identity:
@@ -198,8 +199,8 @@ cf_cache_behavior_config:
    default_ttl: 0
    max_ttl: 0
    trusted_signers:
-    - 'self'
    path_pattern:
+   query_string: True
 
 request_config: &request_config
   templates:
