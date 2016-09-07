@@ -55,7 +55,7 @@ runcmd:
         instance_dependencies=internet_gateway.title,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -80,7 +80,8 @@ runcmd:
         private_subnets=private_subnets,
         public_subnets=public_subnets,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         keypair='pipeline',
         cd_service_role_arn=service_role_arn,
         nat_highly_available=False,
@@ -94,7 +95,6 @@ runcmd:
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None,
         ssl_certificate_id=None
     )
 

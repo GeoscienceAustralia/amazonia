@@ -3,6 +3,7 @@
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.hosted_zone import HostedZone
 from troposphere import ec2, Ref, Tags, Template
 
 
@@ -31,7 +32,7 @@ def main():
                                                         AvailabilityZone='ap-southeast-2c',
                                                         VpcId=Ref(vpc),
                                                         CidrBlock='10.0.3.0/24'))]
-
+    private_hosted_zone = HostedZone(vpcs=[vpc], template=template, domain='private.lan.')
     network_config = NetworkConfig(
         public_subnets=None,
         vpc=vpc,
@@ -39,7 +40,8 @@ def main():
         jump=None,
         nat=None,
         public_cidr=None,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=private_hosted_zone,
         keypair=None,
         cd_service_role_arn=None,
         nat_highly_available=False,
