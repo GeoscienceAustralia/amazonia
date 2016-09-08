@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - RDS creates R53 record in private hosted zone
 - Internal ELBs create R53 records in private hosted zone
 - Public ELBs now use stack public_hosted_zone_name, unit_hosted_zone_name removed
+- Updated Web App to handle all types of errors a little nicer.
+- Add support for OriginPath, forwarded QueryStrings, CustomHeaders to Cloudfront Distributions
 
 ## [1.3.6] - 7/09/2016
 - Allow for Lambdas to have no dependencies, and for them to have Cloudwatch event triggers

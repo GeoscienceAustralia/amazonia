@@ -4,7 +4,7 @@
 class CFDistributionConfig(object):
     def __init__(self, aliases, comment, default_root_object, enabled, price_class,
                  target_origin_id, allowed_methods, cached_methods, trusted_signers,
-                 forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl,
+                 query_string, forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl,
                  default_ttl, max_ttl, error_page_path, acm_cert_arn, minimum_protocol_version,
                  ssl_support_method):
         """
@@ -22,6 +22,7 @@ class CFDistributionConfig(object):
         :param allowed_methods: List of HTTP methods that can be passed to the origin
         :param cached_methods: List of HTTP methods for which Cloudfront caches responses
         :param trusted_signers: List of AWS accounts that can create signed URLs in order to access private content
+        :param query_string: indicates whether to forward query strings to the origin
         :param forward_cookies: Which cookies to forward to the origin
         :param forwarded_headers: List of headers to forward to the origin
         :param viewer_protocol_policy: The protocol that users can use to access origin files
@@ -42,7 +43,8 @@ class CFDistributionConfig(object):
         self.target_origin_id = target_origin_id
         self.allowed_methods = allowed_methods
         self.cached_methods = cached_methods
-        self.trusted_signers = trusted_signers
+        self.trusted_signers = trusted_signers if trusted_signers else []
+        self.query_string = query_string
         self.forward_cookies = forward_cookies
         self.forwarded_headers = forwarded_headers
         self.viewer_protocol_policy = viewer_protocol_policy
