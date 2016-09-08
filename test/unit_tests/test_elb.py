@@ -15,7 +15,8 @@ from troposphere import ec2, Ref, Template
 
 def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
                hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
-               elb_log_bucket=None, public_unit=True, ssl_certificate_id=None):
+               elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
+               unhealthy_threshold=2, interval=300, timeout=30):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
@@ -79,7 +80,11 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         elb_health_check=elb_health_check,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
-        ssl_certificate_id=ssl_certificate_id
+        ssl_certificate_id=ssl_certificate_id,
+        healthy_threshold=healthy_threshold,
+        unhealthy_threshold=unhealthy_threshold,
+        interval=interval,
+        timeout=timeout
     )
 
     elb = Elb(title='elb',
@@ -219,7 +224,7 @@ def test_public_unit():
 @AttributeError
 def test_ssl_none():
     """
-    # Test to determine that the ssl certificate is being passed into the elb listners
+    # Test to determine that the ssl certificate is being passed into the elb listeners
     """
     helper_elb = create_elb(ssl_certificate_id=None)
     for listener in helper_elb.trop_elb.Listeners:
@@ -228,8 +233,33 @@ def test_ssl_none():
 
 def test_ssl_certificate():
     """
-    # Test to determine that the ssl certificate is being passed into the elb listners
+    # Test to determine that the ssl certificate is being passed into the elb listeners
     """
     helper_elb = create_elb(ssl_certificate_id='arn:aws:acm::tester', loadbalancer_protocol='HTTPS')
     for listener in helper_elb.trop_elb.Listeners:
         assert_equals(listener.SSLCertificateId, 'arn:aws:acm::tester')
+
+
+def test_thresholds():
+    """
+    Tests to validate that the healthy and unhealthy thresholds are being passed to the ELB HealthCheck
+    """
+    thresholds = [2, 10]
+
+    for threshold in thresholds:
+        helper_elb = create_elb(healthy_threshold=threshold)
+        assert_equal(threshold, helper_elb.trop_elb.HealthCheck.HealthyThreshold)
+        helper_elb = create_elb(unhealthy_threshold=threshold)
+        assert_equal(threshold, helper_elb.trop_elb.HealthCheck.UnhealthyThreshold)
+
+
+def test_interval():
+    """
+    Test to determine that elb scheme is private if public_unit is set to False
+    """
+    interval = 300
+    timeout = 30
+
+    helper_elb = create_elb(interval=interval, timeout=timeout)
+    assert_equals(interval, helper_elb.trop_elb.HealthCheck.Interval)
+    assert_equals(timeout, helper_elb.trop_elb.HealthCheck.Timeout)

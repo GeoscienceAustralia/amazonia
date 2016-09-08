@@ -88,6 +88,10 @@ runcmd:
     instance_port = ['80']
     loadbalancer_port = ['80']
     elb_health_check = 'HTTP:80/index.html'
+    healthy_threshold = 10
+    unhealthy_threshold = 2
+    interval = 300
+    timeout = 30
     minsize = 1
     maxsize = 1
     health_check_grace_period = 300
@@ -110,7 +114,12 @@ runcmd:
                            elb_log_bucket=None,
                            elb_health_check=elb_health_check,
                            public_unit=True,
-                           ssl_certificate_id=None)
+                           ssl_certificate_id=None,
+                           healthy_threshold=healthy_threshold,
+                           unhealthy_threshold=unhealthy_threshold,
+                           interval=interval,
+                           timeout=timeout
+                           )
     blue_asg_config = AsgConfig(sns_topic_arn=None,
                                 sns_notification_types=None,
                                 health_check_grace_period=health_check_grace_period,

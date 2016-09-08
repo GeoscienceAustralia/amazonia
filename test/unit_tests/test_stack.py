@@ -30,7 +30,8 @@ def setup_resources():
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
-        db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
+        db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, \
+        healthy_threshold, unhealthy_threshold, interval, timeout
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -57,6 +58,10 @@ runcmd:
     minsize = 1
     maxsize = 1
     elb_health_check = 'HTTP:80/index.html'
+    healthy_threshold = 10
+    unhealthy_threshold = 2
+    interval = 300
+    timeout = 30
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
@@ -141,7 +146,8 @@ def test_highly_available_nat_stack():
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
-        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
+        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
+        unhealthy_threshold, interval, timeout
 
     stack = Stack(
         code_deploy_service_role=code_deploy_service_role,
@@ -254,7 +260,11 @@ def test_duplicate_unit_names():
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
-                                   ssl_certificate_id=None
+                                   ssl_certificate_id=None,
+                                   healthy_threshold=healthy_threshold,
+                                   unhealthy_threshold=unhealthy_threshold,
+                                   interval=interval,
+                                   timeout=timeout
                                ),
                                'dependencies': [],
                                },
@@ -267,7 +277,11 @@ def test_duplicate_unit_names():
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
-                                   ssl_certificate_id=None
+                                   ssl_certificate_id=None,
+                                   healthy_threshold=healthy_threshold,
+                                   unhealthy_threshold=unhealthy_threshold,
+                                   interval=interval,
+                                   timeout=timeout
                                ),
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -302,7 +316,8 @@ def create_stack():
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
-        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config
+        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
+        unhealthy_threshold, interval, timeout
 
     stack = Stack(
         code_deploy_service_role=code_deploy_service_role,
@@ -330,7 +345,11 @@ def create_stack():
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
-                                   ssl_certificate_id=None
+                                   ssl_certificate_id=None,
+                                   healthy_threshold=healthy_threshold,
+                                   unhealthy_threshold=unhealthy_threshold,
+                                   interval=interval,
+                                   timeout=timeout
                                ),
                                'blue_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -371,7 +390,11 @@ def create_stack():
                                 elb_health_check=elb_health_check,
                                 elb_log_bucket=None,
                                 public_unit=True,
-                                ssl_certificate_id=None
+                                ssl_certificate_id=None,
+                                healthy_threshold=healthy_threshold,
+                                unhealthy_threshold=unhealthy_threshold,
+                                interval=interval,
+                                timeout=timeout
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,
@@ -398,7 +421,11 @@ def create_stack():
                                 elb_health_check=elb_health_check,
                                 elb_log_bucket=None,
                                 public_unit=True,
-                                ssl_certificate_id=None
+                                ssl_certificate_id=None,
+                                healthy_threshold=healthy_threshold,
+                                unhealthy_threshold=unhealthy_threshold,
+                                interval=interval,
+                                timeout=timeout
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,

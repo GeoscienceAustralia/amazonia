@@ -32,10 +32,10 @@ class Elb(SecurityEnabledObject):
                              # Assume health check against first protocol/instance port pair
                              HealthCheck=elb.HealthCheck(
                                  Target=elb_config.elb_health_check,
-                                 HealthyThreshold='10',
-                                 UnhealthyThreshold='2',
-                                 Interval='300',
-                                 Timeout='60'),
+                                 HealthyThreshold=elb_config.healthy_threshold,
+                                 UnhealthyThreshold=elb_config.unhealthy_threshold,
+                                 Interval=elb_config.interval,
+                                 Timeout=elb_config.timeout),
                              Listeners=[elb.Listener(LoadBalancerPort=listener_tuple[0],
                                                      Protocol=listener_tuple[2],
                                                      InstancePort=listener_tuple[1],

@@ -51,6 +51,18 @@ elb_config: &elb_config
       type: 'string'
       nullable: True
       regex: '^arn:aws:.*'
+    healthy_threshold:
+      type: 'number'
+      min: 2
+      max: 10
+    unhealthy_threshold:
+      type: 'number'
+      min: 2
+      max: 10
+    interval:
+      type: 'number'
+    timeout:
+      type: 'number'
 
 simple_scaling_policy_config: &simple_scaling_policy_config
   type: 'dict'

@@ -85,7 +85,11 @@ runcmd:
                  elb_health_check='HTTP:80/index.html',
                  elb_log_bucket=None,
                  public_unit=True,
-                 ssl_certificate_id=None
+                 ssl_certificate_id=None,
+                 healthy_threshold=10,
+                 unhealthy_threshold=2,
+                 interval=300,
+                 timeout=30
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
@@ -140,7 +144,11 @@ runcmd:
                                 elb_health_check='HTTP:80/index.html',
                                 elb_log_bucket=None,
                                 public_unit=True,
-                                ssl_certificate_id=None
+                                ssl_certificate_id=None,
+                                healthy_threshold=10,
+                                unhealthy_threshold=2,
+                                interval=300,
+                                timeout=30
                             ),
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
@@ -166,7 +174,11 @@ runcmd:
                                 elb_health_check='HTTP:80/index.html',
                                 elb_log_bucket=None,
                                 public_unit=False,
-                                ssl_certificate_id=None
+                                ssl_certificate_id=None,
+                                healthy_threshold=10,
+                                unhealthy_threshold=2,
+                                interval=300,
+                                timeout=30
                             ),
                             'dependencies': []}
                            ],
