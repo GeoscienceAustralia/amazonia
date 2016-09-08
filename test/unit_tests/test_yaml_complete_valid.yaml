@@ -355,6 +355,9 @@ cf_distribution_units:
         domain_name: 's3bucket.s3.amazonaws.com'
         origin_id: 'S3-s3bucket'
         origin_path:
+        custom_headers:
+          'origin': 'http://www.domain.com'
+          'accept': 'True'
         origin_policy:
           is_s3 : True
           origin_access_identity: 'origin-access-identity/cloudfront/ABCD1234ABCD1234'
