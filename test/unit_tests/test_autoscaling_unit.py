@@ -36,7 +36,7 @@ def setup_resources():
         instance_dependencies=vpc.title,
         alert=False,
         alert_emails=['some@email.com'],
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -58,7 +58,8 @@ def setup_resources():
         nat=nat,
         jump=jump,
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
         keypair='pipeline',
         nat_highly_available=False,
@@ -105,7 +106,6 @@ runcmd:
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,
-        unit_hosted_zone_name=None,
         ssl_certificate_id=None
     )
 

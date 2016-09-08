@@ -22,7 +22,7 @@ def main():
         subnet=subnet,
         is_nat=True,
         instance_dependencies=vpc.title,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         alert=False,
         alert_emails=[],
         iam_instance_profile_arn=None

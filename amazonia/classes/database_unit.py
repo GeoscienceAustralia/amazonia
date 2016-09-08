@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter
+from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter, route53
 
 
 class DatabaseUnit(SecurityEnabledObject):
@@ -18,6 +18,7 @@ class DatabaseUnit(SecurityEnabledObject):
         self.title = unit_title + 'Rds'
         self.dependencies = []
         self.db_subnet_group_title = unit_title + 'Dsg'
+        self.network_config = network_config
         self.port = database_config.db_port
         super(DatabaseUnit, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
 
@@ -56,11 +57,13 @@ class DatabaseUnit(SecurityEnabledObject):
         # Remove username and password if SnapshotID present
         if database_config.db_snapshot_id is None:
             self.username = self.template.add_parameter(Parameter(
-                self.title + 'MasterUsername', Type='String', Description='Master username of {0} RDS'.format(self.title),
+                self.title + 'MasterUsername', Type='String',
+                Description='Master username of {0} RDS'.format(self.title),
                 NoEcho=True))
 
             self.password = self.template.add_parameter(Parameter(
-                self.title + 'MasterPassword', Type='String', Description='Master password of {0} RDS'.format(self.title),
+                self.title + 'MasterPassword', Type='String',
+                Description='Master password of {0} RDS'.format(self.title),
                 NoEcho=True))
             rds_params['MasterUsername'] = Ref(self.username)
             rds_params['MasterUserPassword'] = Ref(self.password)
@@ -71,11 +74,7 @@ class DatabaseUnit(SecurityEnabledObject):
         # Create RDS
         self.trop_db = template.add_resource(rds.DBInstance(self.title,
                                                             **rds_params))
-
-        self.template.add_output(Output(
-            self.trop_db.title + 'Endpoint',
-            Description='Address of the {0} RDS'.format(self.title),
-            Value=Join('', [GetAtt(self.trop_db, 'Endpoint.Address'), ':', GetAtt(self.trop_db, 'Endpoint.Port')])))
+        self.create_r53_record()
 
     def get_dependencies(self):
         """
@@ -102,6 +101,27 @@ class DatabaseUnit(SecurityEnabledObject):
         """
         raise InvalidFlowError('Error: database_unit {0} may only be the destination of flow, not the originator.'
                                .format(self.title))
+
+    def create_r53_record(self):
+
+        """
+        Function to create r53 recourdset to associate with the RDS
+        """
+        self.rds_r53 = self.template.add_resource(route53.RecordSetGroup(
+            self.title + 'R53',
+            HostedZoneId=Ref(self.network_config.private_hosted_zone.trop_hosted_zone),
+            RecordSets=[route53.RecordSet(
+                Name=Join('', [self.title,
+                               '.',
+                               self.network_config.private_hosted_zone.domain]),
+                ResourceRecords=[GetAtt(self.trop_db, 'Endpoint.Address')],
+                TTL=300,
+                Type='CNAME')]))
+
+        self.template.add_output(Output(
+            self.trop_db.title + 'Endpoint',
+            Description='Address of the {0} RDS'.format(self.title),
+            Value=Join('', [self.rds_r53.RecordSets[0].Name, ':', GetAtt(self.trop_db, 'Endpoint.Port')])))
 
 
 class InvalidFlowError(Exception):

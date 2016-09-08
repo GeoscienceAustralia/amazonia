@@ -19,7 +19,8 @@ nat_highly_available: true
 home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'
-stack_hosted_zone_name: 'test.org.'
+public_hosted_zone_name: 'test.org.'
+private_hosted_zone_name: 'private.lan.'
 owner_emails:
 nat_alerting: false
 iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
@@ -249,7 +250,6 @@ autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      unit_hosted_zone_name: 'test.lan.'
       loadbalancer_protocol:
        - 'HTTP'
       instance_protocol:

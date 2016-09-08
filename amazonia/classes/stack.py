@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
+from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.cf_distribution_unit import CFDistributionUnit
 from amazonia.classes.database_unit import DatabaseUnit
+from amazonia.classes.hosted_zone import HostedZone
 from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
@@ -10,7 +12,6 @@ from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.util import get_cf_friendly_name
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
-from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from troposphere import Ref, Template, ec2, Tags, Join, GetAtt
 from troposphere.ec2 import EIP, NatGateway
 
@@ -18,8 +19,8 @@ from troposphere.ec2 import EIP, NatGateway
 class Stack(object):
     def __init__(self, code_deploy_service_role, keypair, availability_zones, vpc_cidr, home_cidrs,
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
-                 autoscaling_units, database_units, cf_distribution_units, stack_hosted_zone_name,
-                 iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
+                 autoscaling_units, database_units, cf_distribution_units, public_hosted_zone_name,
+                 private_hosted_zone_name, iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
                  nat_alerting, nat_highly_available):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
@@ -45,8 +46,9 @@ class Stack(object):
         :param cf_distribution_units: list of cf_distribution_unit dicts
         :param api_gateway_units: list of api_gateway_unit dicts
         :param lambda_units: List of lambda_unit dicts
-        :param stack_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create record
+        :param public_hosted_zone_name: A string containing the name of the Route 53 hosted zone to create public record
         sets in.
+        :param private_hosted_zone_name: name of private hosted zone to create
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
         :param nat_alerting: True/False for whether or not to alert on the nat instance status.
@@ -61,7 +63,8 @@ class Stack(object):
         self.vpc_cidr = vpc_cidr
         self.home_cidrs = home_cidrs
         self.public_cidr = public_cidr
-        self.hosted_zone_name = stack_hosted_zone_name
+        self.public_hosted_zone_name = public_hosted_zone_name
+        self.private_hosted_zone_name = private_hosted_zone_name
         self.jump_image_id = jump_image_id
         self.jump_instance_type = jump_instance_type
         self.nat_image_id = nat_image_id
@@ -83,6 +86,7 @@ class Stack(object):
         self.private_subnets = []
         self.public_subnets = []
         self.vpc = None
+        self.private_hosted_zone = None
         self.internet_gateway = None
         self.gateway_attachment = None
         self.public_route_table = None
@@ -133,7 +137,7 @@ class Stack(object):
                     Name=Join('', [Ref('AWS::StackName'), '-', vpc_name])
                 )
             ))
-
+        self.private_hosted_zone = HostedZone(self.template, self.private_hosted_zone_name, vpcs=[self.vpc])
         ig_name = 'Ig'
         self.internet_gateway = self.template.add_resource(
             ec2.InternetGateway(ig_name,
@@ -179,7 +183,7 @@ class Stack(object):
             si_instance_type=self.jump_instance_type,
             subnet=self.public_subnets[0],
             vpc=self.vpc,
-            hosted_zone_name=self.hosted_zone_name,
+            public_hosted_zone_name=self.public_hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
             alert_emails=self.owner_emails,
@@ -231,7 +235,7 @@ class Stack(object):
                 iam_instance_profile_arn=self.iam_instance_profile_arn,
                 alert_emails=self.owner_emails,
                 alert=self.nat_alerting,
-                hosted_zone_name=None
+                public_hosted_zone_name=None
             )
 
             self.nat = SingleInstance(
@@ -259,7 +263,8 @@ class Stack(object):
                                             nat=self.nat,
                                             nat_highly_available=self.nat_highly_available,
                                             public_cidr=self.public_cidr,
-                                            stack_hosted_zone_name=self.hosted_zone_name,
+                                            public_hosted_zone_name=self.public_hosted_zone_name,
+                                            private_hosted_zone=self.private_hosted_zone,
                                             keypair=self.keypair,
                                             cd_service_role_arn=self.code_deploy_service_role,
                                             nat_gateways=self.nat_gateways)

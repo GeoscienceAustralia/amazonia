@@ -154,7 +154,8 @@ def test_highly_available_nat_stack():
         jump_instance_type=instance_type,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone_name='private.lan.',
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_alerting=nat_alerting,
@@ -224,7 +225,8 @@ def test_duplicate_unit_names():
         'jump_instance_type': instance_type,
         'nat_image_id': nat_image_id,
         'nat_instance_type': instance_type,
-        'stack_hosted_zone_name': None,
+        'public_hosted_zone_name': None,
+        'private_hosted_zone_name': 'private.lan.',
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_alerting': nat_alerting,
@@ -252,7 +254,6 @@ def test_duplicate_unit_names():
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
-                                   unit_hosted_zone_name=None,
                                    ssl_certificate_id=None
                                ),
                                'dependencies': [],
@@ -266,7 +267,6 @@ def test_duplicate_unit_names():
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
-                                   unit_hosted_zone_name=None,
                                    ssl_certificate_id=None
                                ),
                                'asg_config': AsgConfig(
@@ -315,7 +315,8 @@ def create_stack():
         jump_instance_type=instance_type,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone_name='priavte.lan.',
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_alerting=nat_alerting,
@@ -327,7 +328,6 @@ def create_stack():
                                    instance_port=instance_port,
                                    loadbalancer_port=loadbalancer_port,
                                    elb_health_check=elb_health_check,
-                                   unit_hosted_zone_name=None,
                                    elb_log_bucket=None,
                                    public_unit=True,
                                    ssl_certificate_id=None
@@ -369,7 +369,6 @@ def create_stack():
                                 instance_port=instance_port,
                                 loadbalancer_port=loadbalancer_port,
                                 elb_health_check=elb_health_check,
-                                unit_hosted_zone_name=None,
                                 elb_log_bucket=None,
                                 public_unit=True,
                                 ssl_certificate_id=None
@@ -397,7 +396,6 @@ def create_stack():
                                 instance_port=instance_port,
                                 loadbalancer_port=loadbalancer_port,
                                 elb_health_check=elb_health_check,
-                                unit_hosted_zone_name=None,
                                 elb_log_bucket=None,
                                 public_unit=True,
                                 ssl_certificate_id=None

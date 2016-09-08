@@ -7,7 +7,6 @@ autoscaling_units:
     blah: 'should not be here'
     unit_title: 'app1'
     elb_config:
-      unit_hosted_zone_name: '.test.lan'
       loadbalancer_protocol:
        - 'HTTP'
       instance_protocol:
