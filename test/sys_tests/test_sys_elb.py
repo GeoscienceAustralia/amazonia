@@ -86,7 +86,11 @@ def main():
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=False,
-        ssl_certificate_id=None
+        ssl_certificate_id=None,
+        healthy_threshold=10,
+        unhealthy_threshold=2,
+        interval=300,
+        timeout=30
     )
     elb_config2 = ElbConfig(
         instance_port=['80'],
@@ -96,7 +100,11 @@ def main():
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
-        ssl_certificate_id='arn:aws:acm::tester'
+        ssl_certificate_id='arn:aws:acm::tester',
+        healthy_threshold=10,
+        unhealthy_threshold=2,
+        interval=300,
+        timeout=30
     )
     elb_config3 = ElbConfig(
         instance_port=['80'],
@@ -106,7 +114,11 @@ def main():
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
-        ssl_certificate_id=None
+        ssl_certificate_id=None,
+        healthy_threshold=10,
+        unhealthy_threshold=2,
+        interval=300,
+        timeout=30
     )
 
     Elb(title='MyUnit1',

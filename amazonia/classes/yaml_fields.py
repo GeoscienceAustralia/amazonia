@@ -35,7 +35,11 @@ class YamlFields(object):
                            'elb_health_check',
                            'public_unit',
                            'elb_log_bucket',
-                           'ssl_certificate_id'
+                           'ssl_certificate_id',
+                           'healthy_threshold',
+                           'unhealthy_threshold',
+                           'interval',
+                           'timeout',
                            ]
 
     # asg_config field list
