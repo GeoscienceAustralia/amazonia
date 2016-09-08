@@ -86,6 +86,10 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
         domain_name=domain_name,
         origin_id=origin_id,
         origin_path='',
+        custom_headers={
+            'Origin':'http://www.domain.com',
+            'Accept':'True'
+        },
         origin_policy={
             'is_s3': is_s3,
             'origin_access_identity': origin_access_identity
@@ -118,6 +122,7 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
         domain_name=domain_name,
         origin_id=origin_id,
         origin_path='/path',
+        custom_headers={},
         origin_policy={
             'is_s3': is_s3,
             'origin_protocol_policy': origin_protocol_policy,
