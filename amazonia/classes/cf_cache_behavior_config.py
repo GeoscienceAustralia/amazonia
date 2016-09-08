@@ -35,3 +35,4 @@ class CFCacheBehavior(object):
         self.max_ttl = max_ttl
         self.trusted_signers = trusted_signers if trusted_signers else []
         self.query_string = query_string
+        
