@@ -57,6 +57,24 @@ class CFDistributionUnit(object):
         """
         for number, origin in enumerate(cf_origins_config):
 
+            created_origin = cloudfront.Origin(
+                '{0}Origin{1}'.format(title, number),
+                DomainName=origin.domain_name,
+                Id=origin.origin_id
+            )
+
+            if origin.origin_path:
+                created_origin.OriginPath = origin.origin_path
+            if origin.custom_headers:
+                created_headers = []
+                for k, v in origin.custom_headers.items():
+                    if v is not None:
+                        created_headers.append(
+                            cloudfront.OriginCustomHeader(HeaderName=k, HeaderValue=v)
+                        )
+                created_origin.OriginCustomHeaders = created_headers
+
+            # Set S3 config
             if origin.origin_policy['is_s3']:
                 # Create S3Origin
                 s3_origin_config=cloudfront.S3Origin()
@@ -65,12 +83,9 @@ class CFDistributionUnit(object):
                 if origin.origin_access_identity:
                     s3_origin_config.OriginAccessIdentity=origin.origin_access_identity
 
-                created_origin = cloudfront.Origin(
-                    '{0}Origin{1}'.format(title, number),
-                    DomainName=origin.domain_name,
-                    Id=origin.origin_id,
-                    S3OriginConfig=s3_origin_config
-                )
+                # Set S3Origin
+                created_origin.S3OriginConfig=s3_origin_config
+            # Set Custom config
             else:
                 # Create CustomOrigin
                 custom_origin_config = cloudfront.CustomOrigin()
@@ -86,12 +101,8 @@ class CFDistributionUnit(object):
                 #if origin.origin_ssl_protocols:
                     #custom_origin_config.OriginSSLProtocols=origin.origin_ssl_protocols
 
-                created_origin = cloudfront.Origin(
-                    '{0}Origin{1}'.format(title, number),
-                    DomainName=origin.domain_name,
-                    Id=origin.origin_id,
-                    CustomOriginConfig=custom_origin_config
-                )
+                # Set CustomOrigin
+                created_origin.CustomOriginConfig=custom_origin_config
 
             self.origins.append(created_origin)
 
@@ -117,7 +128,7 @@ class CFDistributionUnit(object):
                         Forward=cache_behavior.forward_cookies
                     ),
                     Headers=cache_behavior.forwarded_headers,
-                    QueryString=False
+                    QueryString=cache_behavior.query_string
                 )
 
             created_cache_behavior = cloudfront.CacheBehavior(
