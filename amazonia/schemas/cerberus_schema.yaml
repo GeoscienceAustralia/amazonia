@@ -411,8 +411,6 @@ cf_origins_config: &cf_origins_config
       custom_headers:
         type: 'dict'
         nullable: True
-        schema:
-          type: 'string'
       origin_policy:
         nullable: True
         type: 'dict'
