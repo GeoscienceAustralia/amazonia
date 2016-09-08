@@ -35,7 +35,6 @@ class YamlFields(object):
                            'elb_health_check',
                            'public_unit',
                            'elb_log_bucket',
-                           'unit_hosted_zone_name',
                            'ssl_certificate_id'
                            ]
 
@@ -181,7 +180,8 @@ class YamlFields(object):
         'nat_instance_type',
         'nat_highly_available',
         'home_cidrs',
-        'stack_hosted_zone_name',
+        'public_hosted_zone_name',
+        'private_hosted_zone_name',
         'cf_distribution_units',
         'zd_autoscaling_units',
         'autoscaling_units',
@@ -297,3 +297,4 @@ class YamlFields(object):
         'lambda_config':
             ComplexObjectFieldMapping(LambdaConfig, False, lambda_config_key_list),
     }
+

@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.lambda_unit import LambdaUnit
-from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.single_instance import SingleInstance
+from amazonia.classes.single_instance_config import SingleInstanceConfig
 from troposphere import Template, ec2, Ref, Tags
 
 
@@ -85,7 +85,7 @@ def main():
         instance_dependencies=vpc.title,
         alert=False,
         alert_emails=['some@email.com'],
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -102,7 +102,8 @@ def main():
         private_subnets=private_subnets,
         jump=None,
         nat=nat,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
@@ -118,7 +119,8 @@ def main():
         lambda_memory_size=128,
         lambda_role_arn='test_arn',
         lambda_runtime='python2.7',
-        lambda_timeout=1
+        lambda_timeout=1,
+        lambda_schedule=None
     )
 
     lambda_unit = LambdaUnit(
@@ -132,7 +134,7 @@ def main():
     apigw = ApiGatewayUnit(unit_title=apiname,
                            template=template,
                            method_config=[method_config],
-                           network_config=None)
+                           network_config=None, deployment_config=None)
 
     apigw.add_unit_flow(lambda_unit)
 

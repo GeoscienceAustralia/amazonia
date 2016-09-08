@@ -103,7 +103,7 @@ runcmd:
         else:
             self.si_output(nat=True, subnet=single_instance_config.subnet)
 
-        if single_instance_config.hosted_zone_name:
+        if single_instance_config.public_hosted_zone_name:
             # Give the instance an Elastic IP Address
             self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
@@ -116,10 +116,10 @@ runcmd:
 
             self.si_r53 = self.template.add_resource(route53.RecordSetType(
                 self.single.title + 'R53',
-                HostedZoneName=single_instance_config.hosted_zone_name,
+                HostedZoneName=single_instance_config.public_hosted_zone_name,
                 Comment='DNS Record for {0}'.format(self.single.title),
                 Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.',
-                               single_instance_config.hosted_zone_name]),
+                               single_instance_config.public_hosted_zone_name]),
                 ResourceRecords=[Ref(self.eip_address)],
                 Type='A',
                 TTL='300',

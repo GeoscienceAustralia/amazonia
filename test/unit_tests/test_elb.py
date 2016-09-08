@@ -8,6 +8,7 @@ from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.hosted_zone import HostedZone
 from nose.tools import *
 from troposphere import ec2, Ref, Template
 
@@ -49,12 +50,13 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         is_nat=True,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None
     )
     nat = SingleInstance(title='Nat',
                          template=template,
                          single_instance_config=single_instance_config)
+    private_hosted_zone = HostedZone(vpcs=[vpc], template=template, domain='private.lan.')
     network_config = NetworkConfig(
         vpc=vpc,
         public_subnets=public_subnets,
@@ -62,7 +64,8 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         nat=nat,
         private_subnets=private_subnets,
         public_cidr=None,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=hosted_zone_name,
+        private_hosted_zone=private_hosted_zone,
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
@@ -76,7 +79,6 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         elb_health_check=elb_health_check,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
-        unit_hosted_zone_name=hosted_zone_name,
         ssl_certificate_id=ssl_certificate_id
     )
 

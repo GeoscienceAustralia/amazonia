@@ -56,7 +56,7 @@ runcmd:
         is_nat=True,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None
     )
     nat = SingleInstance(title='nat',
@@ -77,7 +77,8 @@ runcmd:
                                    private_subnets=private_subnets,
                                    nat=nat,
                                    jump=jump,
-                                   stack_hosted_zone_name=None,
+                                   public_hosted_zone_name=None,
+                                   private_hosted_zone=None,
                                    cd_service_role_arn=cd_service_role_arn,
                                    keypair='pipeline',
                                    nat_highly_available=False,
@@ -109,7 +110,6 @@ runcmd:
                            elb_log_bucket=None,
                            elb_health_check=elb_health_check,
                            public_unit=True,
-                           unit_hosted_zone_name=None,
                            ssl_certificate_id=None)
     blue_asg_config = AsgConfig(sns_topic_arn=None,
                                 sns_notification_types=None,

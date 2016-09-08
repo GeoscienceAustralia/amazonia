@@ -54,7 +54,7 @@ runcmd:
         instance_dependencies=vpc.title,
         alert=None,
         alert_emails=None,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -73,7 +73,8 @@ runcmd:
                                    public_subnets=public_subnets,
                                    vpc=vpc,
                                    public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-                                   stack_hosted_zone_name=None,
+                                   public_hosted_zone_name=None,
+                                   private_hosted_zone=None,
                                    keypair='pipeline',
                                    cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
                                    nat_highly_available=False,
@@ -85,7 +86,6 @@ runcmd:
                            loadbalancer_port=['80'],
                            elb_health_check='HTTP:80/index.html',
                            public_unit=True,
-                           unit_hosted_zone_name=None,
                            ssl_certificate_id=None)
     common_asg_config = AsgConfig(
         minsize=1,

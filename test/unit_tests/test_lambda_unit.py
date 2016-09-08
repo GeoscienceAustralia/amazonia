@@ -49,7 +49,7 @@ def setup_resources():
         instance_dependencies=vpc.title,
         alert=False,
         alert_emails=['some@email.com'],
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
     )
@@ -64,7 +64,8 @@ def setup_resources():
         private_subnets=private_subnets,
         jump=None,
         nat=nat,
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name=None,
+        private_hosted_zone=None,
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,

@@ -73,7 +73,8 @@ runcmd:
         owner_emails=None,
         home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
-        stack_hosted_zone_name=None,
+        public_hosted_zone_name='gadevs.ga.',
+        private_hosted_zone_name='private.lan.',
         zd_autoscaling_units=[
             {'unit_title': 'zdapp1',
              'elb_config': ElbConfig(
@@ -82,7 +83,6 @@ runcmd:
                  instance_port=['80'],
                  loadbalancer_port=['80'],
                  elb_health_check='HTTP:80/index.html',
-                 unit_hosted_zone_name='gadevs.ga.',
                  elb_log_bucket=None,
                  public_unit=True,
                  ssl_certificate_id=None
@@ -138,7 +138,6 @@ runcmd:
                                 instance_port=['80'],
                                 loadbalancer_port=['80'],
                                 elb_health_check='HTTP:80/index.html',
-                                unit_hosted_zone_name='gadevs.ga.',
                                 elb_log_bucket=None,
                                 public_unit=True,
                                 ssl_certificate_id=None
@@ -165,7 +164,6 @@ runcmd:
                                 instance_port=['80'],
                                 loadbalancer_port=['80'],
                                 elb_health_check='HTTP:80/index.html',
-                                unit_hosted_zone_name='gadevs.ga.',
                                 elb_log_bucket=None,
                                 public_unit=False,
                                 ssl_certificate_id=None

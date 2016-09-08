@@ -20,7 +20,7 @@ def main():
         vpc=vpc,
         subnet=subnet,
         instance_dependencies=vpc.title,
-        hosted_zone_name=None,
+        public_hosted_zone_name=None,
         alert=False,
         alert_emails=[],
         is_nat=False,
