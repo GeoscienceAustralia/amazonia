@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from troposphere import Ref
 
 
 class ApiGatewayMethodConfig(object):
@@ -27,7 +28,7 @@ class ApiGatewayRequestConfig(object):
 class ApiGatewayResponseConfig(ApiGatewayRequestConfig):
     def __init__(self, templates, parameters, statuscode, models, selectionpattern):
         """
-
+        This class is used to hold the configuration required for an Api Gateway Response.
         """
 
         super(ApiGatewayResponseConfig, self).__init__(templates, parameters)
@@ -35,3 +36,13 @@ class ApiGatewayResponseConfig(ApiGatewayRequestConfig):
         self.statuscode = statuscode
         self.models = models
         self.selectionpattern = selectionpattern
+
+
+class ApiGatewayDeploymentConfig(object):
+    def __init__(self, apiname, stagename):
+        """
+        This class is used to hold the configuration required for an Api Gateway Deployment.
+        """
+
+        self.restapiid = Ref(apiname + 'API')
+        self.stagename = stagename

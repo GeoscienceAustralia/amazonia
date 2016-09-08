@@ -2,10 +2,11 @@
 
 from troposphere import Ref, Join, GetAtt
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
+from troposphere.apigateway import Deployment
 
 
 class ApiGatewayUnit(object):
-    def __init__(self, unit_title, template, method_config, network_config):
+    def __init__(self, unit_title, template, method_config, network_config, deployment_config):
         """
         This class creates an API Gateway object with one or multiple methods attached.
         AWS Cloud Formation Links:
@@ -21,6 +22,7 @@ class ApiGatewayUnit(object):
         :param template: the troposphere template object to update
         :param method_config: a list of one or many ApiGatewayMethodConfig objects with data prefilled from yaml values
         :param network_config: a Network Config object, currently unused but required while this is considered a 'unit'
+        :param deployment_config: a list of one or may ApiGatewayDeploymentConfig objects with data prefille from yaml values
         """
         self.title = unit_title
         self.template = template
@@ -28,14 +30,16 @@ class ApiGatewayUnit(object):
         self.method_responses = []
         self.integration_responses = []
         self.dependencies = []
+        self.deployments = []
         self.network_config = network_config
         self.method_config = method_config
+        self.deployment_config = deployment_config
 
         self.api = self.template.add_resource(RestApi(
                                                       '{0}API'.format(self.title),
                                                       Name=self.title
                                                      )
-                                             )
+                                              )
 
         for method in self.method_config:
             self.dependencies.append(method.lambda_unit)
@@ -140,6 +144,29 @@ class ApiGatewayUnit(object):
         self.methods.append(method)
         self.template.add_resource(method)
 
+    def add_deployment(self, deployment_config):
+        """
+        Creates a deployment and adds it to this api gateway.
+        :param deployment_config: the Deployment Config object with details for the deployment.
+        """
+
+        dependencies = []
+        for method in self.methods:
+            dependencies.append(method.title)
+
+        deployment = Deployment(
+                                '{0}{1}Deployment'.format(
+                                    self.title, deployment_config.stagename),
+                                Description='{0} Deployment created for APIGW {1}'.format(
+                                    deployment_config.stagename, self.title),
+                                RestApiId=deployment_config.restapiid,
+                                StageName=deployment_config.stagename,
+                                DependsOn=dependencies
+                                )
+
+        self.deployments.append(deployment)
+        self.template.add_resource(deployment)
+
     def add_unit_flow(self, other_unit):
         """
         Creates a method that points at the other_unit object (other_unit should be a lambda_unit)
@@ -154,8 +181,12 @@ class ApiGatewayUnit(object):
                 integration = self.create_integration(method, GetAtt(lambda_title, 'Arn'))
                 self.add_method(resource, integration, method)
 
+        if self.deployment_config:
+            for deployment in self.deployment_config:
+                self.add_deployment(deployment)
+
     def get_dependencies(self):
         """
-        :return: ist of other unit's this unit is dependant upon
+        :return: list of other unit's this unit is dependant upon
         """
         return self.dependencies
