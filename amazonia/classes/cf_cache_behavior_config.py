@@ -4,7 +4,7 @@
 class CFCacheBehavior(object):
     def __init__(self, path_pattern, allowed_methods, cached_methods, target_origin_id,
                  forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl, default_ttl,
-                 max_ttl, trusted_signers):
+                 max_ttl, trusted_signers, query_string):
         """
         Class containing cache behavior details for a Cloudfront origin
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachebehavior.html
@@ -21,6 +21,7 @@ class CFCacheBehavior(object):
         :param max_ttl: The maximum amount of time objects should stay in the cache
         :param forward_cookies: boolean to forward cookies to origin
         :param trusted_signers: list of identifies that are trusted to sign cookies on behalf of this behavior
+        :param query_string: boolean indicating whether to forward query strings to the origin
         """
         self.path_pattern = path_pattern
         self.allowed_methods = allowed_methods
@@ -32,4 +33,6 @@ class CFCacheBehavior(object):
         self.min_ttl = min_ttl
         self.default_ttl = default_ttl
         self.max_ttl = max_ttl
-        self.trusted_signers = trusted_signers
+        self.trusted_signers = trusted_signers if trusted_signers else []
+        self.query_string = query_string
+        
