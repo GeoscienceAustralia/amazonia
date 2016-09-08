@@ -438,6 +438,10 @@ def create_stack():
                                     domain_name='amazonia-elb-bucket.s3.amazonaws.com',
                                     origin_id='S3-amazonia-elb-bucket',
                                     origin_path='',
+                                    custom_headers={
+                                        'Origin':'http://www.domain.com',
+                                        'Accept':'True'
+                                    },
                                     origin_policy={
                                         'is_s3': True,
                                         'origin_access_identity': 'originaccessid1'
@@ -448,6 +452,7 @@ def create_stack():
                                         'amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
                                         origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
                                         origin_path='/path',
+                                        custom_headers={},
                                         origin_policy={
                                             'is_s3': False,
                                             'origin_protocol_policy': 'https-only',

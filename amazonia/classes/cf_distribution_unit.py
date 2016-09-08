@@ -65,6 +65,14 @@ class CFDistributionUnit(object):
 
             if origin.origin_path:
                 created_origin.OriginPath = origin.origin_path
+            if origin.custom_headers:
+                created_headers = []
+                for k, v in origin.custom_headers.items():
+                    if v is not None:
+                        created_headers.append(
+                            cloudfront.OriginCustomHeader(HeaderName=k, HeaderValue=v)
+                        )
+                created_origin.OriginCustomHeaders = created_headers
 
             # Set S3 config
             if origin.origin_policy['is_s3']:

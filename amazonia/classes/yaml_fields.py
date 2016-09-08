@@ -128,6 +128,7 @@ class YamlFields(object):
         'domain_name',
         'origin_id',
         'origin_path',
+        'custom_headers',
         'origin_policy'
     ]
 
