@@ -3,21 +3,22 @@
 from troposphere import cloudfront
 
 class CFOriginsConfig(object):
-    def __init__(self, domain_name, origin_id, origin_policy):
+    def __init__(self, domain_name, origin_id, origin_path, custom_headers, origin_policy):
         """
         Class to abstract a Cloudfront Distribution Origin object of type S3 or Custom
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-origin.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
-        :param template: Troposphere stack to append resources to
-        :param network_config: The network_config of this stack (unused)
         :param domain_name: The DNS name of the S3 bucket or HTTP server which this distribution will point to
         :param origin_id: An identifier for this origin (must be unique within this distribution)
-        :param origin_headers: A list of custom headers to forward to this origin
+        :param origin_path: An optional directory path
+        :param custom_headers: A list of custom headers to forward to this origin
         :param origin_policy: A dictionary containing origin-related variables
         """
 
         self.domain_name = domain_name
         self.origin_id = origin_id
+        self.origin_path = origin_path if origin_path else None
+        self.custom_headers = custom_headers if custom_headers else {}
         self.origin_policy = origin_policy
         self.origin_access_identity = None
         self.origin_protocol_policy = None

@@ -85,6 +85,7 @@ class YamlFields(object):
         'allowed_methods',
         'cached_methods',
         'trusted_signers',
+        'query_string',
         'viewer_protocol_policy',
         'forward_cookies',
         'forwarded_headers',
@@ -132,6 +133,8 @@ class YamlFields(object):
     cf_origins_config_key_list = [
         'domain_name',
         'origin_id',
+        'origin_path',
+        'custom_headers',
         'origin_policy'
     ]
 
@@ -147,7 +150,8 @@ class YamlFields(object):
         'min_ttl',
         'default_ttl',
         'max_ttl',
-        'trusted_signers'
+        'trusted_signers',
+        'query_string'
     ]
 
     # database_config field list

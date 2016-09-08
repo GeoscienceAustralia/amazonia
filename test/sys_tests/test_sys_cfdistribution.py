@@ -14,6 +14,11 @@ def main():
     origins = [ CFOriginsConfig (
             domain_name='amazonia-elb-bucket.s3.amazonaws.com',
             origin_id='S3-amazonia-elb-bucket',
+            origin_path='/directory',
+            custom_headers={
+                'Origin': 'http://www.domain.com',
+                'Accept': 'True'
+            },
             origin_policy={
                 'is_s3' : True,
                 'origin_access_identity': 'originaccessid1'
@@ -22,6 +27,8 @@ def main():
         CFOriginsConfig(
             domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
             origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
+            origin_path='',
+            custom_headers=[],
             origin_policy={
                 'is_s3' : False,
                 'origin_protocol_policy' : 'https-only',
@@ -44,7 +51,8 @@ def main():
             min_ttl=0,
             default_ttl=0,
             max_ttl=0,
-            trusted_signers=['self']
+            trusted_signers=[],
+            query_string=True
         ),
         CFCacheBehavior(
             path_pattern='/login.js',
@@ -65,7 +73,8 @@ def main():
             min_ttl=0,
             default_ttl=0,
             max_ttl=0,
-            trusted_signers=['self']
+            trusted_signers=['self'],
+            query_string=False
         ),
     ]
 
@@ -79,6 +88,7 @@ def main():
         allowed_methods=['GET','HEAD'],
         cached_methods=['GET','HEAD'],
         trusted_signers=['self'],
+        query_string=True,
         forward_cookies='all',
         forwarded_headers=[''],
         viewer_protocol_policy='https-only',
