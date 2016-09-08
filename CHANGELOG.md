@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.9] - 8/09/2016
+- Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
+
 ## [1.3.8] - 8/09/2016
 - Replaced stack parameter stack_hosted_zone_name with public_hosted_zone_name
 - Stack now creates a discrete private hosted zone (configurable via private_hosted_zone_name, default 'private.lan.')
