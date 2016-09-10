@@ -2,13 +2,14 @@
 
 
 class CFCacheBehavior(object):
-    def __init__(self, path_pattern, allowed_methods, cached_methods, target_origin_id,
+    def __init__(self, is_default, path_pattern, allowed_methods, cached_methods, target_origin_id,
                  forward_cookies, forwarded_headers, viewer_protocol_policy, min_ttl, default_ttl,
                  max_ttl, trusted_signers, query_string):
         """
         Class containing cache behavior details for a Cloudfront origin
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-cachebehavior.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
+        :param is_default: Indicates whether this is the default cache behavior
         :param path_pattern: The pattern to which this cache behavior applies
         :param allowed_methods: List of HTTP methods that can be passed to the origin
         :param cached_methods: List of HTTP methods for which Cloudfront caches responses
@@ -23,7 +24,9 @@ class CFCacheBehavior(object):
         :param trusted_signers: list of identifies that are trusted to sign cookies on behalf of this behavior
         :param query_string: boolean indicating whether to forward query strings to the origin
         """
-        self.path_pattern = path_pattern
+
+        self.is_default = is_default
+        self.path_pattern = path_pattern if path_pattern else None
         self.allowed_methods = allowed_methods
         self.cached_methods = cached_methods
         self.target_origin_id = target_origin_id

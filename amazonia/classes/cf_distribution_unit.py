@@ -115,82 +115,44 @@ class CFDistributionUnit(object):
 
         for number, cache_behavior in enumerate(cf_cache_behavior_config):
 
-            if cache_behavior.forwarded_headers is None:
-                forwarded_values = cloudfront.ForwardedValues(
-                    Cookies=cloudfront.Cookies(
-                        Forward=cache_behavior.forward_cookies
-                    ),
-                    QueryString=False
+            forwarded_values = cloudfront.ForwardedValues(
+                Cookies=cloudfront.Cookies(
+                    Forward=cache_behavior.forward_cookies
+                )
+            )
+
+            if cache_behavior.forwarded_headers is not None:
+                forwarded_values.QueryString=cache_behavior.forwarded_headers
+
+            cf_cache_behavior_params = {
+                'AllowedMethods': cache_behavior.allowed_methods,
+                'CachedMethods': cache_behavior.cached_methods,
+                'Compress': False,
+                'TargetOriginId': cache_behavior.target_origin_id,
+                'ForwardedValues': forwarded_values,
+                'TrustedSigners': cache_behavior.trusted_signers,
+                'ViewerProtocolPolicy': cache_behavior.viewer_protocol_policy,
+                'MinTTL': cache_behavior.min_ttl,
+                'DefaultTTL': cache_behavior.default_ttl,
+                'MaxTTL': cache_behavior.max_ttl,
+                'SmoothStreaming': False
+            }
+
+            if cache_behavior.is_default:
+                # Add default cache behavior
+                self.default_cache_behavior = cloudfront.DefaultCacheBehavior(
+                    '{0}DefaultCacheBehavior'.format(title),
+                    **cf_cache_behavior_params
                 )
             else:
-                forwarded_values = cloudfront.ForwardedValues(
-                    Cookies=cloudfront.Cookies(
-                        Forward=cache_behavior.forward_cookies
-                    ),
-                    Headers=cache_behavior.forwarded_headers,
-                    QueryString=cache_behavior.query_string
+                # Append additional cache behaviors to list
+                created_cache_behavior = cloudfront.CacheBehavior(
+                    '{0}CacheBehavior{1}'.format(title, number),
+                    PathPattern=cache_behavior.path_pattern
+                    **cf_cache_behavior_params
                 )
 
-            created_cache_behavior = cloudfront.CacheBehavior(
-                '{0}CacheBehavior{1}'.format(title, number),
-                AllowedMethods=cache_behavior.allowed_methods,
-                CachedMethods=cache_behavior.cached_methods,
-                Compress=False,
-                TargetOriginId=cache_behavior.target_origin_id,
-                ForwardedValues=forwarded_values,
-                TrustedSigners=cache_behavior.trusted_signers,
-                ViewerProtocolPolicy=cache_behavior.viewer_protocol_policy,
-                MinTTL=cache_behavior.min_ttl,
-                DefaultTTL=cache_behavior.default_ttl,
-                MaxTTL=cache_behavior.max_ttl,
-                PathPattern=cache_behavior.path_pattern,
-                SmoothStreaming=False
-            )
-
-            self.cache_behaviors.append(created_cache_behavior)
-
-    def add_default_cache_behavior(self, title, cf_distribution_config):
-        """
-        Create Cloudfront DefaultCacheBehavior object
-        :param title: Title of this Cloudfront distribution
-        :param cf_distribution_config: Object containing the default cache behavior of this distribution
-        :return: Returns the created DefaultCacheBehavior object
-        """
-
-        if cf_distribution_config.forwarded_headers is None:
-            forwarded_values = cloudfront.ForwardedValues(
-                Cookies=cloudfront.Cookies(
-                    Forward=cf_distribution_config.forward_cookies
-                ),
-                QueryString=False
-            )
-        else:
-            forwarded_values = cloudfront.ForwardedValues(
-                Cookies=cloudfront.Cookies(
-                    Forward=cf_distribution_config.forward_cookies
-                ),
-                Headers=cf_distribution_config.forwarded_headers,
-                QueryString=False
-        )
-
-        return cloudfront.DefaultCacheBehavior(
-            TargetOriginId=cf_distribution_config.target_origin_id,
-            CachedMethods=cf_distribution_config.cached_methods,
-            Compress=False,
-            ForwardedValues=forwarded_values,
-            TrustedSigners=cf_distribution_config.trusted_signers,
-            ViewerProtocolPolicy=cf_distribution_config.viewer_protocol_policy,
-            MinTTL=cf_distribution_config.min_ttl,
-            DefaultTTL=cf_distribution_config.default_ttl,
-            MaxTTL=cf_distribution_config.max_ttl,
-            # TODO: Uncomment when pip troposphere supports ViewerCertificate
-            #ViewerCertificate=cloudfront.ViewerCertificate(
-                #AcmCertificateArn=cf_distribution_config.acm_cert_arn,
-                #MinimumProtocolVersion=cf_distribution_config.minimum_protocol_version,
-                #SslSupportMethod=cf_distribution_config.ssl_support_method
-            #)
-        )
-
+                self.cache_behaviors.append(created_cache_behavior)
 
     def get_dependencies(self):
         """
