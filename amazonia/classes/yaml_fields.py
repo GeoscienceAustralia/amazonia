@@ -84,17 +84,6 @@ class YamlFields(object):
         'default_root_object',
         'enabled',
         'price_class',
-        'target_origin_id',
-        'allowed_methods',
-        'cached_methods',
-        'trusted_signers',
-        'query_string',
-        'viewer_protocol_policy',
-        'forward_cookies',
-        'forwarded_headers',
-        'min_ttl',
-        'default_ttl',
-        'max_ttl',
         'error_page_path',
         'acm_cert_arn',
         'minimum_protocol_version',
@@ -143,6 +132,7 @@ class YamlFields(object):
 
     # cloudfront cache behavior config key list
     cf_cache_behavior_config_key_list = [
+        'is_default',
         'path_pattern',
         'allowed_methods',
         'cached_methods',

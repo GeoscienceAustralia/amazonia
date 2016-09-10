@@ -2,6 +2,7 @@
 
 from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
 from amazonia.classes.cf_distribution_config import CFDistributionConfig
+from amazonia.classes.cf_distribution_unit import CloudfrontConfigError
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from nose.tools import *
 
@@ -10,15 +11,6 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
                                   comment='UnitTestCFDistConfig',
                                   default_root_object='index.html',
                                   enabled=True, price_class='PriceClass_All',
-                                  target_origin_id='originId',
-                                  allowed_methods=('GET', 'HEAD'),
-                                  cached_methods=('GET', 'HEAD'),
-                                  trusted_signers=('self'),
-                                  query_string=True,
-                                  forward_cookies='*',
-                                  forwarded_headers=('Accept', 'Set-Cookie'),
-                                  viewer_protocol_policy='https-only',
-                                  min_ttl=0, default_ttl=0, max_ttl=0,
                                   error_page_path='index.html',
                                   acm_cert_arn='arn.acm.certificate',
                                   minimum_protocol_version='TLSv1',
@@ -30,15 +22,6 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
     :param default_root_object: The object (e.g. index.html) that should be provided when the root URL is requested
     :param enabled: Controls whether the distribution is enabled to access user requests
     :param price_class: The price class that corresponds with the maximum price to be paid for the service
-    :param target_origin_id: Value of the unique ID for the default cache behavior of this distribution
-    :param allowed_methods: List of HTTP methods that can be passed to the origin
-    :param cached_methods: List of HTTP methods for which Cloudfront caches responses
-    :param trusted_signers: List of AWS accounts that can create signed URLs in order to access private content
-    :param query_string: indicates whether to forward query strings to the origin
-    :param viewer_protocol_policy: The protocol that users can use to access origin files
-    :param min_ttl: The minimum amount of time objects should stay in the cache
-    :param default_ttl: The default amount of time objects stay in the cache
-    :param max_ttl: The maximum amount of time objects should stay in the cache
     :param error_page_path: The error page that should be served when an HTTP error code is returned
     :param acm_cert_arn: ARN of the ACM certificate
     :param minimum_protocol_version: The minimum version of the SSL protocol that should be used for HTTPS
@@ -51,17 +34,6 @@ def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.
         default_root_object=default_root_object,
         enabled=enabled,
         price_class=price_class,
-        target_origin_id=target_origin_id,
-        allowed_methods=allowed_methods,
-        cached_methods=cached_methods,
-        trusted_signers=trusted_signers,
-        query_string=query_string,
-        forward_cookies=forward_cookies,
-        forwarded_headers=forwarded_headers,
-        viewer_protocol_policy=viewer_protocol_policy,
-        min_ttl=min_ttl,
-        default_ttl=default_ttl,
-        max_ttl=max_ttl,
         error_page_path=error_page_path,
         acm_cert_arn=acm_cert_arn,
         minimum_protocol_version=minimum_protocol_version,
@@ -135,7 +107,8 @@ def create_custom_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com',
     return origin
 
 
-def create_cache_behavior(path_pattern='/index.html',
+def create_cache_behavior(is_default=False,
+                          path_pattern='/index.html',
                           allowed_methods=('GET', 'POST'),
                           cached_methods=('GET', 'POST'),
                           target_origin_id='S3-bucket-id',
@@ -162,6 +135,7 @@ def create_cache_behavior(path_pattern='/index.html',
     :return: Instance of CacheBehavior object
     """
     cache_behavior = CFCacheBehavior(
+        is_default=is_default,
         path_pattern=path_pattern,
         allowed_methods=allowed_methods,
         cached_methods=cached_methods,
@@ -249,6 +223,7 @@ def test_cf_cache_behavior():
     """
     Test to check CacheBehavior object inputs match the created outputs
     """
+    is_default=False
     path_pattern = '/index.html'
     allowed_methods = ('GET', 'POST')
     cached_methods = ('GET', 'POST'),
@@ -262,7 +237,8 @@ def test_cf_cache_behavior():
     trusted_signers = ('self')
     query_string = True
 
-    helper_cf_cache_behavior = create_cache_behavior(path_pattern=path_pattern,
+    helper_cf_cache_behavior = create_cache_behavior(is_default=is_default,
+                                                     path_pattern=path_pattern,
                                                      allowed_methods=allowed_methods,
                                                      cached_methods=cached_methods,
                                                      target_origin_id=target_origin_id,
@@ -275,6 +251,7 @@ def test_cf_cache_behavior():
                                                      trusted_signers=trusted_signers,
                                                      query_string=query_string)
 
+    assert_equal(is_default, helper_cf_cache_behavior.is_default)
     assert_equal(path_pattern, helper_cf_cache_behavior.path_pattern)
     assert_equal(allowed_methods, helper_cf_cache_behavior.allowed_methods)
     assert_equal(cached_methods, helper_cf_cache_behavior.cached_methods)
@@ -298,16 +275,6 @@ def test_cf_distribution_config():
     default_root_object = 'index.html'
     enabled = True
     price_class = 'PriceClass_All'
-    target_origin_id = 'originId'
-    allowed_methods = ['GET', 'HEAD']
-    cached_methods = ['GET', 'HEAD']
-    trusted_signers = 'self'
-    forward_cookies = 'all'
-    forwarded_headers = ('Accept', 'Set-Cookie')
-    viewer_protocol_policy = 'https-only'
-    min_ttl = 0
-    default_ttl = 0
-    max_ttl = 0
     error_page_path = 'index.html'
     acm_cert_arn = 'arn.acm.certificate'
     minimum_protocol_version = 'TLSv1'
@@ -321,16 +288,6 @@ def test_cf_distribution_config():
                                                    default_root_object=default_root_object,
                                                    enabled=enabled,
                                                    price_class=price_class,
-                                                   target_origin_id=target_origin_id,
-                                                   allowed_methods=allowed_methods,
-                                                   cached_methods=cached_methods,
-                                                   trusted_signers=trusted_signers,
-                                                   forward_cookies=forward_cookies,
-                                                   forwarded_headers=forwarded_headers,
-                                                   viewer_protocol_policy=viewer_protocol_policy,
-                                                   min_ttl=min_ttl,
-                                                   default_ttl=default_ttl,
-                                                   max_ttl=max_ttl,
                                                    error_page_path=error_page_path,
                                                    acm_cert_arn=acm_cert_arn,
                                                    minimum_protocol_version=minimum_protocol_version,
@@ -341,14 +298,8 @@ def test_cf_distribution_config():
     assert_equal(default_root_object, helper_cf_dist.default_root_object)
     assert_equal(enabled, helper_cf_dist.enabled)
     assert_equal(price_class, helper_cf_dist.price_class)
-    assert_equal(target_origin_id, helper_cf_dist.target_origin_id)
-    assert_equal(allowed_methods, helper_cf_dist.allowed_methods)
-    assert_equal(cached_methods, helper_cf_dist.cached_methods)
-    assert_equal(trusted_signers, helper_cf_dist.trusted_signers)
-    assert_equal(forward_cookies, helper_cf_dist.forward_cookies)
-    assert_equal(forwarded_headers, helper_cf_dist.forwarded_headers)
-    assert_equal(viewer_protocol_policy, helper_cf_dist.viewer_protocol_policy)
-    assert_equal(min_ttl, helper_cf_dist.min_ttl)
-    assert_equal(default_ttl, helper_cf_dist.default_ttl)
-    assert_equal(max_ttl, helper_cf_dist.max_ttl)
     assert_equal(error_page_path, helper_cf_dist.error_page_path)
+#
+# def test_multiple_default_cache_behaviors():
+#
+#     assert_raises(CloudfrontConfigError, )

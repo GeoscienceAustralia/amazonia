@@ -493,23 +493,13 @@ def create_stack():
                                     default_root_object='index.html',
                                     enabled=True,
                                     price_class='PriceClass_All',
-                                    target_origin_id='originId',
-                                    allowed_methods=['GET', 'HEAD'],
-                                    cached_methods=['GET', 'HEAD'],
-                                    trusted_signers=['self'],
-                                    query_string=True,
-                                    forward_cookies='all',
-                                    forwarded_headers=['Accept', 'Set-Cookie'],
-                                    viewer_protocol_policy='https-only',
-                                    min_ttl=0,
-                                    default_ttl=0,
-                                    max_ttl=0,
                                     error_page_path='index.html',
                                     acm_cert_arn='arn.acm.certificate',
                                     minimum_protocol_version='TLSv1',
                                     ssl_support_method='sni-only'
                                 ),
                                 'cf_cache_behavior_config': [CFCacheBehavior(
+                                    is_default=True,
                                     path_pattern='/index.html',
                                     allowed_methods=['GET', 'HEAD'],
                                     cached_methods=['GET', 'HEAD'],
@@ -524,6 +514,7 @@ def create_stack():
                                     query_string='False'
                                 ),
                                     CFCacheBehavior(
+                                        is_default=False,
                                         path_pattern='/login.js',
                                         allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
                                         cached_methods=['GET', 'HEAD'],

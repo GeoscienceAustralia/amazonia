@@ -23,8 +23,6 @@ class CFDistributionUnit(object):
         self.cache_behaviors = []
         self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
 
-        self.default_cache_behavior = self.add_default_cache_behavior(self.title, cf_distribution_config)
-
         # Populate origins
         self.add_origins(self.title, cf_origins_config)
         # Populate cache_behaviors
@@ -113,16 +111,18 @@ class CFDistributionUnit(object):
         :param cf_cache_behavior_config: list of CFCacheBehavior
         """
 
+        default_cache_behavior_count = 0
+
         for number, cache_behavior in enumerate(cf_cache_behavior_config):
 
             forwarded_values = cloudfront.ForwardedValues(
                 Cookies=cloudfront.Cookies(
                     Forward=cache_behavior.forward_cookies
-                )
+                ),
+                QueryString=cache_behavior.query_string
             )
-
             if cache_behavior.forwarded_headers is not None:
-                forwarded_values.QueryString=cache_behavior.forwarded_headers
+                forwarded_values.Headers = cache_behavior.forwarded_headers
 
             cf_cache_behavior_params = {
                 'AllowedMethods': cache_behavior.allowed_methods,
@@ -144,18 +144,30 @@ class CFDistributionUnit(object):
                     '{0}DefaultCacheBehavior'.format(title),
                     **cf_cache_behavior_params
                 )
+
+                default_cache_behavior_count += 1
             else:
                 # Append additional cache behaviors to list
+                cf_cache_behavior_params['PathPattern'] = cache_behavior.path_pattern
+
                 created_cache_behavior = cloudfront.CacheBehavior(
                     '{0}CacheBehavior{1}'.format(title, number),
-                    PathPattern=cache_behavior.path_pattern
                     **cf_cache_behavior_params
                 )
 
                 self.cache_behaviors.append(created_cache_behavior)
+
+            if default_cache_behavior_count != 1:
+                raise CloudfrontConfigError('Error: cf_distribution_unit {0} must have exactly one default cache behavior.'
+                                       .format(self.title))
 
     def get_dependencies(self):
         """
         :return: returns an empty list as a cfdistribution has no upstream dependencies
         """
         return self.dependencies
+
+
+class CloudfrontConfigError(Exception):
+    def __init__(self, value):
+        self.value = value
