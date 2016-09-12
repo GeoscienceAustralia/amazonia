@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.10] - 12/09/2016
+- Refactor Cloudfront distributions
+
 ## [1.3.9] - 8/09/2016
 - Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
 
