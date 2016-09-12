@@ -40,6 +40,7 @@ def main():
 
     cache_behavior = [
         CFCacheBehavior(
+            is_default=True,
             path_pattern='/index.html',
             allowed_methods=['GET', 'HEAD'],
             cached_methods=['GET', 'HEAD'],
@@ -54,6 +55,7 @@ def main():
             query_string=True
         ),
         CFCacheBehavior(
+            is_default=False,
             path_pattern='/login.js',
             allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
             cached_methods=['GET', 'HEAD'],
@@ -83,17 +85,6 @@ def main():
         default_root_object='index.html',
         enabled=True,
         price_class='PriceClass_All',
-        target_origin_id='originId',
-        allowed_methods=['GET', 'HEAD'],
-        cached_methods=['GET', 'HEAD'],
-        trusted_signers=['self'],
-        query_string=True,
-        forward_cookies='all',
-        forwarded_headers=[''],
-        viewer_protocol_policy='https-only',
-        min_ttl=0,
-        default_ttl=0,
-        max_ttl=0,
         error_page_path='index.html',
         acm_cert_arn='',
         minimum_protocol_version='TLSv1',

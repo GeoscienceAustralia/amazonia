@@ -371,6 +371,9 @@ cf_cache_behavior_config: &cf_cache_behavior_config
     type: 'dict'
     nullable: True
     schema:
+      is_default:
+        type: 'boolean'
+        nullable: False
       path_pattern:
         type: 'string'
         nullable: True
