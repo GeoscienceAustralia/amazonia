@@ -112,6 +112,7 @@ class CFDistributionUnit(object):
         """
 
         default_cache_behavior_count = 0
+        cache_behavior_count = 0
 
         for number, cache_behavior in enumerate(cf_cache_behavior_config):
 
@@ -156,8 +157,10 @@ class CFDistributionUnit(object):
                 )
 
                 self.cache_behaviors.append(created_cache_behavior)
+                cache_behavior_count += 1
 
-            if default_cache_behavior_count != 1:
+            # if there is at least one cache behavior, there must be exactly one default cache behavior
+            if cache_behavior_count > 0 and default_cache_behavior_count != 1:
                 raise CloudfrontConfigError('Error: cf_distribution_unit {0} must have exactly one default cache behavior.'
                                        .format(self.title))
 
