@@ -154,7 +154,6 @@ cf_distribution_config:
   default_root_object: 'index.html'
   enabled: True
   price_class: 'PriceClass_All'
-  target_origin_id:
   error_page_path: '404.html'
   acm_cert_arn: ''
   minimum_protocol_version: 'TLSv1'
