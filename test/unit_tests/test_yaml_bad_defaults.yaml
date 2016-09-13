@@ -136,19 +136,6 @@ cf_distribution_config:
   default_root_object: 'index.html'
   enabled: True
   price_class: 'PriceClass_All'
-  target_origin_id:
-  allowed_methods:
-   - 'GET'
-   - 'HEAD'
-  cached_methods:
-   - 'GET'
-   - 'HEAD'
-  trusted_signers:
-   - 'self'
-  viewer_protocol_policy: 'https-only'
-  min_ttl: 0
-  default_ttl: 0
-  max_ttl: 0
   error_page_path: '404.html'
   acm_cert_arn: ''
   minimum_protocol_version: 'TLSv1'
