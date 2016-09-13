@@ -2,12 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.3.10] - 12/09/2016
+## [1.3.9] - 14/09/2016
+- Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
 - Refactor Cloudfront distributions
 - Added an Output for the endpoint of each deployment that is created for api gateway units. Storing these in an 'endpoints' list.
-
-## [1.3.9] - 8/09/2016
-- Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
 
 ## [1.3.8] - 8/09/2016
 - Replaced stack parameter stack_hosted_zone_name with public_hosted_zone_name
