@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from troposphere import Ref, Join, GetAtt
+from troposphere import Ref, Join, GetAtt, Output
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
 from troposphere.apigateway import Deployment
 
@@ -34,6 +34,7 @@ class ApiGatewayUnit(object):
         self.network_config = network_config
         self.method_config = method_config
         self.deployment_config = deployment_config
+        self.endpoints = []
 
         self.api = self.template.add_resource(RestApi(
                                                       '{0}API'.format(self.title),
@@ -166,6 +167,23 @@ class ApiGatewayUnit(object):
 
         self.deployments.append(deployment)
         self.template.add_resource(deployment)
+
+        value = Join('', ['https://',
+                          Ref(self.api),
+                          '.execute-api.',
+                          Ref("AWS::Region"),
+                          '.amazonaws.com/',
+                          deployment.StageName
+                          ]
+                     )
+
+        self.endpoints.append(value)
+
+        self.template.add_output(Output(
+            deployment.title,
+            Description='URL of API deployment: {0}'.format(deployment.title),
+            Value=value
+        ))
 
     def add_unit_flow(self, other_unit):
         """
