@@ -185,6 +185,10 @@ def test_creation_of_deployment():
     assert_equals(type(api.deployments[0].RestApiId), Ref)
     assert_equals(api.deployments[0].StageName, deployment.stagename)
 
+    assert_equals(type(api.endpoints[0]), Join)
+    assert_equals(len(api.endpoints), 1)
+    assert_equals(len(api.endpoints), len(api.deployments))
+
 
 @with_setup(setup_resources())
 def create_request_config():
