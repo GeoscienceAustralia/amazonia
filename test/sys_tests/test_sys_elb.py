@@ -2,6 +2,7 @@
 
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.hosted_zone import HostedZone
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
@@ -78,11 +79,24 @@ def main():
         nat_highly_available=False,
         nat_gateways=[]
     )
+
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port='80',
+            loadbalancer_port='80',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        ),
+        ElbListenersConfig(
+            instance_port='8080',
+            loadbalancer_port='8080',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        )
+    ]
+
     elb_config1 = ElbConfig(
-        instance_port=['80'],
-        loadbalancer_port=['80'],
-        loadbalancer_protocol=['HTTP'],
-        instance_protocol=['HTTP'],
+        elb_listeners_config=elb_listeners_config,
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=False,
@@ -93,10 +107,7 @@ def main():
         timeout=30
     )
     elb_config2 = ElbConfig(
-        instance_port=['80'],
-        loadbalancer_port=['443'],
-        loadbalancer_protocol=['HTTPS'],
-        instance_protocol=['HTTP'],
+        elb_listeners_config=elb_listeners_config,
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,
@@ -107,10 +118,7 @@ def main():
         timeout=30
     )
     elb_config3 = ElbConfig(
-        instance_port=['80'],
-        loadbalancer_port=['80'],
-        loadbalancer_protocol=['HTTP'],
-        instance_protocol=['HTTP'],
+        elb_listeners_config=elb_listeners_config,
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket='my-s3-bucket',
         public_unit=True,

@@ -5,6 +5,7 @@ import re
 
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -13,14 +14,14 @@ from nose.tools import *
 from troposphere import ec2, Ref, Template
 
 
-def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
+def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
                hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
                unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookies=['JSESSION','SESSIONTOKEN']):
     """
     Helper function to create Elb Troposhpere object to interate through.
-    :param instanceport - port for traffic to instances from the load balancer
-    :param loadbalancerport - port for traffic to the load balancer from public
+    :param instance_port - port for traffic to instances from the load balancer
+    :param loadbalancer_port - port for traffic to the load balancer from public
     :param loadbalancer_protocol: protocol for traffic into ELB from World
     :param instance_protocol: protocol for traffic into ASG from ELB
     :param elb_health_check: path to test page
@@ -73,11 +74,17 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         nat_highly_available=False,
         nat_gateways=None
     )
+
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port=instance_port,
+            loadbalancer_port=loadbalancer_port,
+            loadbalancer_protocol=loadbalancer_protocol,
+            instance_protocol=instance_protocol
+        )
+    ]
     elb_config = ElbConfig(
-        instance_port=[instanceport],
-        loadbalancer_port=[loadbalancerport],
-        loadbalancer_protocol=[loadbalancer_protocol],
-        instance_protocol=[instance_protocol],
+        elb_listeners_config=elb_listeners_config,
         elb_health_check=elb_health_check,
         elb_log_bucket=elb_log_bucket,
         public_unit=public_unit,
@@ -136,7 +143,7 @@ def test_target():
     """
     helper_elb = create_elb(instance_protocol='HTTPS',
                             loadbalancer_protocol='HTTPS',
-                            instanceport='443',
+                            instance_port='443',
                             elb_health_check='HTTPS:443/test/index.html')
     assert_equals('HTTPS:443/test/index.html', helper_elb.trop_elb.HealthCheck.Target)
 
@@ -150,7 +157,7 @@ def test_instance_port():
     ports = ['8080', '80', '443', '5678', '-1', '99', '65535']
 
     for port in ports:
-        helper_elb = create_elb(instanceport=port)
+        helper_elb = create_elb(instance_port=port)
         for listener in helper_elb.trop_elb.Listeners:
             assert_equal(port, listener.InstancePort)
 
@@ -163,7 +170,7 @@ def test_loadbalancer_port():
     ports = ['8080', '80', '443', '5678', '-1', '99', '65535']
 
     for port in ports:
-        helper_elb = create_elb(loadbalancerport=port)
+        helper_elb = create_elb(loadbalancer_port=port)
         for listener in helper_elb.trop_elb.Listeners:
             assert_equal(port, listener.LoadBalancerPort)
 

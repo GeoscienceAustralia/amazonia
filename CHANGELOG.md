@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
 - Refactor Cloudfront distributions
 - Added an Output for the endpoint of each deployment that is created for api gateway units. Storing these in an 'endpoints' list.
+- ELB listeners are now a defaultable list of complex objects rather than 4 different arrays (who were implicitly linked)
+- YAML loader now allows defaulting of lists of complex objects (elb listeners) and "None-ing" of single complex objects (no examples yet)
 
 ## [1.3.8] - 8/09/2016
 - Replaced stack parameter stack_hosted_zone_name with public_hosted_zone_name

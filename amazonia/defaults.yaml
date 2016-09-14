@@ -67,16 +67,16 @@ database_config:
   db_storage_type:
 
 # (ZD) Autoscaling unit default values
+elb_listeners_config: &elb_listeners_config
+    loadbalancer_protocol: 'HTTP'
+    instance_protocol: 'HTTP'
+    instance_port: '80'
+    loadbalancer_port: '80'
+
 # ELB default values
 elb_config:
-  loadbalancer_protocol:
-    - 'HTTP'
-  instance_protocol:
-    - 'HTTP'
-  instance_port:
-    - '80'
-  loadbalancer_port:
-    - '80'
+  elb_listeners_config:
+    - *elb_listeners_config
   elb_health_check: 'HTTP:80/index.html'
   elb_log_bucket:
   public_unit: true

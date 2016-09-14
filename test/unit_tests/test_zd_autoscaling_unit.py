@@ -1,6 +1,7 @@
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -79,11 +80,17 @@ runcmd:
                                    cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
                                    nat_highly_available=False,
                                    nat_gateways=None)
+
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port='80',
+            loadbalancer_port='80',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        )]
+
     elb_config = ElbConfig(elb_log_bucket=None,
-                           loadbalancer_protocol=['HTTP'],
-                           instance_protocol=['HTTP'],
-                           instance_port=['80'],
-                           loadbalancer_port=['80'],
+                           elb_listeners_config=elb_listeners_config,
                            elb_health_check='HTTP:80/index.html',
                            public_unit=True,
                            ssl_certificate_id=None,

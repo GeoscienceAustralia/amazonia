@@ -7,6 +7,7 @@ from amazonia.classes.cf_distribution_config import CFDistributionConfig
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
 from amazonia.classes.util import get_cf_friendly_name
@@ -16,7 +17,9 @@ from troposphere import Tags, Ref
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = elb_health_check = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
     health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = \
-    db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = None
+    db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = \
+    elb_listeners_config = healthy_threshold = unhealthy_threshold = interval = timeout = None
+
 availability_zones = []
 home_cidrs = []
 instance_port = []
@@ -31,7 +34,7 @@ def setup_resources():
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
         db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, \
-        healthy_threshold, unhealthy_threshold, interval, timeout, sticky_app_cookies
+        elb_listeners_config, healthy_threshold, unhealthy_threshold, interval, timeout, sticky_app_cookies
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -92,6 +95,14 @@ runcmd:
         ebs_snapshot_id='',
         virtual_name=True
     )]
+
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port='80',
+            loadbalancer_port='80',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        )]
 
 
 @with_setup(setup_resources)
@@ -254,10 +265,7 @@ def test_duplicate_unit_names():
                                    simple_scaling_policy_config=None
                                ),
                                'elb_config': ElbConfig(
-                                   loadbalancer_protocol=loadbalancer_protocol,
-                                   instance_protocol=instance_protocol,
-                                   instance_port=instance_port,
-                                   loadbalancer_port=loadbalancer_port,
+                                   elb_listeners_config=elb_listeners_config,
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
@@ -272,10 +280,7 @@ def test_duplicate_unit_names():
                                },
                               {'unit_title': 'app1',
                                'elb_config': ElbConfig(
-                                   loadbalancer_protocol=loadbalancer_protocol,
-                                   instance_protocol=instance_protocol,
-                                   instance_port=instance_port,
-                                   loadbalancer_port=loadbalancer_port,
+                                   elb_listeners_config=elb_listeners_config,
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
@@ -320,7 +325,7 @@ def create_stack():
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
         db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
-        unhealthy_threshold, interval, timeout, sticky_app_cookies
+        unhealthy_threshold, interval, timeout, elb_listeners_config, sticky_app_cookies
 
     stack = Stack(
         code_deploy_service_role=code_deploy_service_role,
@@ -341,10 +346,7 @@ def create_stack():
         nat_highly_available=False,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
-                                   loadbalancer_protocol=loadbalancer_protocol,
-                                   instance_protocol=instance_protocol,
-                                   instance_port=instance_port,
-                                   loadbalancer_port=loadbalancer_port,
+                                   elb_listeners_config=elb_listeners_config,
                                    elb_health_check=elb_health_check,
                                    elb_log_bucket=None,
                                    public_unit=True,
@@ -387,10 +389,7 @@ def create_stack():
                                }],
         autoscaling_units=[{'unit_title': 'app1',
                             'elb_config': ElbConfig(
-                                loadbalancer_protocol=loadbalancer_protocol,
-                                instance_protocol=instance_protocol,
-                                instance_port=instance_port,
-                                loadbalancer_port=loadbalancer_port,
+                                elb_listeners_config=elb_listeners_config,
                                 elb_health_check=elb_health_check,
                                 elb_log_bucket=None,
                                 public_unit=True,
@@ -419,10 +418,7 @@ def create_stack():
                             },
                            {'unit_title': 'app2',
                             'elb_config': ElbConfig(
-                                loadbalancer_protocol=loadbalancer_protocol,
-                                instance_protocol=instance_protocol,
-                                instance_port=instance_port,
-                                loadbalancer_port=loadbalancer_port,
+                                elb_listeners_config=elb_listeners_config,
                                 elb_health_check=elb_health_check,
                                 elb_log_bucket=None,
                                 public_unit=True,

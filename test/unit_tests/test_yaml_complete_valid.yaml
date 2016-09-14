@@ -114,14 +114,12 @@ zd_autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      loadbalancer_protocol:
-       - 'HTTP'
-      instance_protocol:
-       - 'HTTP'
-      loadbalancer_port:
-       - '80'
-      instance_port:
-       - '80'
+      elb_listeners_config:
+        -
+          loadbalancer_protocol: 'HTTP'
+          instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_port: '80'
       elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
@@ -165,14 +163,12 @@ autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      loadbalancer_protocol:
-       - 'HTTP'
-      instance_protocol:
-       - 'HTTP'
-      loadbalancer_port:
-       - '80'
-      instance_port:
-       - '80'
+      elb_listeners_config:
+        -
+          loadbalancer_protocol: 'HTTP'
+          instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_port: '80'
       elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true
@@ -250,14 +246,12 @@ autoscaling_units:
         runcmd:
          - service httpd start
     elb_config:
-      loadbalancer_protocol:
-       - 'HTTP'
-      instance_protocol:
-       - 'HTTP'
-      loadbalancer_port:
-       - '80'
-      instance_port:
-       - '80'
+      elb_listeners_config:
+        -
+          loadbalancer_protocol: 'HTTP'
+          instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_port: '80'
       elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: false

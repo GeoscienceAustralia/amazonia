@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+
+
 class SingleInstanceConfig(object):
     def __init__(self, vpc, keypair, si_image_id, si_instance_type, subnet, instance_dependencies,
                  alert_emails, alert, iam_instance_profile_arn, public_hosted_zone_name, is_nat):

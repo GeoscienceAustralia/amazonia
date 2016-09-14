@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+
+
 class DatabaseConfig(object):
     def __init__(self, db_hdd_size, db_instance_type, db_engine, db_port, db_name,
                  db_snapshot_id, db_backup_window, db_backup_retention, db_maintenance_window,

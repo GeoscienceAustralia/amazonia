@@ -5,6 +5,7 @@ from amazonia.classes.cf_distribution_config import CFDistributionConfig
 from amazonia.classes.cf_origins_config import CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
 from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
@@ -12,15 +13,17 @@ from amazonia.classes.lambda_config import LambdaConfig
 
 
 class ComplexObjectFieldMapping(object):
-    def __init__(self, constructor, is_list, key_list):
+    def __init__(self, constructor, is_list, is_defaulted, key_list):
         """
         Simple class to hold mapping information between input data and config classes
         :param constructor: config class definition
         :param is_list: is the field a list of config objects or a single config object?
+        :param is_defaulted: is the complex object settable wholly from defaults?
         :param key_list: expected config keys
         """
         self.constructor = constructor
         self.is_list = is_list
+        self.is_defaulted = is_defaulted
         self.key_list = key_list
 
 
@@ -28,11 +31,8 @@ class YamlFields(object):
     """Simple object to consolidate a number of key list constants"""
 
     # elb_config field list
-    elb_config_key_list = ['instance_protocol',
-                           'loadbalancer_protocol',
-                           'instance_port',
-                           'loadbalancer_port',
-                           'elb_health_check',
+    elb_config_key_list = ['elb_health_check',
+                           'elb_listeners_config',
                            'public_unit',
                            'elb_log_bucket',
                            'ssl_certificate_id',
@@ -42,6 +42,13 @@ class YamlFields(object):
                            'timeout',
                            'sticky_app_cookies'
                            ]
+
+    # elb_listeners_config field list
+    elb_listeners_config_key_list = ['instance_protocol',
+                                     'loadbalancer_protocol',
+                                     'instance_port',
+                                     'loadbalancer_port'
+                                     ]
 
     # asg_config field list
     asg_config_key_list = ['sns_topic_arn',
@@ -250,46 +257,48 @@ class YamlFields(object):
     # config classes
     complex_object_field_mapping = {
         'elb_config':
-            ComplexObjectFieldMapping(ElbConfig, False, elb_config_key_list),
+            ComplexObjectFieldMapping(ElbConfig, False, True, elb_config_key_list),
+        'elb_listeners_config':
+            ComplexObjectFieldMapping(ElbListenersConfig, True, True, elb_listeners_config_key_list),
         'asg_config':
-            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, True, asg_config_key_list),
         'blue_asg_config':
-            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, True, asg_config_key_list),
         'green_asg_config':
-            ComplexObjectFieldMapping(AsgConfig, False, asg_config_key_list),
+            ComplexObjectFieldMapping(AsgConfig, False, True, asg_config_key_list),
         'database_config':
-            ComplexObjectFieldMapping(DatabaseConfig, False, database_config_key_list),
+            ComplexObjectFieldMapping(DatabaseConfig, False, True, database_config_key_list),
         'block_devices_config':
-            ComplexObjectFieldMapping(BlockDevicesConfig, True, block_devices_config_key_list),
+            ComplexObjectFieldMapping(BlockDevicesConfig, True, False, block_devices_config_key_list),
         'simple_scaling_policy_config':
-            ComplexObjectFieldMapping(SimpleScalingPolicyConfig, True, simple_scaling_policy_config_key_list),
+            ComplexObjectFieldMapping(SimpleScalingPolicyConfig, True, False, simple_scaling_policy_config_key_list),
         'autoscaling_units':
-            ComplexObjectFieldMapping(dict, True, autoscaling_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, autoscaling_unit_key_list),
         'zd_autoscaling_units':
-            ComplexObjectFieldMapping(dict, True, zd_autoscaling_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, zd_autoscaling_unit_key_list),
         'database_units':
-            ComplexObjectFieldMapping(dict, True, database_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, database_unit_key_list),
         'cf_distribution_units':
-            ComplexObjectFieldMapping(dict, True, cf_distribution_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, cf_distribution_unit_key_list),
         'cf_cache_behavior_config':
-            ComplexObjectFieldMapping(CFCacheBehavior, True, cf_cache_behavior_config_key_list),
+            ComplexObjectFieldMapping(CFCacheBehavior, True, False, cf_cache_behavior_config_key_list),
         'cf_distribution_config':
-            ComplexObjectFieldMapping(CFDistributionConfig, False, cf_distribution_config_key_list),
+            ComplexObjectFieldMapping(CFDistributionConfig, False, True, cf_distribution_config_key_list),
         'cf_origins_config':
-            ComplexObjectFieldMapping(CFOriginsConfig, True, cf_origins_config_key_list),
+            ComplexObjectFieldMapping(CFOriginsConfig, True, False, cf_origins_config_key_list),
         'api_gateway_units':
-            ComplexObjectFieldMapping(dict, True, api_gateway_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, api_gateway_unit_key_list),
         'method_config':
-            ComplexObjectFieldMapping(ApiGatewayMethodConfig, True, api_method_config),
+            ComplexObjectFieldMapping(ApiGatewayMethodConfig, True, False, api_method_config),
         'request_config':
-            ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, api_request_config),
+            ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, True, api_request_config),
         'response_config':
-            ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, api_response_config),
+            ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, False, api_response_config),
         'deployment_config':
-            ComplexObjectFieldMapping(ApiGatewayDeploymentConfig, True, api_deployment_config),
+            ComplexObjectFieldMapping(ApiGatewayDeploymentConfig, True, False, api_deployment_config),
         'lambda_units':
-            ComplexObjectFieldMapping(dict, True, lambda_unit_key_list),
+            ComplexObjectFieldMapping(dict, True, False, lambda_unit_key_list),
         'lambda_config':
-            ComplexObjectFieldMapping(LambdaConfig, False, lambda_config_key_list),
+            ComplexObjectFieldMapping(LambdaConfig, False, True, lambda_config_key_list),
     }
 

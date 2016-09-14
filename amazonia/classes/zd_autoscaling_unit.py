@@ -54,22 +54,25 @@ class ZdAutoscalingUnit(object):
             asg_config=green_asg_config
         )
 
+        self.loadbalancer_ports = [listener.loadbalancer_port for listener in elb_config.elb_listeners_config]
+        self.instance_ports = [listener.instance_port for listener in elb_config.elb_listeners_config]
+
         # create security group rules to allow communication between the two ELBS to the two ASGs
         [self.prod_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instance_port]
+         for instanceport in self.instance_ports]
         [self.prod_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instance_port]
+         for instanceport in self.instance_ports]
         [self.pre_elb.add_flow(receiver=self.blue_asg, port=instanceport)
-         for instanceport in elb_config.instance_port]
+         for instanceport in self.instance_ports]
         [self.pre_elb.add_flow(receiver=self.green_asg, port=instanceport)
-         for instanceport in elb_config.instance_port]
+         for instanceport in self.instance_ports]
 
         # create security group rules to allow traffic from the public to the loadbalancer
         if elb_config.public_unit:
             [self.prod_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-             for loadbalancerport in elb_config.loadbalancer_port]
+             for loadbalancerport in self.loadbalancer_ports]
             [self.pre_elb.add_ingress(sender=network_config.public_cidr, port=loadbalancerport)
-             for loadbalancerport in elb_config.loadbalancer_port]
+             for loadbalancerport in self.loadbalancer_ports]
 
         if network_config.nat_highly_available:
             # All Traffic to Nat gateways
@@ -100,7 +103,7 @@ class ZdAutoscalingUnit(object):
         """
         :return: return list of ports exposed by ELB for routing other unit's traffic
         """
-        return self.elb_config.loadbalancer_port
+        return self.loadbalancer_ports
 
     def add_unit_flow(self, receiver):
         """

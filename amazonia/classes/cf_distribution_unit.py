@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-from troposphere import Tags, Ref, Output, Join, GetAtt, cloudfront
+from troposphere import cloudfront
+
 
 class CFDistributionUnit(object):
     def __init__(self, unit_title, template, network_config, cf_origins_config, cf_cache_behavior_config,
@@ -9,7 +10,7 @@ class CFDistributionUnit(object):
         Class to abstract a Cloudfront Distribution object
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
-        :param title: The title of this Cloudfront distribution
+        :param unit_title: The title of this Cloudfront distribution
         :param template: Troposphere stack to append resources to
         :param cf_origins_config: A list of CFOriginsConfig objects
         :param cf_cache_behavior_config: A list of CFCacheBehavior objects
@@ -18,6 +19,7 @@ class CFDistributionUnit(object):
         """
 
         self.title = unit_title + 'CFDist'
+        self.network_config = network_config
         self.dependencies = []
         self.origins = []
         self.cache_behaviors = []
