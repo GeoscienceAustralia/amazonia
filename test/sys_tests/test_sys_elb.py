@@ -104,7 +104,8 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30
+        timeout=30,
+        sticky_app_cookies=['JSESSION','SESSIONTOKEN']
     )
     elb_config2 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -115,7 +116,8 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30
+        timeout=30,
+        sticky_app_cookies=['JSESSION','SESSIONTOKEN']
     )
     elb_config3 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -126,7 +128,8 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30
+        timeout=30,
+        sticky_app_cookies=['JSESSION','SESSIONTOKEN']
     )
 
     Elb(title='MyUnit1',

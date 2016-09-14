@@ -58,10 +58,10 @@ runcmd:
                                                ebs_encrypted=False,
                                                ebs_snapshot_id=None,
                                                virtual_name=False)]
-    elb_listeners_config = ElbListenersConfig(loadbalancer_protocol='HTTP',
+    elb_listeners_config = [ElbListenersConfig(loadbalancer_protocol='HTTP',
                                               instance_protocol='HTTP',
                                               instance_port='80',
-                                              loadbalancer_port='80')
+                                              loadbalancer_port='80')]
 
     stack = Stack(
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
