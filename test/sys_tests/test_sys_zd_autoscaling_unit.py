@@ -92,6 +92,7 @@ runcmd:
     unhealthy_threshold = 2
     interval = 300
     timeout = 30
+    sticky_app_cookies = ['JSESSION', 'SESSIONTOKEN']
     minsize = 1
     maxsize = 1
     health_check_grace_period = 300
@@ -118,7 +119,8 @@ runcmd:
                            healthy_threshold=healthy_threshold,
                            unhealthy_threshold=unhealthy_threshold,
                            interval=interval,
-                           timeout=timeout
+                           timeout=timeout,
+                           sticky_app_cookies=sticky_app_cookies
                            )
     blue_asg_config = AsgConfig(sns_topic_arn=None,
                                 sns_notification_types=None,
