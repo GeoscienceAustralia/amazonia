@@ -47,6 +47,19 @@ class Elb(SecurityEnabledObject):
                              Tags=Tags(Name=self.title),
                              DependsOn=network_config.get_depends_on()))
 
+        if elb_config.sticky_app_cookies:
+            sticky_app_cookies = []
+
+            for number, sticky_app_cookie in enumerate(elb_config.sticky_app_cookies):
+                policy_name = self.title + 'AppCookiePolicy' + str(number)
+
+                sticky_app_cookies.append(elb.AppCookieStickinessPolicy(
+                    CookieName=sticky_app_cookie,
+                    PolicyName=policy_name
+                ))
+
+            self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookies
+
         for listener in self.trop_elb.Listeners:
             if elb_config.ssl_certificate_id and listener.Protocol == 'HTTPS':
                 listener.SSLCertificateId = elb_config.ssl_certificate_id

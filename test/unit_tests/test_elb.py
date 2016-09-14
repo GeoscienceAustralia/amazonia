@@ -16,7 +16,7 @@ from troposphere import ec2, Ref, Template
 def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
                hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
-               unhealthy_threshold=2, interval=300, timeout=30):
+               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookies=['JSESSION','SESSIONTOKEN']):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instanceport - port for traffic to instances from the load balancer
@@ -28,6 +28,7 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
     :param ssl_certificate_id: SSL Certificate to attach to elb for https using AWS Certificate Manager
+    :param sticky_app_cookies: List of application cookies used for stickiness
     :return: Troposphere object for Elb
     """
     template = Template()
@@ -84,7 +85,8 @@ def create_elb(instanceport='80', loadbalancerport='80', loadbalancer_protocol='
         healthy_threshold=healthy_threshold,
         unhealthy_threshold=unhealthy_threshold,
         interval=interval,
-        timeout=timeout
+        timeout=timeout,
+        sticky_app_cookies=sticky_app_cookies
     )
 
     elb = Elb(title='elb',
@@ -263,3 +265,16 @@ def test_interval():
     helper_elb = create_elb(interval=interval, timeout=timeout)
     assert_equals(interval, helper_elb.trop_elb.HealthCheck.Interval)
     assert_equals(timeout, helper_elb.trop_elb.HealthCheck.Timeout)
+
+def test_sticky_app_cookies():
+    """
+    Test to determine that sticky app cookies are set correctly
+    """
+    sticky_app_cookies = ['JSESSION','SESSIONTOKEN']
+
+    helper_elb = create_elb(sticky_app_cookies=sticky_app_cookies)
+
+    # combine sticky_app_cookies list values with the trop_elb cookies, and check if equal
+    trop_cookies = [sticky_app_cookie.CookieName for sticky_app_cookie in helper_elb.trop_elb.AppCookieStickinessPolicy]
+    for a, b in zip(sticky_app_cookies, trop_cookies):
+        assert_equals(a, b)

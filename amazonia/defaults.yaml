@@ -85,6 +85,7 @@ elb_config:
   unhealthy_threshold: 2
   interval: 300
   timeout: 30
+  sticky_app_cookies:
 
 # Block device configs
 block_devices_config:
