@@ -55,14 +55,12 @@ database_config:
 # (ZD) Autoscaling unit default values
 # ELB default values
 elb_config:
-  loadbalancer_protocol:
-    - 'HTTP'
-  instance_protocol:
-    - 'HTTP'
-  instance_port:
-    - '80'
-  loadbalancer_port:
-    - '80'
+  elb_listeners_config:
+    -
+      loadbalancer_protocol: 'HTTP'
+      instance_protocol: 'HTTP'
+      instance_port: '80'
+      loadbalancer_port: '80'
   elb_health_check: 'HTTP:80/index.html'
   elb_log_bucket:
   public_unit: true

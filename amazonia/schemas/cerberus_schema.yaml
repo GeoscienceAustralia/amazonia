@@ -13,30 +13,31 @@ iam_instance_profile_arn: &iam_instance_profile_arn # A string specifying an ins
   nullable: True
   empty: False
 
-elb_config: &elb_config
+elb_listeners_config: &elb_listeners_config
   type: 'dict'
   nullable: True
   schema:
     instance_protocol: # a list of strings specifying the instance protocols load balancers will connect to this specific autoscaling group.
-      type: 'list'
+      type: 'string'
       nullable: True
-      schema:
-        type: 'string'
     loadbalancer_protocol: # a list of strings specifying the load balancer protocols to allow connections from.
-      type: 'list'
+      type: 'string'
       nullable: True
-      schema:
-        type: 'string'
     instance_port: # a list of strings specifying the ports to send traffic from your load balancers into this specific autoscaling group.
-      type: 'list'
+      type: 'string'
       nullable: True
-      schema:
-        type: 'string'
     loadbalancer_port: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
+      type: 'string'
+      nullable: True
+
+elb_config: &elb_config
+  type: 'dict'
+  nullable: True
+  schema:
+    elb_listeners_config:
       type: 'list'
       nullable: True
-      schema:
-        type: 'string'
+      schema: *elb_listeners_config
     elb_health_check: # A string containing the path for this autoscaling groups load balancer to check to confirm that your instances are healthy.
       type: 'string'
       nullable: True

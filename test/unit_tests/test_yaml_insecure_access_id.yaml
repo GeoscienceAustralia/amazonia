@@ -10,10 +10,9 @@ autoscaling_units:
         #cloud-config
         repo_update: true
         repo_upgrade: all
-        AKI3ISW6DFTLGVWEDYMQ
-
         packages:
          - httpd
 
         runcmd:
          - service httpd start
+         - echo "AKI3ISW6DFTLGVWEDYMQ" > naughty.file

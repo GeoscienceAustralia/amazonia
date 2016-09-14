@@ -3,6 +3,7 @@
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -83,10 +84,6 @@ runcmd:
                                    keypair='pipeline',
                                    nat_highly_available=False,
                                    nat_gateways=[])
-    loadbalancer_protocol = ['HTTP']
-    instance_protocol = ['HTTP']
-    instance_port = ['80']
-    loadbalancer_port = ['80']
     elb_health_check = 'HTTP:80/index.html'
     healthy_threshold = 10
     unhealthy_threshold = 2
@@ -100,6 +97,21 @@ runcmd:
     image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
 
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port='80',
+            loadbalancer_port='80',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        ),
+        ElbListenersConfig(
+            instance_port='8080',
+            loadbalancer_port='8080',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        )
+    ]
+
     block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
                                                ebs_volume_size='15',
                                                ebs_volume_type='gp2',
@@ -107,10 +119,7 @@ runcmd:
                                                ebs_snapshot_id=None,
                                                virtual_name=False)]
 
-    elb_config = ElbConfig(loadbalancer_protocol=loadbalancer_protocol,
-                           instance_protocol=instance_protocol,
-                           instance_port=instance_port,
-                           loadbalancer_port=loadbalancer_port,
+    elb_config = ElbConfig(elb_listeners_config=elb_listeners_config,
                            elb_log_bucket=None,
                            elb_health_check=elb_health_check,
                            public_unit=True,

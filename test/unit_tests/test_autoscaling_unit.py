@@ -2,6 +2,7 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.autoscaling_unit import AutoscalingUnit
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
@@ -98,11 +99,17 @@ runcmd:
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None
     )
+
+    elb_listeners_config = [
+        ElbListenersConfig(
+            instance_port='80',
+            loadbalancer_port='80',
+            loadbalancer_protocol='HTTP',
+            instance_protocol='HTTP'
+        )]
+
     elb_config = ElbConfig(
-        loadbalancer_protocol=['HTTP'],
-        instance_protocol=['HTTP'],
-        instance_port=['80'],
-        loadbalancer_port=['80'],
+        elb_listeners_config=elb_listeners_config,
         elb_health_check='HTTP:80/index.html',
         elb_log_bucket=None,
         public_unit=True,

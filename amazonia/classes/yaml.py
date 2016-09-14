@@ -14,6 +14,7 @@ class InvalidYamlStructureError(Exception):
     """
     Exception if YAML structure is invalid
     """
+
     def __init__(self, value):
         self.value = value
 
@@ -22,6 +23,7 @@ class InvalidYamlValueError(Exception):
     """
     Exception if YAML value is invalid
     """
+
     def __init__(self, value):
         self.value = value
 
@@ -84,17 +86,29 @@ class Yaml(object):
                         # initialise complex object with parameter dictionary and append to list of values for this
                         # field
                         value.append(cofm.constructor(**complex_params))
+                # if users have not specified any config, but one should be derived from the defaults
+                elif cofm.is_defaulted:
+                    nested_user_values = {}
+                    complex_params = self.get_complex_params(current_key, nested_user_values, cofm.key_list,
+                                                             default_values)
+                    # initialise complex object with parameter dictionary and append to list of values for this
+                    # field
+                    value.append(cofm.constructor(**complex_params))
             else:
-                # initialise an empty dictionary to process against default values
-                nested_user_values = {}
+                nested_user_values = None
+                if cofm.is_defaulted:
+                    # initialise an empty dictionary to process against default values
+                    nested_user_values = {}
                 # replace empty dictionary with user values if specified
                 if current_key in user_values:
                     nested_user_values = user_values[current_key]
-                # Note: in contrast to the above, Amazonia will initialise a single complex object with defaults rather
-                # than an undefined object
-                complex_params = self.get_complex_params(current_key, nested_user_values, cofm.key_list, default_values)
-                # initialise complex
-                value = cofm.constructor(**complex_params)
+                if nested_user_values is not None:
+                    complex_params = self.get_complex_params(current_key, nested_user_values, cofm.key_list,
+                                                             default_values)
+                    # initialise complex
+                    value = cofm.constructor(**complex_params)
+                else:
+                    value = None
         # if simple field, return the user value or if not set the corresponding default value
         else:
             if default_values is not None and current_key in default_values:

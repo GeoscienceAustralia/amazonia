@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+
+
 class NetworkConfig(object):
     def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, keypair, cd_service_role_arn,
                  public_hosted_zone_name, private_hosted_zone, nat_highly_available, nat_gateways):

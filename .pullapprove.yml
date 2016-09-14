@@ -13,7 +13,6 @@ reviewers:
   name: autobots
   required: 1
   members:
-  - fuddstar
   - GypsyBojangles
   - smclauch
   - snayler0
@@ -21,6 +20,7 @@ reviewers:
   - ga-autobots
   - aynsof
   - TheAngeloPace
+  - jmettes
   conditions:
     branches:
       - integration

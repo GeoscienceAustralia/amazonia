@@ -10,7 +10,8 @@ from troposphere import Template
 def main():
     template = Template()
 
-    origins = [ CFOriginsConfig (
+    origins = [
+        CFOriginsConfig(
             domain_name='amazonia-elb-bucket.s3.amazonaws.com',
             origin_id='S3-amazonia-elb-bucket',
             origin_path='/directory',
@@ -19,7 +20,7 @@ def main():
                 'Accept': 'True'
             },
             origin_policy={
-                'is_s3' : True,
+                'is_s3': True,
                 'origin_access_identity': 'originaccessid1'
             }
         ),

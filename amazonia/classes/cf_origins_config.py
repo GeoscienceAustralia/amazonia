@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from troposphere import cloudfront
 
 class CFOriginsConfig(object):
     def __init__(self, domain_name, origin_id, origin_path, custom_headers, origin_policy):

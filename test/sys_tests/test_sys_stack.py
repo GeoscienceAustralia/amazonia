@@ -4,6 +4,7 @@ from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.elb_config import ElbConfig
+from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.stack import Stack
 
 
@@ -57,6 +58,10 @@ runcmd:
                                                ebs_encrypted=False,
                                                ebs_snapshot_id=None,
                                                virtual_name=False)]
+    elb_listeners_config = ElbListenersConfig(loadbalancer_protocol='HTTP',
+                                              instance_protocol='HTTP',
+                                              instance_port='80',
+                                              loadbalancer_port='80')
 
     stack = Stack(
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
@@ -78,10 +83,7 @@ runcmd:
         zd_autoscaling_units=[
             {'unit_title': 'zdapp1',
              'elb_config': ElbConfig(
-                 loadbalancer_protocol=['HTTP'],
-                 instance_protocol=['HTTP'],
-                 instance_port=['80'],
-                 loadbalancer_port=['80'],
+                 elb_listeners_config=elb_listeners_config,
                  elb_health_check='HTTP:80/index.html',
                  elb_log_bucket=None,
                  public_unit=True,
@@ -137,10 +139,7 @@ runcmd:
                                 simple_scaling_policy_config=None
                             ),
                             'elb_config': ElbConfig(
-                                loadbalancer_protocol=['HTTP'],
-                                instance_protocol=['HTTP'],
-                                instance_port=['80'],
-                                loadbalancer_port=['80'],
+                                elb_listeners_config=elb_listeners_config,
                                 elb_health_check='HTTP:80/index.html',
                                 elb_log_bucket=None,
                                 public_unit=True,
@@ -167,10 +166,7 @@ runcmd:
                                 simple_scaling_policy_config=None
                             ),
                             'elb_config': ElbConfig(
-                                loadbalancer_protocol=['HTTP'],
-                                instance_protocol=['HTTP'],
-                                instance_port=['80'],
-                                loadbalancer_port=['80'],
+                                elb_listeners_config=elb_listeners_config,
                                 elb_health_check='HTTP:80/index.html',
                                 elb_log_bucket=None,
                                 public_unit=False,

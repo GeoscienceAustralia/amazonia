@@ -35,6 +35,75 @@ def open_yaml_file(file_path):
 
 
 @with_setup(setup_resources)
+def test_basic_values():
+    """
+    Test basic application.yaml, this tests that an elb is created with the default listener (among other properties)
+    """
+    global default_data
+    valid_stack_data = open_yaml_file('../../amazonia/application.yaml')
+    amz_yaml = Yaml(valid_stack_data, default_data)
+
+    stack_input = amz_yaml.united_data
+
+    # Assert stack values are of type dict
+    assert_equals(type(stack_input), dict)
+
+    # Assert that there are no invalid stack keys
+    stack_input_set = set(stack_input)
+    expected_stack_set = set(YamlFields.stack_key_list)
+    assert_equals(len(stack_input_set.difference(expected_stack_set)), 0)
+
+    # Assert that there are no stack keys we missed
+    assert_equals(len(expected_stack_set.difference(stack_input_set)), 0)
+
+    # Assert correct values
+    assert_equals(stack_input['keypair'], 'INSERT_YOUR_KEYPAIR_HERE')
+    assert_list_equal(stack_input['availability_zones'], ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])
+    assert_equals(stack_input['vpc_cidr'], '10.0.0.0/16')
+    assert_dict_equal(stack_input['public_cidr'], {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
+    assert_equals(stack_input['jump_image_id'], 'ami-dc361ebf')
+    assert_equals(stack_input['jump_instance_type'], 't2.micro')
+    assert_equals(stack_input['nat_image_id'], 'ami-53371f30')
+    assert_equals(stack_input['nat_instance_type'], 't2.micro')
+    assert_equals(stack_input['private_hosted_zone_name'], 'private.lan.')
+    assert_equals(type(stack_input['home_cidrs']), list)
+    assert_equals(len(stack_input['home_cidrs']), 1)
+    assert_equals(type(stack_input['autoscaling_units']), list)
+    assert_equals(len(stack_input['autoscaling_units']), 1)
+
+    autoscaling_unit_input = stack_input['autoscaling_units'][0]
+    # Assert autoscaling unit values are of type dict
+    assert_equals(type(autoscaling_unit_input), dict)
+
+    # Assert that there are no invalid autoscaling unit keys
+    autoscaling_unit_input_set = set(autoscaling_unit_input.keys())
+    expected_autoscaling_unit_set = set(YamlFields.autoscaling_unit_key_list)
+    assert_equals(len(autoscaling_unit_input_set.difference(expected_autoscaling_unit_set)), 0)
+
+    # Assert that there are no autoscaling unit keys we missed
+    assert_equals(len(expected_autoscaling_unit_set.difference(autoscaling_unit_input_set)), 0)
+
+    assert_equals(autoscaling_unit_input['unit_title'], 'app1')
+    assert_equals(autoscaling_unit_input['asg_config'].image_id, 'ami-dc361ebf')
+    assert_equals(autoscaling_unit_input['asg_config'].instance_type, 't2.micro')
+    assert_equals(autoscaling_unit_input['elb_config'].elb_health_check, 'HTTP:80/index.html')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].instance_protocol, 'HTTP')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].loadbalancer_protocol, 'HTTP')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].loadbalancer_port, '80')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].instance_port, '80')
+    assert_equals(autoscaling_unit_input['asg_config'].minsize, '1')
+    assert_equals(autoscaling_unit_input['asg_config'].maxsize, '1')
+    assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
+    assert_equals(autoscaling_unit_input['asg_config'].sns_notification_types,
+                  ['autoscaling:EC2_INSTANCE_LAUNCH',
+                   'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
+                   'autoscaling:EC2_INSTANCE_TERMINATE',
+                   'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
+    assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
+    assert_equals(autoscaling_unit_input['dependencies'], None)
+
+
+@with_setup(setup_resources)
 def test_complete_valid_values():
     """
     Validate stack yaml value is a list of dictionaries
@@ -77,7 +146,6 @@ def test_complete_valid_values():
     assert_equals(len(stack_input['database_units']), 1)
 
     autoscaling_unit_input = stack_input['autoscaling_units'][0]
-
     # Assert autoscaling unit values are of type dict
     assert_equals(type(autoscaling_unit_input), dict)
 
@@ -93,10 +161,10 @@ def test_complete_valid_values():
     assert_equals(autoscaling_unit_input['asg_config'].image_id, 'ami-dc361ebf')
     assert_equals(autoscaling_unit_input['asg_config'].instance_type, 't2.micro')
     assert_equals(autoscaling_unit_input['elb_config'].elb_health_check, 'HTTP:80/index.html')
-    assert_list_equal(autoscaling_unit_input['elb_config'].instance_protocol, ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['elb_config'].loadbalancer_protocol, ['HTTP'])
-    assert_list_equal(autoscaling_unit_input['elb_config'].loadbalancer_port, ['80'])
-    assert_list_equal(autoscaling_unit_input['elb_config'].instance_port, ['80'])
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].instance_protocol, 'HTTP')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].loadbalancer_protocol, 'HTTP')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].loadbalancer_port, '80')
+    assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].instance_port, '80')
     assert_equals(autoscaling_unit_input['asg_config'].minsize, '1')
     assert_equals(autoscaling_unit_input['asg_config'].maxsize, '1')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
