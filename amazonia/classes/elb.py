@@ -22,7 +22,6 @@ class Elb(SecurityEnabledObject):
         self.network_config = network_config
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
         elb_listeners = elb_config.elb_listeners_config
-        print('elb_listeners={0}'.format(elb_listeners))
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets
 
         # Create ELB
