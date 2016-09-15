@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.10] - 16/09/2016
+- Implement Sticky Cookies for ELBs
+
 ## [1.3.9] - 14/09/2016
 - Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout
 - Refactor Cloudfront distributions
