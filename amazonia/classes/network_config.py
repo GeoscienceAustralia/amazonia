@@ -3,7 +3,7 @@
 
 class NetworkConfig(object):
     def __init__(self, public_cidr, vpc, public_subnets, private_subnets, nat, jump, keypair, cd_service_role_arn,
-                 public_hosted_zone_name, private_hosted_zone, nat_highly_available, nat_gateways):
+                 public_hosted_zone_name, private_hosted_zone, nat_highly_available, nat_gateways, sns_topic):
         """
         Simple config class to contain networking related parameters
         :param public_cidr: Public cidr pattern
@@ -18,6 +18,7 @@ class NetworkConfig(object):
         :param cd_service_role_arn: AWS IAM Role with Code Deploy permissions
         :param nat_highly_available: using a nat gateway instead of a NAT
         :param nat_gateways: use nat gateways instead of nat instance for depends on
+        :param sns_topic: SNS topic to send notifications to
         """
         self.public_cidr = public_cidr
         self.vpc = vpc
@@ -31,6 +32,7 @@ class NetworkConfig(object):
         self.cd_service_role_arn = cd_service_role_arn
         self.nat_highly_available = nat_highly_available
         self.nat_gateways = nat_gateways
+        self.sns_topic = sns_topic
 
     def get_depends_on(self):
         """

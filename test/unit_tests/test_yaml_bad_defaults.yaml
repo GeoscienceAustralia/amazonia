@@ -29,7 +29,6 @@ home_cidrs:
 public_hosted_zone_name:
 private_hosted_zone_name: 'private.lan.'
 owner_emails:
-nat_alerting: false
 iam_instance_profile_arn:
 zd_autoscaling_units:
 autoscaling_units:
@@ -98,12 +97,6 @@ asg_config: &asg_config
   health_check_type: 'ELB'
   block_devices_config:
   simple_scaling_policy_config:
-  sns_topic_arn:
-  sns_notification_types:
-    - 'autoscaling:EC2_INSTANCE_LAUNCH'
-    - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-    - 'autoscaling:EC2_INSTANCE_TERMINATE'
-    - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
   userdata: |
     #cloud-config
     repo_update: true

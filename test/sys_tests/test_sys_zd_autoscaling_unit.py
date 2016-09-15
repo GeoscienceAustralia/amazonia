@@ -7,6 +7,7 @@ from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 from troposphere import ec2, Ref, Template, Join, Tags
 
@@ -47,6 +48,7 @@ runcmd:
                                                        AvailabilityZone='ap-southeast-2a',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.2.0/24'))]
+    sns_topic = SNS(template)
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -55,10 +57,9 @@ runcmd:
         subnet=public_subnets[0],
         instance_dependencies=internet_gateway.title,
         is_nat=True,
-        alert=None,
-        alert_emails=None,
         public_hosted_zone_name=None,
-        iam_instance_profile_arn=None
+        iam_instance_profile_arn=None,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='nat',
                          template=template,
@@ -83,7 +84,8 @@ runcmd:
                                    cd_service_role_arn=cd_service_role_arn,
                                    keypair='pipeline',
                                    nat_highly_available=False,
-                                   nat_gateways=[])
+                                   nat_gateways=[],
+                                   sns_topic=sns_topic)
     elb_health_check = 'HTTP:80/index.html'
     healthy_threshold = 10
     unhealthy_threshold = 2
@@ -131,9 +133,7 @@ runcmd:
                            timeout=timeout,
                            sticky_app_cookies=sticky_app_cookies
                            )
-    blue_asg_config = AsgConfig(sns_topic_arn=None,
-                                sns_notification_types=None,
-                                health_check_grace_period=health_check_grace_period,
+    blue_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                 health_check_type=health_check_type,
                                 minsize=minsize,
                                 maxsize=maxsize,
@@ -143,9 +143,7 @@ runcmd:
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None)
-    green_asg_config = AsgConfig(sns_topic_arn=None,
-                                 sns_notification_types=None,
-                                 health_check_grace_period=health_check_grace_period,
+    green_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                  health_check_type=health_check_type,
                                  minsize=minsize,
                                  maxsize=maxsize,

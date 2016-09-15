@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from amazonia.classes.single_instance import SingleInstance
-from troposphere import ec2, Ref, Template
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from troposphere import ec2, Ref, Template
 
 
 def main():
@@ -21,8 +21,7 @@ def main():
         subnet=subnet,
         instance_dependencies=vpc.title,
         public_hosted_zone_name=None,
-        alert=False,
-        alert_emails=[],
+        sns_topic=None,
         is_nat=False,
         iam_instance_profile_arn=None
     )

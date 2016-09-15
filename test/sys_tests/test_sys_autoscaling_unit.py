@@ -8,6 +8,7 @@ from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from troposphere import ec2, Ref, Template, Join, Tags
 
 
@@ -47,6 +48,8 @@ runcmd:
                                                        AvailabilityZone='ap-southeast-2a',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.2.0/24'))]
+    sns_topic = SNS(template)
+
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -54,11 +57,10 @@ runcmd:
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=internet_gateway.title,
-        alert=None,
-        alert_emails=None,
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
-        is_nat=True
+        is_nat=True,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='nat',
                          template=template,
@@ -86,7 +88,8 @@ runcmd:
         keypair='pipeline',
         cd_service_role_arn=service_role_arn,
         nat_highly_available=False,
-        nat_gateways=[]
+        nat_gateways=[],
+        sns_topic=sns_topic
     )
 
     elb_listeners_config = [
@@ -134,8 +137,6 @@ runcmd:
         instance_type='t2.nano',
         userdata=userdata,
         iam_instance_profile_arn=None,
-        sns_topic_arn=None,
-        sns_notification_types=None,
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None
     )

@@ -59,9 +59,9 @@ runcmd:
                                                ebs_snapshot_id=None,
                                                virtual_name=False)]
     elb_listeners_config = [ElbListenersConfig(loadbalancer_protocol='HTTP',
-                                              instance_protocol='HTTP',
-                                              instance_port='80',
-                                              loadbalancer_port='80')]
+                                               instance_protocol='HTTP',
+                                               instance_port='80',
+                                               loadbalancer_port='80')]
 
     stack = Stack(
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
@@ -75,7 +75,7 @@ runcmd:
         nat_instance_type=instance_type,
         iam_instance_profile_arn=None,
         nat_alerting=False,
-        owner_emails=None,
+        owner_emails=[],
         home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         public_hosted_zone_name='gadevs.ga.',
@@ -102,8 +102,6 @@ runcmd:
                  image_id=app_image_id,
                  instance_type=instance_type,
                  iam_instance_profile_arn=None,
-                 sns_topic_arn=None,
-                 sns_notification_types=None,
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None
@@ -116,8 +114,6 @@ runcmd:
                  image_id=app_image_id,
                  instance_type=instance_type,
                  iam_instance_profile_arn=None,
-                 sns_topic_arn=None,
-                 sns_notification_types=None,
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None
@@ -133,8 +129,6 @@ runcmd:
                                 image_id=app_image_id,
                                 instance_type=instance_type,
                                 iam_instance_profile_arn=None,
-                                sns_topic_arn=None,
-                                sns_notification_types=None,
                                 userdata=userdata1,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None
@@ -161,8 +155,6 @@ runcmd:
                                 image_id=app_image_id,
                                 instance_type=instance_type,
                                 iam_instance_profile_arn=None,
-                                sns_topic_arn=None,
-                                sns_notification_types=None,
                                 userdata=userdata2,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None

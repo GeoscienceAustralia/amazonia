@@ -39,9 +39,7 @@ def main():
         DependsOn=internet_gateway.title
     ))
 
-    SNS(unit_title='test',
-        template=template,
-        display_name='display_name')
+    SNS(template=template)
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

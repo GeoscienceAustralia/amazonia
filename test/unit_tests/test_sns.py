@@ -1,6 +1,6 @@
 from nose.tools import *
 from amazonia.classes.sns import SNS
-from troposphere import Template
+from troposphere import Template, Join
 
 """
 Tests the functions of the SNS class
@@ -12,12 +12,10 @@ def test_sns():
     Test SNS object is created with the correct structure
     """
     template = Template()
-    title = 'test'
-    display_name = 'test_display_name'
 
-    sns_topic = SNS(unit_title=title, template=template, display_name=display_name)
+    sns_topic = SNS(template=template)
 
-    assert_equals(sns_topic.sns_topic.title, (title + 'sns').lower())
-    assert_equals(sns_topic.sns_topic.DisplayName, display_name)
+    assert_equals(sns_topic.trop_topic.title, 'SnsTopic')
+    assert_is(type(sns_topic.trop_topic.DisplayName), Join)
 
     assert_equals(len(template.outputs), 1)

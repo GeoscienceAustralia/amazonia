@@ -6,10 +6,11 @@ import re
 from amazonia.classes.elb import Elb
 from amazonia.classes.elb_config import ElbConfig
 from amazonia.classes.elb_listeners_config import ElbListenersConfig
+from amazonia.classes.hosted_zone import HostedZone
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.hosted_zone import HostedZone
+from amazonia.classes.sns import SNS
 from nose.tools import *
 from troposphere import ec2, Ref, Template
 
@@ -17,7 +18,7 @@ from troposphere import ec2, Ref, Template
 def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
                hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
-               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookies=['JSESSION','SESSIONTOKEN']):
+               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookies=None):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instance_port - port for traffic to instances from the load balancer
@@ -43,6 +44,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
                                  AvailabilityZone='ap-southeast-2a',
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
+    sns_topic = SNS(template)
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -51,10 +53,9 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
         subnet=public_subnets[0],
         instance_dependencies=vpc.title,
         is_nat=True,
-        alert=None,
-        alert_emails=None,
         public_hosted_zone_name=None,
-        iam_instance_profile_arn=None
+        iam_instance_profile_arn=None,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='Nat',
                          template=template,
@@ -72,7 +73,8 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=sns_topic
     )
 
     elb_listeners_config = [

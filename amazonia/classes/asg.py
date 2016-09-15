@@ -24,6 +24,7 @@ class Asg(SecurityEnabledObject):
 
         self.template = template
         self.title = title + 'Asg'
+        self.network_config = network_config
         self.trop_asg = None
         self.lc = None
         self.cd_app = None
@@ -75,14 +76,12 @@ class Asg(SecurityEnabledObject):
             )
         )
 
-        # Set up SNS topic for autoscaling events if an SNS topic arn is supplied
-        if asg_config.sns_topic_arn is not None:
-            if asg_config.sns_notification_types is not None and isinstance(asg_config.sns_notification_types, list):
-                self.trop_asg.NotificationConfigurations = [
-                    NotificationConfigurations(TopicARN=asg_config.sns_topic_arn,
-                                               NotificationTypes=asg_config.sns_notification_types)]
-            else:
-                raise MalformedSNSError('Error: sns_notification_types must be a non null list.')
+        self.trop_asg.NotificationConfigurations = [
+            NotificationConfigurations(TopicARN=Ref(network_config.sns_topic.trop_topic),
+                                       NotificationTypes=['autoscaling:EC2_INSTANCE_LAUNCH',
+                                                          'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
+                                                          'autoscaling:EC2_INSTANCE_TERMINATE',
+                                                          'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])]
 
         # if there are any scaling policies specified, create and associated with ASG
         if asg_config.simple_scaling_policy_config is not None:
@@ -132,7 +131,7 @@ class Asg(SecurityEnabledObject):
 
         # If block devices have been configured
         if asg_config.block_devices_config is not None:
-            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config)\
+            self.lc.BlockDeviceMappings = Bdm(launch_config_title, asg_config.block_devices_config) \
                 .block_device_mappings
 
         return launch_config_title
@@ -187,6 +186,24 @@ class Asg(SecurityEnabledObject):
             Statistic='Average',
             Threshold=scaling_policy_config.threshold
         )))
+        self.cw_alarms.append(self.template.add_resource(Alarm(
+            title=cf_name + 'Sns' + 'Cwa',
+            AlarmActions=[Ref(self.network_config.sns_topic.trop_topic.title)],
+            AlarmDescription=scaling_policy_config.description,
+            AlarmName=cf_name + 'Sns',
+            ComparisonOperator=scaling_policy_config.comparison_operator,
+            Dimensions=[MetricDimension(
+                Name='AutoScalingGroupName',
+                Value=Ref(self.trop_asg)
+            )],
+            EvaluationPeriods=scaling_policy_config.evaluation_periods,
+            MetricName=scaling_policy_config.metric_name,
+            Namespace='AWS/EC2',
+            Period=scaling_policy_config.period,
+            Statistic='Average',
+            Threshold=scaling_policy_config.threshold,
+            OKActions=[Ref(self.network_config.sns_topic.trop_topic.title)]
+        )))
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):
         """
@@ -235,8 +252,3 @@ class Asg(SecurityEnabledObject):
             ))
 
         return cd_app_title, cd_deploygroup_title
-
-
-class MalformedSNSError(Exception):
-    def __init__(self, value):
-        self.value = value

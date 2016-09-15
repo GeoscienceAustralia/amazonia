@@ -51,9 +51,7 @@ class YamlFields(object):
                                      ]
 
     # asg_config field list
-    asg_config_key_list = ['sns_topic_arn',
-                           'sns_notification_types',
-                           'health_check_grace_period',
+    asg_config_key_list = ['health_check_grace_period',
                            'health_check_type',
                            'minsize',
                            'maxsize',
@@ -191,8 +189,7 @@ class YamlFields(object):
         'lambda_units',
         'database_units',
         'iam_instance_profile_arn',
-        'owner_emails',
-        'nat_alerting'
+        'owner_emails'
     ]
 
     # autoscaling unit parameter field list

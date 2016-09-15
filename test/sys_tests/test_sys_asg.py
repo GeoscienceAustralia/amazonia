@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import troposphere.elasticloadbalancing as elb
+from amazonia.classes.sns import SNS
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
@@ -50,6 +51,7 @@ runcmd:
                                                                                    InstanceProtocol='HTTP')],
                                                            Scheme='internet-facing',
                                                            Subnets=[Ref(subnet) for subnet in subnets]))
+    sns_topic = SNS(template)
 
     class Single(object):
         def __init__(self):
@@ -67,7 +69,8 @@ runcmd:
         keypair='pipeline',
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
         nat_highly_available=False,
-        nat_gateways=[]
+        nat_gateways=[],
+        sns_topic=sns_topic
     )
 
     block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
@@ -119,11 +122,6 @@ runcmd:
         health_check_grace_period=300,
         health_check_type='ELB',
         iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
-        sns_topic_arn='arn:aws:sns:ap-southeast-2:123456789:test_sns_arn',
-        sns_notification_types=['autoscaling:EC2_INSTANCE_LAUNCH',
-                                'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                                'autoscaling:EC2_INSTANCE_TERMINATE',
-                                'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=simple_scaling_policy_config
     )

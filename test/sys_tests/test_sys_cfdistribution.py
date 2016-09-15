@@ -94,7 +94,7 @@ def main():
 
     CFDistributionUnit(unit_title='cfdist',
                        template=template,
-                       network_config=[],
+                       network_config=None,
                        cf_origins_config=origins,
                        cf_cache_behavior_config=cache_behavior,
                        cf_distribution_config=distribution_config)

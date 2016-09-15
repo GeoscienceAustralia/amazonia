@@ -4,7 +4,6 @@
 from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53, Base64
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from amazonia.classes.sns import SNS
 
 
 class SingleInstance(SecurityEnabledObject):
@@ -19,7 +18,7 @@ class SingleInstance(SecurityEnabledObject):
         """
 
         super(SingleInstance, self).__init__(vpc=single_instance_config.vpc, title=title, template=template)
-
+        self.sns_topic = single_instance_config.sns_topic
         region = single_instance_config.subnet.AvailabilityZone[:-1]
         userdata = """#cloud-config
 # Capture all cloud-config output into a more readable logfile
@@ -79,15 +78,9 @@ runcmd:
                 UserData=Base64(userdata)
             ))
 
-        if single_instance_config.is_nat and single_instance_config.alert and single_instance_config.alert_emails:
-            snsname = title + 'topic'
-            self.topic = SNS(title, self.template, snsname)
-
-            for email in single_instance_config.alert_emails:
-                self.topic.add_subscription(email, 'email')
-
+        if single_instance_config.is_nat:
             metric = 'CPUUtilization'
-            self.topic.add_alarm(
+            self.sns_topic.add_alarm(
                 description='Alarms when {0} metric {1} reaches {2}'.format(self.single.title, metric, '60'),
                 metric=metric,
                 namespace='AWS/EC2',
