@@ -171,26 +171,9 @@ class Asg(SecurityEnabledObject):
 
         self.cw_alarms.append(self.template.add_resource(Alarm(
             title=cf_name + 'Cwa',
-            AlarmActions=[Ref(scaling_policy)],
+            AlarmActions=[Ref(scaling_policy), Ref(self.network_config.sns_topic.trop_topic.title)],
             AlarmDescription=scaling_policy_config.description,
             AlarmName=cf_name,
-            ComparisonOperator=scaling_policy_config.comparison_operator,
-            Dimensions=[MetricDimension(
-                Name='AutoScalingGroupName',
-                Value=Ref(self.trop_asg)
-            )],
-            EvaluationPeriods=scaling_policy_config.evaluation_periods,
-            MetricName=scaling_policy_config.metric_name,
-            Namespace='AWS/EC2',
-            Period=scaling_policy_config.period,
-            Statistic='Average',
-            Threshold=scaling_policy_config.threshold
-        )))
-        self.cw_alarms.append(self.template.add_resource(Alarm(
-            title=cf_name + 'Sns' + 'Cwa',
-            AlarmActions=[Ref(self.network_config.sns_topic.trop_topic.title)],
-            AlarmDescription=scaling_policy_config.description,
-            AlarmName=cf_name + 'Sns',
             ComparisonOperator=scaling_policy_config.comparison_operator,
             Dimensions=[MetricDimension(
                 Name='AutoScalingGroupName',
