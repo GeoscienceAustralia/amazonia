@@ -40,6 +40,7 @@ class YamlFields(object):
                            'unhealthy_threshold',
                            'interval',
                            'timeout',
+                           'sticky_app_cookies'
                            ]
 
     # elb_listeners_config field list

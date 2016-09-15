@@ -58,10 +58,10 @@ runcmd:
                                                ebs_encrypted=False,
                                                ebs_snapshot_id=None,
                                                virtual_name=False)]
-    elb_listeners_config = ElbListenersConfig(loadbalancer_protocol='HTTP',
+    elb_listeners_config = [ElbListenersConfig(loadbalancer_protocol='HTTP',
                                               instance_protocol='HTTP',
                                               instance_port='80',
-                                              loadbalancer_port='80')
+                                              loadbalancer_port='80')]
 
     stack = Stack(
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
@@ -91,7 +91,8 @@ runcmd:
                  healthy_threshold=10,
                  unhealthy_threshold=2,
                  interval=300,
-                 timeout=30
+                 timeout=30,
+                 sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
@@ -147,7 +148,8 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30
+                                timeout=30,
+                                sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
                             ),
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
@@ -174,7 +176,8 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30
+                                timeout=30,
+                                sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
                             ),
                             'dependencies': []}
                            ],

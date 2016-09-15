@@ -68,6 +68,11 @@ elb_config: &elb_config
     timeout:
       nullable: True
       type: 'number'
+    sticky_app_cookies:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
 
 simple_scaling_policy_config: &simple_scaling_policy_config
   type: 'dict'

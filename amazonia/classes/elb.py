@@ -22,7 +22,6 @@ class Elb(SecurityEnabledObject):
         self.network_config = network_config
         super(Elb, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
         elb_listeners = elb_config.elb_listeners_config
-        print('elb_listeners={0}'.format(elb_listeners))
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets
 
         # Create ELB
@@ -45,6 +44,19 @@ class Elb(SecurityEnabledObject):
                              Subnets=[Ref(x) for x in subnets],
                              Tags=Tags(Name=self.title),
                              DependsOn=network_config.get_depends_on()))
+
+        if elb_config.sticky_app_cookies:
+            sticky_app_cookies = []
+
+            for number, sticky_app_cookie in enumerate(elb_config.sticky_app_cookies):
+                policy_name = self.title + 'AppCookiePolicy' + str(number)
+
+                sticky_app_cookies.append(elb.AppCookieStickinessPolicy(
+                    CookieName=sticky_app_cookie,
+                    PolicyName=policy_name
+                ))
+
+            self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookies
 
         # Create SSL for Listeners
         for listener in self.trop_elb.Listeners:
