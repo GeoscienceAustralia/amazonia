@@ -69,7 +69,7 @@ class Stack(object):
         self.jump_instance_type = jump_instance_type
         self.nat_image_id = nat_image_id
         self.nat_instance_type = nat_instance_type
-        self.owner_emails = owner_emails
+        self.owner_emails = owner_emails if owner_emails else []
         self.nat_highly_available = nat_highly_available
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []

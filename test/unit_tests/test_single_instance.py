@@ -57,7 +57,7 @@ def test_nat_single_instance():
     assert_equals(si.single.IamInstanceProfile, 'instance-profile')
     assert_equals(si.sns_topic.trop_topic.title, title)
     assert_is(type(si.sns_topic.trop_topic.DisplayName), Join)
-    assert_is(type(si.template.outputs[title].Description), Join)
+    assert_equals(si.template.outputs[title].Description, 'SNS Topic')
     assert_equals(si.sns_topic.trop_topic.Subscription[0].title, title + 'Subscription0')
     assert_equals(si.sns_topic.trop_topic.Subscription[0].Endpoint, 'some@email.com')
     assert_equals(si.sns_topic.trop_topic.Subscription[0].Protocol, 'email')
