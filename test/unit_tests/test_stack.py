@@ -16,7 +16,7 @@ from troposphere import Tags, Ref
 
 userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = public_cidr = \
     minsize = maxsize = elb_health_check = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
-    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = nat_alerting = \
+    health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = \
     db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = \
     elb_listeners_config = healthy_threshold = unhealthy_threshold = interval = timeout = None
 
@@ -32,7 +32,7 @@ def setup_resources():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
-        unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, nat_alerting, \
+        unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, \
         db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, \
         elb_listeners_config, healthy_threshold, unhealthy_threshold, interval, timeout, sticky_app_cookies
     userdata = """#cloud-config
@@ -70,7 +70,6 @@ runcmd:
     health_check_grace_period = 300
     health_check_type = 'ELB'
     owner_emails = ['some@email.com']
-    nat_alerting = False
 
     db_instance_type = 'db.m1.small'
     db_engine = 'postgres'
@@ -157,7 +156,7 @@ def test_highly_available_nat_stack():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
-        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
+        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, db_backup_window, \
         db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
         unhealthy_threshold, interval, timeout, sticky_app_cookies
 
@@ -176,7 +175,6 @@ def test_highly_available_nat_stack():
         private_hosted_zone_name='private.lan.',
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
-        nat_alerting=nat_alerting,
         nat_highly_available=True,
         zd_autoscaling_units=[],
         autoscaling_units=[],
@@ -247,7 +245,6 @@ def test_duplicate_unit_names():
         'private_hosted_zone_name': 'private.lan.',
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
-        'nat_alerting': nat_alerting,
         'nat_highly_available': False,
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
@@ -319,7 +316,7 @@ def create_stack():
     global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
         public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
-        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, nat_alerting, db_backup_window, \
+        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, db_backup_window, \
         db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
         unhealthy_threshold, interval, timeout, elb_listeners_config, sticky_app_cookies
 
@@ -338,7 +335,6 @@ def create_stack():
         private_hosted_zone_name='priavte.lan.',
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
-        nat_alerting=nat_alerting,
         nat_highly_available=False,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(

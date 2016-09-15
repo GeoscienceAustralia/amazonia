@@ -22,7 +22,7 @@ class Stack(object):
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, public_hosted_zone_name,
                  private_hosted_zone_name, iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
-                 nat_alerting, nat_highly_available):
+                 nat_highly_available):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -52,7 +52,6 @@ class Stack(object):
         :param private_hosted_zone_name: name of private hosted zone to create
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
-        :param nat_alerting: True/False for whether or not to alert on the nat instance status.
         :param nat_highly_available: True/False for whether or not to use a series of NAT gateways or a single NAT
         """
 
@@ -71,7 +70,6 @@ class Stack(object):
         self.nat_image_id = nat_image_id
         self.nat_instance_type = nat_instance_type
         self.owner_emails = owner_emails
-        self.nat_alerting = nat_alerting
         self.nat_highly_available = nat_highly_available
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
