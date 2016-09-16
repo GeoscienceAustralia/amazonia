@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.3.10] - 16/09/2016
 - Implement Sticky Cookies for ELBs
+- Implement single, non-configurable SNS topic to use with all stack alerts
 
 ## [1.3.9] - 14/09/2016
 - Add extra configuration for ELBs - healthy/unhealthy thresholds, interval, timeout

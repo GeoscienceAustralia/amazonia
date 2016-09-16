@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from amazonia.classes.sns import SNS
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.api_gateway_unit import ApiGatewayUnit
@@ -76,6 +77,8 @@ def main():
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
 
+    sns_topic = SNS(template)
+
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -83,8 +86,7 @@ def main():
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=vpc.title,
-        alert=False,
-        alert_emails=['some@email.com'],
+        sns_topic=sns_topic,
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         is_nat=True
@@ -107,7 +109,8 @@ def main():
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=sns_topic
     )
 
     lambda_config = LambdaConfig(

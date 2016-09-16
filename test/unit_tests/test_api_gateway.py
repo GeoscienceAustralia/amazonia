@@ -6,6 +6,7 @@ from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from nose.tools import *
 from troposphere import Template, ec2, Ref, Join, Tags
 
@@ -36,7 +37,7 @@ def setup_resources():
     selection_pattern = ''
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_request_config():
     """
     Tests the creation of a request config
@@ -47,7 +48,7 @@ def test_request_config():
     assert_equals(request.parameters, request_parameters)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_response_config():
     """
     Tests the creation of a response config
@@ -61,7 +62,7 @@ def test_response_config():
     assert_equals(response.models, response_models)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_method_config():
     """
     Tests the creation of a method config
@@ -78,7 +79,7 @@ def test_method_config():
     assert_equals(method.authorizationtype, authorizationtype)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_creation_of_api():
     """
     Tests the creation of an api
@@ -93,7 +94,7 @@ def test_creation_of_api():
     assert_equals(api.api.Name, apiname)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_creation_of_method():
     """
     Tests the creation of a method
@@ -128,7 +129,7 @@ def test_creation_of_method():
     assert_equals(method_response.ResponseParameters, response_parameters)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_creation_of_integration():
     """
     Tests the creation of an integration
@@ -160,7 +161,7 @@ def test_creation_of_integration():
     assert_equals(integration_response.ResponseTemplates, response_template)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def test_creation_of_deployment():
     """
     Tests the creation of a demployment
@@ -190,7 +191,7 @@ def test_creation_of_deployment():
     assert_equals(len(api.endpoints), len(api.deployments))
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def create_request_config():
     """
     Create a request config
@@ -201,7 +202,7 @@ def create_request_config():
                                    parameters=request_parameters)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def create_response_config():
     """
     Create a response config
@@ -215,7 +216,7 @@ def create_response_config():
                                     models=response_models)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def create_method_config(request, responses):
     """
     Creates a method config object, stitching together the request and reponses that are passed in
@@ -232,7 +233,7 @@ def create_method_config(request, responses):
                                   authorizationtype=authorizationtype)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def create_api(method_config):
     """
     Creates an API object using a method_config object
@@ -243,7 +244,7 @@ def create_api(method_config):
     return ApiGatewayUnit(apiname, template, [method_config], None, None)
 
 
-@with_setup(setup_resources())
+@with_setup(setup_resources)
 def add_lambda(num):
     """
     Creates a lambda function to use with the api gateway
@@ -276,6 +277,7 @@ def add_lambda(num):
                                  AvailabilityZone='ap-southeast-2a',
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
+    sns_topic = SNS(template)
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -283,11 +285,10 @@ def add_lambda(num):
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=vpc.title,
-        alert=False,
-        alert_emails=['some@email.com'],
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
-        is_nat=True
+        is_nat=True,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='Nat' + num,
                          template=template,
@@ -306,7 +307,8 @@ def add_lambda(num):
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=sns_topic
     )
 
     lambda_config = LambdaConfig(

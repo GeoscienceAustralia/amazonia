@@ -22,7 +22,6 @@ home_cidrs:
 public_hosted_zone_name: 'test.org.'
 private_hosted_zone_name: 'private.lan.'
 owner_emails:
-nat_alerting: false
 iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
 
 zd_autoscaling_units:
@@ -36,12 +35,6 @@ zd_autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      sns_topic_arn: 'sns_topic_arn'
-      sns_notification_types:
-        - 'autoscaling:EC2_INSTANCE_LAUNCH'
-        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
       userdata: |
         #cloud-config
         repo_update: true
@@ -68,12 +61,6 @@ zd_autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      sns_topic_arn: 'sns_topic_arn'
-      sns_notification_types:
-        - 'autoscaling:EC2_INSTANCE_LAUNCH'
-        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
       simple_scaling_policy_config:
         -
           name: 'heavy load'
@@ -138,12 +125,6 @@ autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      sns_topic_arn: 'sns_topic_arn'
-      sns_notification_types:
-        - 'autoscaling:EC2_INSTANCE_LAUNCH'
-        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
       userdata: |
         #cloud-config
         repo_update: true
@@ -185,12 +166,6 @@ autoscaling_units:
       maxsize: '1'
       health_check_grace_period: '300'
       health_check_type: 'ELB'
-      sns_topic_arn: 'sns_topic_arn'
-      sns_notification_types:
-        - 'autoscaling:EC2_INSTANCE_LAUNCH'
-        - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE'
-        - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
       simple_scaling_policy_config:
         -
           name: 'heavy - load'

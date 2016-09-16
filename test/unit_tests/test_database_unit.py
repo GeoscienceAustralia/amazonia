@@ -1,7 +1,7 @@
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit, InvalidFlowError
-from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.hosted_zone import HostedZone
+from amazonia.classes.network_config import NetworkConfig
 from nose.tools import *
 from troposphere import ec2, Ref, Tags, Template, Join
 
@@ -36,6 +36,7 @@ def setup_resources():
                                                         VpcId=Ref(vpc),
                                                         CidrBlock='10.0.3.0/24'))]
     private_hosted_zone = HostedZone(vpcs=[vpc], template=template, domain='private.lan.')
+
     network_config = NetworkConfig(
         public_cidr=None,
         vpc=vpc,
@@ -48,7 +49,8 @@ def setup_resources():
         cd_service_role_arn=None,
         keypair=None,
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=None
     )
 
     database_config = DatabaseConfig(

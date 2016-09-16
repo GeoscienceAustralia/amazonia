@@ -9,6 +9,7 @@ from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from amazonia.classes.subnet import Subnet
 from amazonia.classes.util import get_cf_friendly_name
 from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
@@ -21,7 +22,7 @@ class Stack(object):
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, public_hosted_zone_name,
                  private_hosted_zone_name, iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
-                 nat_alerting, nat_highly_available):
+                 nat_highly_available):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -51,7 +52,6 @@ class Stack(object):
         :param private_hosted_zone_name: name of private hosted zone to create
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
-        :param nat_alerting: True/False for whether or not to alert on the nat instance status.
         :param nat_highly_available: True/False for whether or not to use a series of NAT gateways or a single NAT
         """
 
@@ -69,8 +69,7 @@ class Stack(object):
         self.jump_instance_type = jump_instance_type
         self.nat_image_id = nat_image_id
         self.nat_instance_type = nat_instance_type
-        self.owner_emails = owner_emails
-        self.nat_alerting = nat_alerting
+        self.owner_emails = owner_emails if owner_emails else []
         self.nat_highly_available = nat_highly_available
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
@@ -97,6 +96,7 @@ class Stack(object):
         self.private_route = None
         self.public_route = None
         self.network_config = None
+        self.sns_topic = None
 
         self.setup_vpc()
 
@@ -177,6 +177,11 @@ class Stack(object):
                                               is_public=True,
                                               cidr=self.generate_subnet_cidr(is_public=True)).trop_subnet)
 
+        self.sns_topic = SNS(self.template)
+
+        for email in self.owner_emails:
+            self.sns_topic.add_subscription(email, 'email')
+
         jump_config = SingleInstanceConfig(
             keypair=self.keypair,
             si_image_id=self.jump_image_id,
@@ -186,9 +191,8 @@ class Stack(object):
             public_hosted_zone_name=self.public_hosted_zone_name,
             instance_dependencies=self.gateway_attachment.title,
             iam_instance_profile_arn=self.iam_instance_profile_arn,
-            alert_emails=self.owner_emails,
-            alert=self.nat_alerting,
-            is_nat=False
+            is_nat=False,
+            sns_topic=self.sns_topic
         )
 
         # Add Jumpbox and NAT and associated security group ingress and egress rules
@@ -233,9 +237,8 @@ class Stack(object):
                 is_nat=True,
                 instance_dependencies=self.gateway_attachment.title,
                 iam_instance_profile_arn=self.iam_instance_profile_arn,
-                alert_emails=self.owner_emails,
-                alert=self.nat_alerting,
-                public_hosted_zone_name=None
+                public_hosted_zone_name=None,
+                sns_topic=self.sns_topic
             )
 
             self.nat = SingleInstance(
@@ -267,7 +270,8 @@ class Stack(object):
                                             private_hosted_zone=self.private_hosted_zone,
                                             keypair=self.keypair,
                                             cd_service_role_arn=self.code_deploy_service_role,
-                                            nat_gateways=self.nat_gateways)
+                                            nat_gateways=self.nat_gateways,
+                                            sns_topic=self.sns_topic)
 
     def add_units(self, unit_list, unit_constructor):
         for unit in unit_list:  # type: dict

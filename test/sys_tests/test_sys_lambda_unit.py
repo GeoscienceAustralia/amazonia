@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
-from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.lambda_config import LambdaConfig
+from amazonia.classes.lambda_unit import LambdaUnit
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from troposphere import ec2, Ref, Tags, Template
 
 
@@ -38,6 +39,7 @@ def main():
                                                        AvailabilityZone='ap-southeast-2a',
                                                        VpcId=Ref(vpc),
                                                        CidrBlock='10.0.2.0/24'))]
+    sns_topic = SNS(template)
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -45,11 +47,10 @@ def main():
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=internet_gateway.title,
-        alert=None,
-        alert_emails=None,
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
-        is_nat=True
+        is_nat=True,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='nat',
                          template=template,
@@ -68,7 +69,8 @@ def main():
         keypair=None,
         cd_service_role_arn=None,
         nat_highly_available=False,
-        nat_gateways=[]
+        nat_gateways=[],
+        sns_topic=sns_topic
     )
 
     lambda_config = LambdaConfig(

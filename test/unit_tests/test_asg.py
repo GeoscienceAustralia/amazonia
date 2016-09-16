@@ -1,13 +1,13 @@
 import troposphere.elasticloadbalancing as elb
+from amazonia.classes.asg import Asg
+from amazonia.classes.asg_config import AsgConfig
+from amazonia.classes.block_devices_config import BlockDevicesConfig
+from amazonia.classes.network_config import NetworkConfig
+from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
+from amazonia.classes.sns import SNS
 from nose.tools import *
 from troposphere import ec2, Ref, Template, Join, Base64
 from troposphere.policies import AutoScalingRollingUpdate
-
-from amazonia.classes.asg import Asg, MalformedSNSError
-from amazonia.classes.asg_config import AsgConfig
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.block_devices_config import BlockDevicesConfig
-from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 
 template = asg_config = elb_config = network_config = load_balancer = None
 
@@ -77,9 +77,6 @@ runcmd:
         iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
         image_id='ami-dc361ebf',
         instance_type='t2.micro',
-        sns_topic_arn='arn:aws:sns:ap-southeast-2:1234567890:test_service_status',
-        sns_notification_types=['autoscaling:EC2_INSTANCE_LAUNCH', 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                                'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'],
         maxsize=1,
         minsize=1,
         block_devices_config=block_devices_config,
@@ -98,6 +95,7 @@ runcmd:
         def __init__(self):
             self.single = ec2.Instance('title')
 
+    sns_topic = SNS(template)
     network_config = NetworkConfig(
         vpc=ec2.VPC('MyVPC',
                     CidrBlock='10.0.0.0/16'),
@@ -111,7 +109,8 @@ runcmd:
         keypair='pipeline',
         cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=sns_topic
     )
 
     load_balancer = elb.LoadBalancer('testElb',
@@ -149,8 +148,7 @@ def test_asg():
         assert_equals(asg.trop_asg.HealthCheckType, 'ELB')
         assert_equals(asg.trop_asg.HealthCheckGracePeriod, 300)
         assert_not_equal(asg.trop_asg.NotificationConfigurations, None)
-        assert_equals(asg.trop_asg.NotificationConfigurations[0].TopicARN,
-                      'arn:aws:sns:ap-southeast-2:1234567890:test_service_status')
+        assert_is(type(asg.trop_asg.NotificationConfigurations[0].TopicARN), Ref)
         assert_list_equal(asg.trop_asg.NotificationConfigurations[0].NotificationTypes,
                           ['autoscaling:EC2_INSTANCE_LAUNCH', 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                            'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
@@ -203,22 +201,6 @@ def test_no_userdata():
     asg = create_asg('nouserdata')
 
     assert_equals(asg.lc.UserData, '')
-
-
-@with_setup(setup_resources)
-def test_malformed_sns():
-    """
-    Test that an asg raises an error if SNS parameters are passed in malformed
-    """
-    global template, network_config, asg_config
-
-    asg_config.sns_notification_types = None
-    assert_raises(MalformedSNSError, Asg, **{'title': 'testsns',
-                                             'template': template,
-                                             'load_balancers': [load_balancer],
-                                             'network_config': network_config,
-                                             'asg_config': asg_config
-                                             })
 
 
 def create_asg(title):

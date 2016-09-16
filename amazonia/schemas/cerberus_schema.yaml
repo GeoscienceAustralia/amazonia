@@ -135,14 +135,6 @@ asg_config: &asg_config
   type: 'dict'
   nullable: True
   schema:
-    sns_topic_arn: # A string containing the IAM role for SNS topics by it's ARN.
-      type: 'string'
-      nullable: True
-    sns_notification_types: # A list of strings containing the notification types for SNS topics
-      type: 'list'
-      nullable: True
-      schema:
-        type: 'string'
     health_check_grace_period:  # A string containing the amount of seconds for your load balancer to wait for new instances before checking if they are 'healthy' or not.
       type: 'string'
       nullable: True
@@ -511,10 +503,6 @@ owner_emails:  # A list of email addresses to specify ownership of this stack an
   schema:
     type: 'string'
     empty: False
-nat_alerting: # A True/False advising whether or not to alert on the NAT instance to the owner_emails list.
-  type: 'boolean'
-  nullable: False
-  empty: False
 nat_highly_available: # A True/False advising whether or not to use a single NAT instance or a series of NAT gateways
   type: 'boolean'
   nullable: False

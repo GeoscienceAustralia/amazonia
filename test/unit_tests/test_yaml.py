@@ -94,11 +94,6 @@ def test_basic_values():
     assert_equals(autoscaling_unit_input['asg_config'].minsize, '1')
     assert_equals(autoscaling_unit_input['asg_config'].maxsize, '1')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
-    assert_equals(autoscaling_unit_input['asg_config'].sns_notification_types,
-                  ['autoscaling:EC2_INSTANCE_LAUNCH',
-                   'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                   'autoscaling:EC2_INSTANCE_TERMINATE',
-                   'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
     assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
     assert_equals(autoscaling_unit_input['dependencies'], None)
 
@@ -170,12 +165,6 @@ def test_complete_valid_values():
     assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
     assert_equals(autoscaling_unit_input['asg_config'].iam_instance_profile_arn,
                   'arn:aws:iam::1234567890124:role/InstanceProfile')
-    assert_equals(autoscaling_unit_input['asg_config'].sns_topic_arn, 'sns_topic_arn')
-    assert_equals(autoscaling_unit_input['asg_config'].sns_notification_types,
-                  ['autoscaling:EC2_INSTANCE_LAUNCH',
-                   'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
-                   'autoscaling:EC2_INSTANCE_TERMINATE',
-                   'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
     assert_equals(autoscaling_unit_input['elb_config'].elb_log_bucket, 'elb_log_bucket')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
     assert_list_equal(autoscaling_unit_input['dependencies'], ['app2', 'db1'])

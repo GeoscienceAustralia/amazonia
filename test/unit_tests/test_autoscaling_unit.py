@@ -6,6 +6,7 @@ from amazonia.classes.elb_listeners_config import ElbListenersConfig
 from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
+from amazonia.classes.sns import SNS
 from nose.tools import *
 from troposphere import ec2, Ref, Template
 
@@ -28,6 +29,7 @@ def setup_resources():
                                  AvailabilityZone='ap-southeast-2a',
                                  VpcId=Ref(vpc),
                                  CidrBlock='10.0.2.0/24')]
+    sns_topic = SNS(template)
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
@@ -35,11 +37,10 @@ def setup_resources():
         vpc=vpc,
         subnet=public_subnets[0],
         instance_dependencies=vpc.title,
-        alert=False,
-        alert_emails=['some@email.com'],
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
-        is_nat=True
+        is_nat=True,
+        sns_topic=sns_topic
     )
     nat = SingleInstance(title='Nat',
                          template=template,
@@ -64,7 +65,8 @@ def setup_resources():
         cd_service_role_arn='instance-iam-role-InstanceProfile-OGL42SZSIQRK',
         keypair='pipeline',
         nat_highly_available=False,
-        nat_gateways=None
+        nat_gateways=None,
+        sns_topic=sns_topic
     )
 
     block_devices_config = [BlockDevicesConfig(
@@ -94,8 +96,6 @@ runcmd:
         instance_type='t2.nano',
         maxsize=1,
         minsize=1,
-        sns_topic_arn=None,
-        sns_notification_types=None,
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None
     )

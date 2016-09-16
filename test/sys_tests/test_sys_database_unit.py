@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from amazonia.classes.sns import SNS
 from amazonia.classes.database_config import DatabaseConfig
 from amazonia.classes.database_unit import DatabaseUnit
 from amazonia.classes.network_config import NetworkConfig
@@ -33,6 +34,7 @@ def main():
                                                         VpcId=Ref(vpc),
                                                         CidrBlock='10.0.3.0/24'))]
     private_hosted_zone = HostedZone(vpcs=[vpc], template=template, domain='private.lan.')
+    sns_topic = SNS(template)
     network_config = NetworkConfig(
         public_subnets=None,
         vpc=vpc,
@@ -45,7 +47,8 @@ def main():
         keypair=None,
         cd_service_role_arn=None,
         nat_highly_available=False,
-        nat_gateways=[]
+        nat_gateways=[],
+        sns_topic=sns_topic
     )
 
     database_config = DatabaseConfig(
