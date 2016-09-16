@@ -88,13 +88,15 @@ def main():
             instance_port='80',
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies = ['JSESSION80', 'SESSIONTOKEN80']
         ),
         ElbListenersConfig(
             instance_port='8080',
             loadbalancer_port='8080',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=['JSESSION8080', 'SESSIONTOKEN8080']
         )
     ]
 
@@ -107,8 +109,7 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30,
-        sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+        timeout=30
     )
     elb_config2 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -119,8 +120,7 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30,
-        sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+        timeout=30
     )
     elb_config3 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -131,8 +131,7 @@ def main():
         healthy_threshold=10,
         unhealthy_threshold=2,
         interval=300,
-        timeout=30,
-        sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+        timeout=30
     )
 
     Elb(title='MyUnit1',

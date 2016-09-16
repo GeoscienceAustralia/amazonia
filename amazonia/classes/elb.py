@@ -45,18 +45,21 @@ class Elb(SecurityEnabledObject):
                              Tags=Tags(Name=self.title),
                              DependsOn=network_config.get_depends_on()))
 
-        if elb_config.sticky_app_cookies:
-            sticky_app_cookies = []
-
-            for number, sticky_app_cookie in enumerate(elb_config.sticky_app_cookies):
-                policy_name = self.title + 'AppCookiePolicy' + str(number)
-
-                sticky_app_cookies.append(elb.AppCookieStickinessPolicy(
-                    CookieName=sticky_app_cookie,
+        # App sticky session cookies
+        sticky_app_cookie_policies = []
+        for listener_num, listener in enumerate(elb_listeners):
+            policy_names = []
+            for cookie_num, cookie_name in enumerate(listener.sticky_app_cookies):
+                policy_name = self.title + 'AppCookiePolicy' + cookie_name + str(cookie_num) \
+                                                + str(listener.instance_port) + str(listener.loadbalancer_port) \
+                                                + str(listener.instance_protocol)
+                policy_names.append(policy_name)
+                sticky_app_cookie_policies.append(elb.AppCookieStickinessPolicy(
+                    CookieName=cookie_name,
                     PolicyName=policy_name
                 ))
-
-            self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookies
+            self.trop_elb.Listeners[listener_num].PolicyNames = policy_names
+        self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookie_policies
 
         # Create SSL for Listeners
         for listener in self.trop_elb.Listeners:

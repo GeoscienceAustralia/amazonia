@@ -34,7 +34,7 @@ def setup_resources():
         elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
         unit_image_id, db_instance_type, db_engine, db_port, db_hdd_size, owner_emails, \
         db_backup_window, db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, \
-        elb_listeners_config, healthy_threshold, unhealthy_threshold, interval, timeout, sticky_app_cookies
+        elb_listeners_config, healthy_threshold, unhealthy_threshold, interval, timeout
     userdata = """#cloud-config
 repo_update: true
 repo_upgrade: all
@@ -100,7 +100,8 @@ runcmd:
             instance_port='80',
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=sticky_app_cookies
         )]
 
 
@@ -268,8 +269,7 @@ def test_duplicate_unit_names():
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout,
-                                   sticky_app_cookies=sticky_app_cookies
+                                   timeout=timeout
                                ),
                                'dependencies': [],
                                },
@@ -283,8 +283,7 @@ def test_duplicate_unit_names():
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout,
-                                   sticky_app_cookies=sticky_app_cookies
+                                   timeout=timeout
                                ),
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -346,8 +345,7 @@ def create_stack():
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout,
-                                   sticky_app_cookies=sticky_app_cookies
+                                   timeout=timeout
                                ),
                                'blue_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -385,8 +383,7 @@ def create_stack():
                                 healthy_threshold=healthy_threshold,
                                 unhealthy_threshold=unhealthy_threshold,
                                 interval=interval,
-                                timeout=timeout,
-                                sticky_app_cookies=sticky_app_cookies
+                                timeout=timeout
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,
@@ -412,8 +409,7 @@ def create_stack():
                                 healthy_threshold=healthy_threshold,
                                 unhealthy_threshold=unhealthy_threshold,
                                 interval=interval,
-                                timeout=timeout,
-                                sticky_app_cookies=sticky_app_cookies
+                                timeout=timeout
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,

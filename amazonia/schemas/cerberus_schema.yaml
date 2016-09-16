@@ -29,6 +29,11 @@ elb_listeners_config: &elb_listeners_config
     loadbalancer_port: # a list of strings specifying the ports to receive traffic on the load balancer for this specific autoscaling group.
       type: 'string'
       nullable: True
+    sticky_app_cookies:
+      type: 'list'
+      nullable: True
+      schema:
+        type: 'string'
 
 elb_config: &elb_config
   type: 'dict'
@@ -68,11 +73,6 @@ elb_config: &elb_config
     timeout:
       nullable: True
       type: 'number'
-    sticky_app_cookies:
-      type: 'list'
-      nullable: True
-      schema:
-        type: 'string'
 
 simple_scaling_policy_config: &simple_scaling_policy_config
   type: 'dict'
