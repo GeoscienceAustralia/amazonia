@@ -39,15 +39,15 @@ class YamlFields(object):
                            'healthy_threshold',
                            'unhealthy_threshold',
                            'interval',
-                           'timeout',
-                           'sticky_app_cookies'
+                           'timeout'
                            ]
 
     # elb_listeners_config field list
     elb_listeners_config_key_list = ['instance_protocol',
                                      'loadbalancer_protocol',
                                      'instance_port',
-                                     'loadbalancer_port'
+                                     'loadbalancer_port',
+                                     'sticky_app_cookies'
                                      ]
 
     # asg_config field list

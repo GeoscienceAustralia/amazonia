@@ -103,7 +103,8 @@ runcmd:
             instance_port='8080',
             loadbalancer_port='8080',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
         )
     ]
 
@@ -116,7 +117,6 @@ runcmd:
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
-        sticky_app_cookies=['JSESSION', 'SESSIONTOKEN'],
         elb_listeners_config=elb_listeners_config
     )
 

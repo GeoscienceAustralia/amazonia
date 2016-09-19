@@ -88,7 +88,8 @@ runcmd:
             instance_port='80',
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
         )]
 
     elb_config = ElbConfig(elb_log_bucket=None,
@@ -99,8 +100,7 @@ runcmd:
                            healthy_threshold=10,
                            unhealthy_threshold=2,
                            interval=300,
-                           timeout=30,
-                           sticky_app_cookies=['JSESSION', 'SESSIONTOKEN'])
+                           timeout=30)
     common_asg_config = AsgConfig(
         minsize=1,
         maxsize=1,

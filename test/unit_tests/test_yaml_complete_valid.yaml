@@ -107,6 +107,8 @@ zd_autoscaling_units:
           instance_protocol: 'HTTP'
           instance_port: '80'
           loadbalancer_port: '80'
+          sticky_app_cookies:
+            - 'JSESSION'
       elb_health_check: 'HTTP:80/index.html'
       elb_log_bucket: 'elb_log_bucket'
       public_unit: true

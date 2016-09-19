@@ -82,7 +82,8 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
             instance_port=instance_port,
             loadbalancer_port=loadbalancer_port,
             loadbalancer_protocol=loadbalancer_protocol,
-            instance_protocol=instance_protocol
+            instance_protocol=instance_protocol,
+            sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
         )
     ]
     elb_config = ElbConfig(
@@ -94,8 +95,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
         healthy_threshold=healthy_threshold,
         unhealthy_threshold=unhealthy_threshold,
         interval=interval,
-        timeout=timeout,
-        sticky_app_cookies=sticky_app_cookies
+        timeout=timeout
     )
 
     elb = Elb(title='elb',

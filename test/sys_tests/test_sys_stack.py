@@ -90,8 +90,7 @@ runcmd:
                  healthy_threshold=10,
                  unhealthy_threshold=2,
                  interval=300,
-                 timeout=30,
-                 sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+                 timeout=30
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
@@ -141,8 +140,7 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30,
-                                sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+                                timeout=30
                             ),
                             'dependencies': ['app2', 'db1']},
                            {'unit_title': 'app2',
@@ -167,8 +165,7 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30,
-                                sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+                                timeout=30
                             ),
                             'dependencies': []}
                            ],
