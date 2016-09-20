@@ -276,7 +276,7 @@ def test_cf_distribution_config():
     enabled = True
     price_class = 'PriceClass_All'
     error_page_path = 'index.html'
-    acm_cert_arn = 'arn.acm.certificate'
+    acm_cert_arn = 'arn:aws:cloudfront::123456789012:distribution/ABCD1234EFGH56'
     minimum_protocol_version = 'TLSv1'
     ssl_support_method = 'sni-only'
 
@@ -298,8 +298,5 @@ def test_cf_distribution_config():
     assert_equal(default_root_object, helper_cf_dist.default_root_object)
     assert_equal(enabled, helper_cf_dist.enabled)
     assert_equal(price_class, helper_cf_dist.price_class)
+    assert_equal(acm_cert_arn, helper_cf_dist.acm_cert_arn)
     assert_equal(error_page_path, helper_cf_dist.error_page_path)
-#
-# def test_multiple_default_cache_behaviors():
-#
-#     assert_raises(CloudfrontConfigError, )

@@ -87,7 +87,7 @@ def main():
         enabled=True,
         price_class='PriceClass_All',
         error_page_path='index.html',
-        acm_cert_arn='',
+        acm_cert_arn='arn:aws:cloudfront::123456789012:distribution/ABCD1234EFGH56',
         minimum_protocol_version='TLSv1',
         ssl_support_method='sni-only'
     )
