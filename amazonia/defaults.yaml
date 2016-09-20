@@ -149,7 +149,7 @@ cf_distribution_config:
   enabled: True
   price_class: 'PriceClass_All'
   error_page_path: '404.html'
-  acm_cert_arn: ''
+  acm_cert_arn: 
   minimum_protocol_version: 'TLSv1'
   ssl_support_method: 'sni-only'
 

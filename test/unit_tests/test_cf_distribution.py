@@ -276,7 +276,7 @@ def test_cf_distribution_config():
     enabled = True
     price_class = 'PriceClass_All'
     error_page_path = 'index.html'
-    acm_cert_arn = 'arn:aws:cloudfront::123456789012:distribution/ABCD1234EFGH56'
+    acm_cert_arn = 'arn:aws:acm:us-east-1:123456789012:certificate/12345678-abcd-efgh-1234-abcd12345678'
     minimum_protocol_version = 'TLSv1'
     ssl_support_method = 'sni-only'
 

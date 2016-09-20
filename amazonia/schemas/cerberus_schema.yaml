@@ -253,6 +253,7 @@ cf_distribution_config: &cf_distribution_config
     acm_cert_arn:
       type: 'string'
       nullable: True
+      regex: 'arn:aws:acm:us-east-1:\w+:certificate\/.*'
     minimum_protocol_version:
       type: 'string'
       nullable: True
