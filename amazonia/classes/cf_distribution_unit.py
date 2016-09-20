@@ -43,6 +43,12 @@ class CFDistributionUnit(object):
             PriceClass=cf_distribution_config.price_class
         )
 
+        if cf_distribution_config.acm_cert_arn:
+            self.cf_dist.ViewerCertificate = cloudfront.ViewerCertificate(
+                AcmCertificateArn=cf_distribution_config.acm_cert_arn,
+                SslSupportMethod='sni-only'
+            )
+
         self.cf_dist = template.add_resource(cloudfront.Distribution(
             self.title,
             DistributionConfig=self.cf_dist
