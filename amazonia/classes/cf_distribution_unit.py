@@ -103,9 +103,8 @@ class CFDistributionUnit(object):
                     custom_origin_config.HTTPSPort=origin.https_port
                 if origin.origin_protocol_policy:
                     custom_origin_config.OriginProtocolPolicy=origin.origin_protocol_policy
-                # TODO: Uncomment when pip troposphere supports OriginSSLProtocols
-                #if origin.origin_ssl_protocols:
-                    #custom_origin_config.OriginSSLProtocols=origin.origin_ssl_protocols
+                if origin.origin_ssl_protocols:
+                    custom_origin_config.OriginSSLProtocols=origin.origin_ssl_protocols
 
                 # Set CustomOrigin
                 created_origin.CustomOriginConfig=custom_origin_config
