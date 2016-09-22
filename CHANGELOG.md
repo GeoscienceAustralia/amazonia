@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.14] - 23/09/2016
+- Update Cloudfront unit flow to refer to API Gateways and ELBs
+
 ## [1.3.13] - 21/09/2016
 - Add support for ACM certificates to Cloudfront distributions
 
