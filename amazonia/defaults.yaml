@@ -71,7 +71,7 @@ elb_listeners_config: &elb_listeners_config
     instance_protocol: 'HTTP'
     instance_port: '80'
     loadbalancer_port: '80'
-    sticky_app_cookies:
+    sticky_app_cookie:
 
 # ELB default values
 elb_config:

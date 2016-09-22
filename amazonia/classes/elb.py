@@ -47,19 +47,25 @@ class Elb(SecurityEnabledObject):
 
         # App sticky session cookies
         sticky_app_cookie_policies = []
-        for listener_num, listener in enumerate(elb_listeners):
-            policy_names = []
-            for cookie_num, cookie_name in enumerate(listener.sticky_app_cookies):
-                policy_name = self.title + 'AppCookiePolicy' + cookie_name + str(cookie_num) \
-                                                + str(listener.instance_port) + str(listener.loadbalancer_port) \
-                                                + str(listener.instance_protocol)
-                policy_names.append(policy_name)
-                sticky_app_cookie_policies.append(elb.AppCookieStickinessPolicy(
-                    CookieName=cookie_name,
-                    PolicyName=policy_name
-                ))
-            self.trop_elb.Listeners[listener_num].PolicyNames = policy_names
-        self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookie_policies
+        # sticky_app_cookie defaults to None, gather listeners that have cookies
+        listeners_with_cookies = [listener for listener in elb_listeners if listener.sticky_app_cookie]
+
+        for listener_num, listener in enumerate(listeners_with_cookies):
+            policy_name = self.title + 'AppCookiePolicy' + listener.sticky_app_cookie \
+                          + str(listener.instance_port) + str(listener.loadbalancer_port) \
+                          + str(listener.instance_protocol)
+
+            sticky_app_cookie_policies.append(elb.AppCookieStickinessPolicy(
+                CookieName=listener.sticky_app_cookie,
+                PolicyName=policy_name
+            ))
+
+            # Even though ELB.Listeners.PolicyNames is a List in the cloudformation documentation,
+            # it only accepts a single list element, not multiple...
+            self.trop_elb.Listeners[listener_num].PolicyNames = [policy_name]
+
+        if sticky_app_cookie_policies:
+            self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookie_policies
 
         # Create SSL for Listeners
         for listener in self.trop_elb.Listeners:
