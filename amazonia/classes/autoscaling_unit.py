@@ -14,6 +14,7 @@ class AutoscalingUnit(object):
         :param dependencies: list of unit names this unit needs access to
         :param network_config: object containing
         """
+        self.title = unit_title
         self.template = template
         self.public_cidr = network_config.public_cidr
         self.loadbalancer_ports = [listener.loadbalancer_port for listener in elb_config.elb_listeners_config]

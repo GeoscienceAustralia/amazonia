@@ -1,4 +1,4 @@
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
@@ -455,9 +455,21 @@ def create_stack():
                                     }
                                 ),
                                     CFOriginsConfig(
-                                        domain_name=
-                                        'amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
-                                        origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
+                                        domain_name='app1',
+                                        origin_id='www-elb',
+                                        origin_path='/path',
+                                        custom_headers={},
+                                        origin_policy={
+                                            'is_s3': False,
+                                            'origin_protocol_policy': 'https-only',
+                                            'http_port': 80,
+                                            'https_port': 443,
+                                            'origin_ssl_protocols': ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
+                                        }
+                                    ),
+                                    CFOriginsConfig(
+                                        domain_name='validYamlTestAPIGW',
+                                        origin_id='www-elb2',
                                         origin_path='/path',
                                         custom_headers={},
                                         origin_policy={
@@ -512,11 +524,11 @@ def create_stack():
                                     )
                                 ]
                                 }],
-        api_gateway_units=[{'unit_title': 'test',
+        api_gateway_units=[{'unit_title': 'validYamlTestAPIGW',
                             'method_config': [
                                 ApiGatewayMethodConfig(
                                     method_name='login',
-                                    lambda_unit='lambda1',
+                                    lambda_unit='validYamlTestLambda',
                                     httpmethod='POST',
                                     authorizationtype='NONE',
                                     request_config=ApiGatewayRequestConfig(
@@ -532,9 +544,14 @@ def create_stack():
                                     )]
                                 )
                             ],
-                            'deployment_config': []
+                            'deployment_config': [
+                                ApiGatewayDeploymentConfig(
+                                    apiname='test',
+                                    stagename='TEST'
+                                )
+                            ]
                             }],
-        lambda_units=[{'unit_title': 'lambda1',
+        lambda_units=[{'unit_title': 'validYamlTestLambda',
                        'dependencies': ['db1'],
                        'lambda_config': LambdaConfig(
                            lambda_s3_bucket='bucket_name',

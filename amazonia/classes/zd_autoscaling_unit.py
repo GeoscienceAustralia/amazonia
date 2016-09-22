@@ -19,6 +19,7 @@ class ZdAutoscalingUnit(object):
         :param blue_asg_config: configuration specific to the blue asg
         :param green_asg_config: configuration specific to the green asg
         """
+        self.title = unit_title
         self.template = template
         self.public_cidr = network_config.public_cidr
         self.dependencies = dependencies if dependencies else []

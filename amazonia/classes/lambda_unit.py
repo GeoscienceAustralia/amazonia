@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.security_enabled_object import SecurityEnabledObject
-from troposphere import Ref, GetAtt
+from troposphere import Ref, GetAtt, Join
 from troposphere.awslambda import Code, VPCConfig, Function, Permission
 from troposphere.events import Rule, Target
 
@@ -18,17 +18,22 @@ class LambdaUnit(SecurityEnabledObject):
         :param network_config: object containing network related variables
         :param lambda_config: object containing lambda related variablea
         """
-        self.title = unit_title + 'Lambda'
+        self.title = unit_title
+        self.cf_title = self.title + 'Lambda'
         self.public_cidr = network_config.public_cidr
         self.dependencies = dependencies if dependencies else []
+
+        self.function_name = Join('', [Ref('AWS::StackName'),
+                                         '-',
+                                       lambda_config.lambda_function_name])
 
         super(LambdaUnit, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
 
         self.trop_lambda_function = template.add_resource(
-            Function(self.title,
+            Function(self.cf_title,
                      Code=Code(S3Bucket=lambda_config.lambda_s3_bucket, S3Key=lambda_config.lambda_s3_key),
                      Description=lambda_config.lambda_description,
-                     FunctionName=lambda_config.lambda_function_name,
+                     FunctionName=self.function_name,
                      Handler=lambda_config.lambda_handler,
                      MemorySize=lambda_config.lambda_memory_size,
                      Role=lambda_config.lambda_role_arn,
@@ -44,10 +49,14 @@ class LambdaUnit(SecurityEnabledObject):
 
         if lambda_config.lambda_schedule:
 
+            self.cwa_name = Join('', [Ref('AWS::StackName'),
+                                           '-',
+                                           lambda_config.lambda_function_name + 'Rule'])
+
             self.trop_cw_rule = template.add_resource(
                 Rule(
-                    self.title + 'Rule',
-                    Name=unit_title + 'Rule',
+                    self.cf_title + 'Rule',
+                    Name= self.cwa_name,
                     ScheduleExpression=lambda_config.lambda_schedule,
                     State='ENABLED',
                     Targets=[Target(

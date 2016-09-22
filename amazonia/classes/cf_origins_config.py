@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from troposphere import GetAtt
 
 class CFOriginsConfig(object):
     def __init__(self, domain_name, origin_id, origin_path, custom_headers, origin_policy):
@@ -29,7 +30,6 @@ class CFOriginsConfig(object):
             # Set S3 origin variables
 
             self.origin_access_identity = origin_policy['origin_access_identity']
-
         else:
             # Check if custom origin variables exist, and set them if they do
             self.origin_protocol_policy = origin_policy['origin_protocol_policy']

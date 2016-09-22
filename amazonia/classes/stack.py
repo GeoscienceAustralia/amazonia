@@ -119,6 +119,7 @@ class Stack(object):
         self.add_units(self.lambda_units, LambdaUnit)
 
         # Add Unit flow
+        # TODO: Add unit not found error try/catch
         for unit_name in self.units:
             dependencies = self.units[unit_name].get_dependencies()
             for dependency in dependencies:
