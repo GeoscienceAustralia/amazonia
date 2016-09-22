@@ -89,14 +89,14 @@ def main():
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
             instance_protocol='HTTP',
-            sticky_app_cookies = ['JSESSION80', 'SESSIONTOKEN80']
+            sticky_app_cookie='JSESSION'
         ),
         ElbListenersConfig(
             instance_port='8080',
             loadbalancer_port='8080',
             loadbalancer_protocol='HTTP',
             instance_protocol='HTTP',
-            sticky_app_cookies=['JSESSION8080', 'SESSIONTOKEN8080']
+            sticky_app_cookie='SESSIONTOKEN'
         )
     ]
 

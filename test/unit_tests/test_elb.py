@@ -18,7 +18,7 @@ from troposphere import ec2, Ref, Template
 def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
                hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
                elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
-               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookies=None):
+               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookie='SESSIONTOKEN'):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instance_port - port for traffic to instances from the load balancer
@@ -30,7 +30,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
     :param ssl_certificate_id: SSL Certificate to attach to elb for https using AWS Certificate Manager
-    :param sticky_app_cookies: List of application cookies used for stickiness
+    :param sticky_app_cookie: List of application cookies used for stickiness
     :return: Troposphere object for Elb
     """
     template = Template()
@@ -83,7 +83,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
             loadbalancer_port=loadbalancer_port,
             loadbalancer_protocol=loadbalancer_protocol,
             instance_protocol=instance_protocol,
-            sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+            sticky_app_cookie='JSESSION'
         )
     ]
     elb_config = ElbConfig(
@@ -275,15 +275,21 @@ def test_interval():
     assert_equals(interval, helper_elb.trop_elb.HealthCheck.Interval)
     assert_equals(timeout, helper_elb.trop_elb.HealthCheck.Timeout)
 
+
 def test_sticky_app_cookies():
     """
     Test to determine that sticky app cookies are set correctly
     """
-    sticky_app_cookies = ['JSESSION','SESSIONTOKEN']
+    sticky_app_cookie = 'JSESSION'
 
-    helper_elb = create_elb(sticky_app_cookies=sticky_app_cookies)
+    helper_elb = create_elb(sticky_app_cookie=sticky_app_cookie)
 
-    # combine sticky_app_cookies list values with the trop_elb cookies, and check if equal
-    trop_cookies = [sticky_app_cookie.CookieName for sticky_app_cookie in helper_elb.trop_elb.AppCookieStickinessPolicy]
-    for a, b in zip(sticky_app_cookies, trop_cookies):
-        assert_equals(a, b)
+    elb_policy_name = helper_elb.trop_elb.AppCookieStickinessPolicy[0].PolicyName
+    elb_cookie_name = helper_elb.trop_elb.AppCookieStickinessPolicy[0].CookieName
+    listener_policy_name = helper_elb.trop_elb.Listeners[0].PolicyNames[0]
+
+    # elb.AppCookieStickinessPolicy has the expected cookie name
+    assert_equals(elb_cookie_name, sticky_app_cookie)
+
+    # elb.listener should have a policy name which equals the policy name in the elb AppCookieStickinessPolicy
+    assert_equals(listener_policy_name, elb_policy_name)
