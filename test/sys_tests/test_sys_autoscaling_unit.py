@@ -104,7 +104,7 @@ runcmd:
             loadbalancer_port='8080',
             loadbalancer_protocol='HTTP',
             instance_protocol='HTTP',
-            sticky_app_cookies=['JSESSION', 'SESSIONTOKEN']
+            sticky_app_cookie='JSESSION'
         )
     ]
 

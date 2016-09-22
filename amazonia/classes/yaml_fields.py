@@ -47,7 +47,7 @@ class YamlFields(object):
                                      'loadbalancer_protocol',
                                      'instance_port',
                                      'loadbalancer_port',
-                                     'sticky_app_cookies'
+                                     'sticky_app_cookie'
                                      ]
 
     # asg_config field list

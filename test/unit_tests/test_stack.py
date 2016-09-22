@@ -65,7 +65,7 @@ runcmd:
     unhealthy_threshold = 2
     interval = 300
     timeout = 30
-    sticky_app_cookies = ['JSESSION','SESSIONTOKEN']
+    sticky_app_cookie='JSESSION'
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
@@ -101,7 +101,7 @@ runcmd:
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
             instance_protocol='HTTP',
-            sticky_app_cookies=sticky_app_cookies
+            sticky_app_cookie=sticky_app_cookie
         )]
 
 
