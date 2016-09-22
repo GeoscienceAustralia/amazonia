@@ -9,10 +9,10 @@ class ElbListenersConfig(object):
         :param loadbalancer_protocol: loadbalancer_protocol for world to communicate with ELB
         :param instance_port: ports for ELB and webserver to communicate via
         :param loadbalancer_port: ports for public and ELB to communicate via
-        :param sticky_app_cookie: list of sticky app cookie names
+        :param sticky_app_cookie: name sticky app cookie
         """
         self.instance_protocol = instance_protocol
         self.loadbalancer_protocol = loadbalancer_protocol
         self.instance_port = instance_port
         self.loadbalancer_port = loadbalancer_port
-        self.sticky_app_cookie = sticky_app_cookie if sticky_app_cookie else ""
+        self.sticky_app_cookie = sticky_app_cookie if sticky_app_cookie else None

@@ -47,7 +47,10 @@ class Elb(SecurityEnabledObject):
 
         # App sticky session cookies
         sticky_app_cookie_policies = []
-        for listener_num, listener in enumerate(elb_listeners):
+        # sticky_app_cookie defaults to None, gather listeners that have cookies
+        listeners_with_cookies = [listener for listener in elb_listeners if listener.sticky_app_cookie]
+
+        for listener_num, listener in enumerate(listeners_with_cookies):
             policy_name = self.title + 'AppCookiePolicy' + listener.sticky_app_cookie \
                           + str(listener.instance_port) + str(listener.loadbalancer_port) \
                           + str(listener.instance_protocol)
@@ -58,10 +61,11 @@ class Elb(SecurityEnabledObject):
             ))
 
             # Even though ELB.Listeners.PolicyNames is a List in the cloudformation documentation,
-            # it only accepts a single list element
+            # it only accepts a single list element, not multiple...
             self.trop_elb.Listeners[listener_num].PolicyNames = [policy_name]
 
-        self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookie_policies
+        if sticky_app_cookie_policies:
+            self.trop_elb.AppCookieStickinessPolicy = sticky_app_cookie_policies
 
         # Create SSL for Listeners
         for listener in self.trop_elb.Listeners:

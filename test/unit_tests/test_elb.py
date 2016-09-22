@@ -30,7 +30,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
     :param hosted_zone_name: Route53 hosted zone ID
     :param public_unit: Boolean to determine if the elb scheme will be internet-facing or private
     :param ssl_certificate_id: SSL Certificate to attach to elb for https using AWS Certificate Manager
-    :param sticky_app_cookie: List of application cookies used for stickiness
+    :param sticky_app_cookie: Name of application cookie used for stickiness
     :return: Troposphere object for Elb
     """
     template = Template()
@@ -83,7 +83,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
             loadbalancer_port=loadbalancer_port,
             loadbalancer_protocol=loadbalancer_protocol,
             instance_protocol=instance_protocol,
-            sticky_app_cookie='JSESSION'
+            sticky_app_cookie=sticky_app_cookie
         )
     ]
     elb_config = ElbConfig(
@@ -293,3 +293,9 @@ def test_sticky_app_cookies():
 
     # elb.listener should have a policy name which equals the policy name in the elb AppCookieStickinessPolicy
     assert_equals(listener_policy_name, elb_policy_name)
+
+    # make sure it doesn't create empty policies
+    empty_app_cookie = ''
+    elb_with_no_sticky_cookies = create_elb(sticky_app_cookie=empty_app_cookie)
+    with assert_raises(AttributeError) as context:
+        elb_with_no_sticky_cookies.trop_elb.AppCookieStickinessPolicy
