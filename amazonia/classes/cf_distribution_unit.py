@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
-from troposphere import cloudfront
-
+from troposphere import cloudfront, GetAtt
+from amazonia.classes.api_gateway_unit import ApiGatewayUnit
+from amazonia.classes.autoscaling_unit import AutoscalingUnit
+from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
 
 class CFDistributionUnit(object):
     def __init__(self, unit_title, template, network_config, cf_origins_config, cf_cache_behavior_config,
@@ -21,6 +23,7 @@ class CFDistributionUnit(object):
         self.title = unit_title + 'CFDist'
         self.network_config = network_config
         self.dependencies = []
+        self.custom_origins = {}
         self.origins = []
         self.cache_behaviors = []
         self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
@@ -93,6 +96,8 @@ class CFDistributionUnit(object):
                 created_origin.S3OriginConfig=s3_origin_config
             # Set Custom config
             else:
+                self.dependencies.append(origin.domain_name)
+                self.custom_origins[origin.domain_name] = created_origin
                 # Create CustomOrigin
                 custom_origin_config = cloudfront.CustomOrigin()
 
@@ -176,6 +181,26 @@ class CFDistributionUnit(object):
         :return: returns an empty list as a cfdistribution has no upstream dependencies
         """
         return self.dependencies
+
+    def add_unit_flow(self, other_unit):
+        if other_unit.title not in self.custom_origins:
+            raise CloudfrontConfigError('Could not find origin {0} in Cloudfront Distribution {1}'
+                                        .format(other_unit.title, self.title))
+
+        if isinstance(other_unit, ApiGatewayUnit):
+            if not other_unit.endpoints:
+                raise CloudfrontConfigError('Custom origin {0} must have at least one endpoint'
+                                            .format(other_unit.title))
+            else:
+              self.custom_origins[other_unit.title].DomainName = other_unit.endpoints[0]
+        elif isinstance(other_unit, AutoscalingUnit):
+            self.custom_origins[other_unit.title].DomainName =  GetAtt(other_unit.elb.trop_elb, 'DNSName')
+        elif isinstance(other_unit, ZdAutoscalingUnit):
+            self.custom_origins[other_unit.title].DomainName = GetAtt(other_unit.prod_elb.trop_elb, 'DNSName')
+        else:
+            raise CloudfrontConfigError(
+                'Custom Origin {0} of Cloudfront Distribution {1} type must be of unit type ApiGatewayUnit, '
+                'AutoscalingUnit, ZDAutoscalingUnit'.format(other_unit.title, self.title))
 
 
 class CloudfrontConfigError(Exception):

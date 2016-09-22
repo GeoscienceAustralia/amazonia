@@ -190,9 +190,11 @@ class ApiGatewayUnit(object):
         Creates a method that points at the other_unit object (other_unit should be a lambda_unit)
         :param other_unit: for this class, other unit should always be a lambda unit
         """
+        # TODO: Test to ensure unit is a lambda
         lambda_title = other_unit.trop_lambda_function.title
 
         for method in self.method_config:
+            # TODO: Add separate field to represent lambda title
             if method.lambda_unit == lambda_title[:-6]:
                 resource = self.create_resource(method)
                 self.get_responses(method)
