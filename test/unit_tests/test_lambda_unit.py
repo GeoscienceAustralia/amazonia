@@ -5,7 +5,7 @@ from amazonia.classes.single_instance import SingleInstance
 from amazonia.classes.single_instance_config import SingleInstanceConfig
 from amazonia.classes.sns import SNS
 from nose.tools import *
-from troposphere import ec2, Ref, Tags, Template
+from troposphere import ec2, Ref, Tags, Template, Join
 
 template = network_config = lambda_config = None
 
@@ -118,7 +118,7 @@ def test_lambda():
     assert_equals(my_lambda.trop_lambda_function.Code.S3Bucket, 'bucket_name')
     assert_equals(my_lambda.trop_lambda_function.Code.S3Key, 'key_name')
     assert_equals(my_lambda.trop_lambda_function.Description, 'blah')
-    assert_equals(my_lambda.trop_lambda_function.FunctionName, 'my_function')
+    assert_is(type(my_lambda.trop_lambda_function.FunctionName), Join)
     assert_equals(my_lambda.trop_lambda_function.Handler, 'main')
     assert_equals(my_lambda.trop_lambda_function.MemorySize, 128)
     assert_equals(my_lambda.trop_lambda_function.Role, 'test_arn')

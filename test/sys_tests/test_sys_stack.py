@@ -61,7 +61,8 @@ runcmd:
     elb_listeners_config = [ElbListenersConfig(loadbalancer_protocol='HTTP',
                                                instance_protocol='HTTP',
                                                instance_port='80',
-                                               loadbalancer_port='80')]
+                                               loadbalancer_port='80',
+                                               sticky_app_cookies=[])]
 
     stack = Stack(
         code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',

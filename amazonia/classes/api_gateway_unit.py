@@ -3,6 +3,7 @@
 from troposphere import Ref, Join, GetAtt, Output
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
 from troposphere.apigateway import Deployment
+from amazonia.classes.lambda_unit import LambdaUnit
 
 
 class ApiGatewayUnit(object):
@@ -190,15 +191,16 @@ class ApiGatewayUnit(object):
         Creates a method that points at the other_unit object (other_unit should be a lambda_unit)
         :param other_unit: for this class, other unit should always be a lambda unit
         """
-        # TODO: Test to ensure unit is a lambda
-        lambda_title = other_unit.trop_lambda_function.title
+        if not isinstance(other_unit, LambdaUnit):
+            raise ApiGatewayConfigError('Api Gateway method {0} must be of type LambdaUnit'
+                                        .format(other_unit.title))
+        lambda_title = other_unit.title
 
         for method in self.method_config:
-            # TODO: Add separate field to represent lambda title
-            if method.lambda_unit == lambda_title[:-6]:
+            if method.lambda_unit == lambda_title:
                 resource = self.create_resource(method)
                 self.get_responses(method)
-                integration = self.create_integration(method, GetAtt(lambda_title, 'Arn'))
+                integration = self.create_integration(method, GetAtt(other_unit.trop_lambda_function, 'Arn'))
                 self.add_method(resource, integration, method)
 
         if self.deployment_config:
@@ -210,3 +212,7 @@ class ApiGatewayUnit(object):
         :return: list of other unit's this unit is dependant upon
         """
         return self.dependencies
+
+class ApiGatewayConfigError(Exception):
+    def __init__(self, value):
+        self.value = value

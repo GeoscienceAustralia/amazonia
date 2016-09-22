@@ -91,7 +91,7 @@ runcmd:
     unhealthy_threshold = 2
     interval = 300
     timeout = 30
-    sticky_app_cookies = ['JSESSION', 'SESSIONTOKEN']
+    sticky_app_cookies = ['JSESSION']
     minsize = 1
     maxsize = 1
     health_check_grace_period = 300
@@ -105,13 +105,15 @@ runcmd:
             instance_port='80',
             loadbalancer_port='80',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=sticky_app_cookies
         ),
         ElbListenersConfig(
             instance_port='8080',
             loadbalancer_port='8080',
             loadbalancer_protocol='HTTP',
-            instance_protocol='HTTP'
+            instance_protocol='HTTP',
+            sticky_app_cookies=[]
         )
     ]
 
@@ -130,8 +132,7 @@ runcmd:
                            healthy_threshold=healthy_threshold,
                            unhealthy_threshold=unhealthy_threshold,
                            interval=interval,
-                           timeout=timeout,
-                           sticky_app_cookies=sticky_app_cookies
+                           timeout=timeout
                            )
     blue_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                 health_check_type=health_check_type,
