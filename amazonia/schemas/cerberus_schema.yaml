@@ -575,10 +575,10 @@ request_config: &request_config # The config for a request to be used in an api 
   schema:
     templates:
       type: 'dict'
-      nullable: False
+      nullable: True
     parameters:
       type: 'dict'
-      nullable: False
+      nullable: True
 
 response_config: &response_config # A list of responses to be used in an api object
   type: 'dict'
@@ -586,10 +586,10 @@ response_config: &response_config # A list of responses to be used in an api obj
   schema:
     templates:
       type: 'dict'
-      nullable: False
+      nullable: True
     parameters:
       type: 'dict'
-      nullable: False
+      nullable: True
     selectionpattern:
       type: 'string'
       nullable: True
@@ -598,7 +598,7 @@ response_config: &response_config # A list of responses to be used in an api obj
       nullable: False
     models:
       type: 'dict'
-      nullable: False
+      nullable: True
 
 method_config: &method_config # The config for an api method
   type: 'dict'

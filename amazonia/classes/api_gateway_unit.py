@@ -3,6 +3,7 @@
 from troposphere import Ref, Join, GetAtt, Output
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
 from troposphere.apigateway import Deployment
+from troposphere.awslambda import Permission
 
 
 class ApiGatewayUnit(object):
@@ -35,6 +36,7 @@ class ApiGatewayUnit(object):
         self.method_config = method_config
         self.deployment_config = deployment_config
         self.endpoints = []
+        self.permissions = []
 
         self.api = self.template.add_resource(RestApi(
                                                       '{0}API'.format(self.title),
@@ -64,13 +66,12 @@ class ApiGatewayUnit(object):
         """
         Creates an integration object using a single provided ApiGatewayMethodConfig object.
         :param method_config: a single ApiGatewayMethodConfig object
-        :param lambda_arn: the ARN of a lambda function to point this integration at.
+        :param lambda_title: the ARN of a lambda function to point this integration at.
         :return: a troposphere integration object
         """
 
         integration = Integration(
                                   '{0}Integration'.format(method_config.method_name),
-                                  Credentials='',
                                   Type='AWS',
                                   IntegrationHttpMethod=method_config.httpmethod,
                                   IntegrationResponses=self.integration_responses,
@@ -83,6 +84,15 @@ class ApiGatewayUnit(object):
                                               ]
                                           )
                                  )
+
+        perm = self.template.add_resource(Permission(
+            '{0}Permission'.format(integration.title),
+            Action='lambda:InvokeFunction',
+            FunctionName=lambda_arn,
+            Principal='apigateway.amazonaws.com'
+        ))
+
+        self.permissions.append(perm)
 
         # At time of creation of this class, the PassthroughBehavior parameter is not implemented for integrations
         # in troposphere. The below assigns it for now. This can be reworked into the above troposphere object once
@@ -101,24 +111,27 @@ class ApiGatewayUnit(object):
         self.integration_responses = []
 
         for number, response in enumerate(method_config.responses):
-            self.method_responses.append(
-                MethodResponse(
+            methodresponse = MethodResponse(
                                '{0}Response{1}'.format(method_config.method_name, number),
-                               StatusCode=response.statuscode,
-                               ResponseModels=response.models,
-                               ResponseParameters=response.parameters
+                               StatusCode=response.statuscode
                               )
-            )
 
-            self.integration_responses.append(
-                IntegrationResponse(
+            if response.models:
+                methodresponse.ResponseModels = response.models
+
+            integrationResponse = IntegrationResponse(
                                     '{0}IntegrationResponse{1}'.format(method_config.method_name, number),
                                     StatusCode=response.statuscode,
-                                    ResponseParameters=response.parameters,
                                     ResponseTemplates=response.templates,
                                     SelectionPattern=response.selectionpattern
                                    )
-            )
+
+            if response.parameters:
+                methodresponse.ResponseParameters = response.parameters
+                integrationResponse.ResponseParameters = response.parameters
+
+            self.integration_responses.append(integrationResponse)
+            self.method_responses.append(methodresponse)
 
     def add_method(self, resource, integration, method_config):
         """
@@ -136,8 +149,10 @@ class ApiGatewayUnit(object):
                              HttpMethod=method_config.httpmethod,
                              Integration=integration,
                              MethodResponses=self.method_responses,
-                             RequestParameters=method_config.request.parameters
                              )
+
+        if method_config.request.parameters:
+            method.RequestParameters = method_config.request.parameters
 
         self.method_responses = []
         self.integration_responses = []
