@@ -9,7 +9,6 @@ class Subnet(object):
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
         Troposphere - https://github.com/cloudtools/troposphere/blob/master/troposphere/ec2.py
         :param template: Troposhere template object
-        :param stack_title: Stack title from stack class
         :param cidr: cidr for subnet
         :param vpc: VPC to create subnet in
         :param route_table: Public or private route table object from stack
@@ -28,7 +27,7 @@ class Subnet(object):
         subnet_title = self.pub_or_pri + 'Subnet' + az[-1:].upper()
         self.trop_subnet = self.template.add_resource(ec2.Subnet(subnet_title,
                                                                  AvailabilityZone=self.az,
-                                                                 VpcId=Ref(self.vpc),
+                                                                 VpcId=self.vpc,
                                                                  CidrBlock=self.cidr,
                                                                  Tags=Tags(Name=Join('',
                                                                                      [Ref('AWS::StackName'),

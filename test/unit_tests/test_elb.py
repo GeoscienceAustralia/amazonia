@@ -4,21 +4,16 @@
 import re
 
 from amazonia.classes.elb import Elb
-from amazonia.classes.elb_config import ElbConfig
-from amazonia.classes.elb_listeners_config import ElbListenersConfig
-from amazonia.classes.hosted_zone import HostedZone
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.sns import SNS
+from amazonia.classes.elb_config import ElbConfig, ElbListenersConfig
+from network_setup import get_network_config
 from nose.tools import *
-from troposphere import ec2, Ref, Template
+from troposphere import Ref
 
 
 def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol='HTTP', instance_protocol='HTTP',
-               hosted_zone_name=None, elb_health_check='HTTP:80/index.html',
-               elb_log_bucket=None, public_unit=True, ssl_certificate_id=None, healthy_threshold=10,
-               unhealthy_threshold=2, interval=300, timeout=30, sticky_app_cookie='SESSIONTOKEN'):
+               hosted_zone_name=None, elb_health_check='HTTP:80/index.html', elb_log_bucket=None, public_unit=True,
+               ssl_certificate_id=None, healthy_threshold=10, unhealthy_threshold=2, interval=300, timeout=30,
+               sticky_app_cookie='SESSIONTOKEN'):
     """
     Helper function to create Elb Troposhpere object to interate through.
     :param instance_port - port for traffic to instances from the load balancer
@@ -33,50 +28,8 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
     :param sticky_app_cookie: Name of application cookie used for stickiness
     :return: Troposphere object for Elb
     """
-    template = Template()
-    vpc = ec2.VPC('MyVPC',
-                  CidrBlock='10.0.0.0/16')
-    private_subnets = [ec2.Subnet('MySubnet',
-                                  AvailabilityZone='ap-southeast-2a',
-                                  VpcId=Ref(vpc),
-                                  CidrBlock='10.0.1.0/24')]
-    public_subnets = [ec2.Subnet('MySubnet2',
-                                 AvailabilityZone='ap-southeast-2a',
-                                 VpcId=Ref(vpc),
-                                 CidrBlock='10.0.2.0/24')]
-    sns_topic = SNS(template)
-    single_instance_config = SingleInstanceConfig(
-        keypair='pipeline',
-        si_image_id='ami-53371f30',
-        si_instance_type='t2.nano',
-        vpc=vpc,
-        subnet=public_subnets[0],
-        instance_dependencies=vpc.title,
-        is_nat=True,
-        public_hosted_zone_name=None,
-        iam_instance_profile_arn=None,
-        sns_topic=sns_topic
-    )
-    nat = SingleInstance(title='Nat',
-                         template=template,
-                         single_instance_config=single_instance_config)
-    private_hosted_zone = HostedZone(vpcs=[vpc], template=template, domain='private.lan.')
-    network_config = NetworkConfig(
-        vpc=vpc,
-        public_subnets=public_subnets,
-        jump=None,
-        nat=nat,
-        private_subnets=private_subnets,
-        public_cidr=None,
-        public_hosted_zone_name=hosted_zone_name,
-        private_hosted_zone=private_hosted_zone,
-        cd_service_role_arn=None,
-        keypair=None,
-        nat_highly_available=False,
-        nat_gateways=None,
-        sns_topic=sns_topic
-    )
-
+    network_config, template = get_network_config()
+    network_config.public_hosted_zone_name = hosted_zone_name
     elb_listeners_config = [
         ElbListenersConfig(
             instance_port=instance_port,
@@ -99,7 +52,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
     )
 
     elb = Elb(title='elb',
-              template=Template(),
+              template=template,
               network_config=network_config,
               elb_config=elb_config)
     return elb

@@ -13,12 +13,12 @@ def main():
     private_subnets = []
     public_subnets = []
 
-    vpc = template.add_resource(ec2.VPC('MyVPC',
-                                        CidrBlock='10.0.0.0/16'))
+    vpc = Ref(template.add_resource(ec2.VPC('MyVPC',
+                                            CidrBlock='10.0.0.0/16')))
     public_route_table = template.add_resource(ec2.RouteTable('MyUnitPublicRouteTable',
-                                                              VpcId=Ref(vpc)))
+                                                              VpcId=vpc))
     private_route_table = template.add_resource(ec2.RouteTable('MyUnitPrivateRouteTable',
-                                                               VpcId=Ref(vpc)))
+                                                               VpcId=vpc))
 
     public_subnets.append(Subnet(template=template,
                                  route_table=public_route_table,

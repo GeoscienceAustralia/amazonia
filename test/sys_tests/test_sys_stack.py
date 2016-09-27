@@ -3,8 +3,7 @@
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
 from amazonia.classes.database_config import DatabaseConfig
-from amazonia.classes.elb_config import ElbConfig
-from amazonia.classes.elb_listeners_config import ElbListenersConfig
+from amazonia.classes.elb_config import ElbConfig, ElbListenersConfig
 from amazonia.classes.stack import Stack
 
 
@@ -62,21 +61,21 @@ runcmd:
                                                instance_protocol='HTTP',
                                                instance_port='80',
                                                loadbalancer_port='80',
-                                               sticky_app_cookies=[])]
+                                               sticky_app_cookie=None)]
 
     stack = Stack(
-        code_deploy_service_role='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
-        keypair='pipeline',
+        code_deploy_service_role='arn:aws:iam::123456789:role/CodeDeployServiceRole',
+        keypair='INSERT_YOUR_KEYPAIR_HERE',
         availability_zones=['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'],
-        vpc_cidr='10.0.0.0/16',
+        vpc_cidr={'name': 'VPC', 'cidr': '10.0.0.0/16'},
         jump_image_id=jump_image_id,
         jump_instance_type=instance_type,
         nat_highly_available=True,
         nat_image_id=nat_image_id,
         nat_instance_type=instance_type,
-        iam_instance_profile_arn=None,
+        iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
         owner_emails=[],
-        home_cidrs=[{'name': 'GA', 'cidr': '123.123.12.34/32'}],
+        home_cidrs=[{'name': 'GA', 'cidr': '0.0.0.0/0'}],
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         public_hosted_zone_name='gadevs.ga.',
         private_hosted_zone_name='private.lan.',
@@ -100,7 +99,7 @@ runcmd:
                  health_check_type='ELB',
                  image_id=app_image_id,
                  instance_type=instance_type,
-                 iam_instance_profile_arn=None,
+                 iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None
@@ -112,12 +111,12 @@ runcmd:
                  health_check_type='ELB',
                  image_id=app_image_id,
                  instance_type=instance_type,
-                 iam_instance_profile_arn=None,
+                 iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None
              ),
-             'dependencies': ['app2', 'db1']}
+             'dependencies': ['app2:80', 'db1:5432']}
         ],
         autoscaling_units=[{'unit_title': 'app1',
                             'asg_config': AsgConfig(
@@ -127,7 +126,7 @@ runcmd:
                                 health_check_type='ELB',
                                 image_id=app_image_id,
                                 instance_type=instance_type,
-                                iam_instance_profile_arn=None,
+                                iam_instance_profile_arn='arn:aws:iam::123456789:iam-instance-profile',
                                 userdata=userdata1,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None
@@ -143,7 +142,7 @@ runcmd:
                                 interval=300,
                                 timeout=30
                             ),
-                            'dependencies': ['app2', 'db1']},
+                            'dependencies': ['app2:80', 'db1:5432']},
                            {'unit_title': 'app2',
                             'asg_config': AsgConfig(
                                 minsize=1,
@@ -172,12 +171,12 @@ runcmd:
                            ],
         database_units=[{'unit_title': 'db1',
                          'database_config': DatabaseConfig(
-                             db_instance_type='db.m1.small',
+                             db_instance_type='db.t2.micro',
                              db_engine='postgres',
                              db_port='5432',
                              db_name='myDb',
                              db_hdd_size=5,
-                             db_snapshot_id=None,
+                             db_snapshot_id='amazonia-verbose-snapshot',
                              db_backup_window=None,
                              db_backup_retention=None,
                              db_maintenance_window=None,

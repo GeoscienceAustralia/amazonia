@@ -1,43 +1,44 @@
 #!/usr/bin/python3
 
-from troposphere import cloudfront, GetAtt
-from amazonia.classes.api_gateway_unit import ApiGatewayUnit
-from amazonia.classes.autoscaling_unit import AutoscalingUnit
-from amazonia.classes.zd_autoscaling_unit import ZdAutoscalingUnit
+from troposphere import cloudfront, ImportValue
 
-class CFDistributionUnit(object):
-    def __init__(self, unit_title, template, network_config, cf_origins_config, cf_cache_behavior_config,
+
+class CloudfrontConfigError(Exception):
+    """
+    Error thrown Cloudfront objects are misconfigured
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+
+class CFDistribution(object):
+    def __init__(self, title, template, cf_origins_config, cf_cache_behavior_config,
                  cf_distribution_config):
         """
         Class to abstract a Cloudfront Distribution object
         http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distributionconfig.html
         https://github.com/cloudtools/troposphere/blob/master/troposphere/cloudfront.py
-        :param unit_title: The title of this Cloudfront distribution
+        :param title: title of the Cloudfront Distribution and associated resources to be used in cloud formation
         :param template: Troposphere stack to append resources to
         :param cf_origins_config: A list of CFOriginsConfig objects
         :param cf_cache_behavior_config: A list of CFCacheBehavior objects
         :param cf_distribution_config: A CFDistributionConfig object
-        :param network_config: Network config information (unused)
         """
-
-        self.title = unit_title + 'CFDist'
-        self.network_config = network_config
-        self.dependencies = []
-        self.custom_origins = {}
         self.origins = []
         self.cache_behaviors = []
         self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
 
         # Populate origins
-        self.add_origins(self.title, cf_origins_config)
+        self.add_origins(title, cf_origins_config)
         # Populate cache_behaviors
-        self.add_cache_behaviors(self.title, cf_cache_behavior_config)
+        self.add_cache_behaviors(title, cf_cache_behavior_config)
 
         # Set distribution-wide parameters
         self.cf_dist = cloudfront.DistributionConfig(
-            self.title,
+            title + 'CfDistConfig',
             Aliases=cf_distribution_config.aliases,
-            Comment=self.title,
+            Comment=title,
             DefaultCacheBehavior=self.default_cache_behavior,
             CacheBehaviors=self.cache_behaviors,
             DefaultRootObject=cf_distribution_config.default_root_object,
@@ -53,9 +54,9 @@ class CFDistributionUnit(object):
             )
 
         self.cf_dist = template.add_resource(cloudfront.Distribution(
-            self.title,
+            title,
             DistributionConfig=self.cf_dist
-            )
+        )
         )
 
     def add_origins(self, title, cf_origins_config):
@@ -86,33 +87,34 @@ class CFDistributionUnit(object):
             # Set S3 config
             if origin.origin_policy['is_s3']:
                 # Create S3Origin
-                s3_origin_config=cloudfront.S3Origin()
+                s3_origin_config = cloudfront.S3Origin()
 
                 # Ensure variables exist
                 if origin.origin_access_identity:
-                    s3_origin_config.OriginAccessIdentity=origin.origin_access_identity
+                    s3_origin_config.OriginAccessIdentity = origin.origin_access_identity
 
                 # Set S3Origin
-                created_origin.S3OriginConfig=s3_origin_config
+                created_origin.S3OriginConfig = s3_origin_config
             # Set Custom config
             else:
-                self.dependencies.append(origin.domain_name)
-                self.custom_origins[origin.domain_name] = created_origin
+
+                created_origin.DomainName = self.get_custom_reference(origin.domain_name)
+
                 # Create CustomOrigin
                 custom_origin_config = cloudfront.CustomOrigin()
 
                 # Ensure variables exist
                 if origin.http_port:
-                    custom_origin_config.HTTPPort=origin.http_port
+                    custom_origin_config.HTTPPort = origin.http_port
                 if origin.https_port:
-                    custom_origin_config.HTTPSPort=origin.https_port
+                    custom_origin_config.HTTPSPort = origin.https_port
                 if origin.origin_protocol_policy:
-                    custom_origin_config.OriginProtocolPolicy=origin.origin_protocol_policy
+                    custom_origin_config.OriginProtocolPolicy = origin.origin_protocol_policy
                 if origin.origin_ssl_protocols:
-                    custom_origin_config.OriginSSLProtocols=origin.origin_ssl_protocols
+                    custom_origin_config.OriginSSLProtocols = origin.origin_ssl_protocols
 
                 # Set CustomOrigin
-                created_origin.CustomOriginConfig=custom_origin_config
+                created_origin.CustomOriginConfig = custom_origin_config
 
             self.origins.append(created_origin)
 
@@ -173,36 +175,66 @@ class CFDistributionUnit(object):
 
             # if there is at least one cache behavior, there must be exactly one default cache behavior
             if cache_behavior_count > 0 and default_cache_behavior_count != 1:
-                raise CloudfrontConfigError('Error: cf_distribution_unit {0} must have exactly one default cache behavior.'
-                                       .format(self.title))
+                raise CloudfrontConfigError(
+                    'Error: cf_distribution_unit {0} must have exactly one default cache behavior.'.format(title))
 
-    def get_dependencies(self):
+    def get_custom_reference(self, domain_name):
         """
-        :return: returns an empty list as a cfdistribution has no upstream dependencies
+        Define abstract method to be overridden by implementing classes
+        :param domain_name: domain name of amazonia resource
         """
-        return self.dependencies
-
-    def add_unit_flow(self, other_unit):
-        if other_unit.title not in self.custom_origins:
-            raise CloudfrontConfigError('Could not find origin {0} in Cloudfront Distribution {1}'
-                                        .format(other_unit.title, self.title))
-
-        if isinstance(other_unit, ApiGatewayUnit):
-            if not other_unit.endpoints:
-                raise CloudfrontConfigError('Custom origin {0} must have at least one endpoint'
-                                            .format(other_unit.title))
-            else:
-              self.custom_origins[other_unit.title].DomainName = other_unit.endpoints[0]
-        elif isinstance(other_unit, AutoscalingUnit):
-            self.custom_origins[other_unit.title].DomainName =  GetAtt(other_unit.elb.trop_elb, 'DNSName')
-        elif isinstance(other_unit, ZdAutoscalingUnit):
-            self.custom_origins[other_unit.title].DomainName = GetAtt(other_unit.prod_elb.trop_elb, 'DNSName')
-        else:
-            raise CloudfrontConfigError(
-                'Custom Origin {0} of Cloudfront Distribution {1} type must be of unit type ApiGatewayUnit, '
-                'AutoscalingUnit, ZDAutoscalingUnit'.format(other_unit.title, self.title))
+        raise NotImplementedError("Please Implement this method")
 
 
-class CloudfrontConfigError(Exception):
-    def __init__(self, value):
-        self.value = value
+class CFDistributionLeaf(CFDistribution):
+    def __init__(self, leaf_title, tree_name, template, cf_origins_config, cf_cache_behavior_config,
+                 cf_distribution_config):
+        """
+        Create an Cloudfront distribution as a leaf, part of cross referenced stack
+        :param leaf_title: title of the API Gateway as part of cross referenced stack
+        :param tree_name: name of cross referenced stack
+        :param template: Troposphere stack to append resources to
+        :param cf_origins_config: A list of CFOriginsConfig objects
+        :param cf_cache_behavior_config: A list of CFCacheBehavior objects
+        :param cf_distribution_config: A CFDistributionConfig object
+        """
+        self.tree_name = tree_name
+        super(CFDistributionLeaf, self).__init__(title=leaf_title, template=template,
+                                                 cf_origins_config=cf_origins_config,
+                                                 cf_cache_behavior_config=cf_cache_behavior_config,
+                                                 cf_distribution_config=cf_distribution_config)
+
+    def get_custom_reference(self, domain_name):
+        """
+        Return the endpoint from a different stack in the same tree
+        :param domain_name: amazonia name of the endpoint
+        :return: The endpoint of the specified amazonia object
+        """
+        return ImportValue(self.tree_name + '-' + domain_name + '-Endpoint')
+
+
+class CFDistributionUnit(CFDistribution):
+    def __init__(self, unit_title, template, stack_config, cf_origins_config, cf_cache_behavior_config,
+                 cf_distribution_config):
+        """
+        Create a Cloudfront Distribution as a unit, part of an integrated stack
+        :param unit_title: title of the API Gateway as part of an integrated stack
+        :param template: troposphere template
+        :param stack_config: shared stack configuration object to store generated API Gateway endpoint
+        :param cf_origins_config: A list of CFOriginsConfig objects
+        :param cf_cache_behavior_config: A list of CFCacheBehavior objects
+        :param cf_distribution_config: A CFDistributionConfig object
+        """
+        self.stack_config = stack_config
+        super(CFDistributionUnit, self).__init__(title=unit_title, template=template,
+                                                 cf_origins_config=cf_origins_config,
+                                                 cf_cache_behavior_config=cf_cache_behavior_config,
+                                                 cf_distribution_config=cf_distribution_config)
+
+    def get_custom_reference(self, domain_name):
+        """
+        Return the endpoint from a different stack in the same stack
+        :param domain_name: amazonia name of the endpoint
+        :return: The endpoint of the specified amazonia object
+        """
+        return self.stack_config.endpoints[domain_name]

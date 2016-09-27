@@ -1,13 +1,10 @@
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
-from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
-from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_distribution_config import CFDistributionConfig, CFOriginsConfig, CFCacheBehaviorConfig
 from amazonia.classes.database_config import DatabaseConfig
-from amazonia.classes.elb_config import ElbConfig
-from amazonia.classes.elb_listeners_config import ElbListenersConfig
+from amazonia.classes.elb_config import ElbConfig, ElbListenersConfig
 from amazonia.classes.lambda_config import LambdaConfig
 from amazonia.classes.stack import Stack, DuplicateUnitNameError
 from amazonia.classes.util import get_cf_friendly_name
@@ -52,7 +49,7 @@ runcmd:
     unit_image_id = 'ami-dc361ebf'
     instance_type = 't2.nano'
     code_deploy_service_role = 'arn:aws:iam::1234567890124 :role/CodeDeployServiceRole'
-    vpc_cidr = '10.0.0.0/16'
+    vpc_cidr = {'name': 'VPC', 'cidr': '10.0.0.0/16'}
     home_cidrs = [{'name': 'GA', 'cidr': '123.123.12.34/32'}, {'name': 'home', 'cidr': '192.168.0.1/16'}]
     instance_port = ['80']
     loadbalancer_port = ['80']
@@ -65,7 +62,7 @@ runcmd:
     unhealthy_threshold = 2
     interval = 300
     timeout = 30
-    sticky_app_cookie='JSESSION'
+    sticky_app_cookie = 'JSESSION'
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     health_check_grace_period = 300
     health_check_type = 'ELB'
@@ -116,10 +113,6 @@ def test_stack():
     assert_equals(stack.vpc_cidr, vpc_cidr)
     [assert_equals(stack.home_cidrs[num], home_cidrs[num]) for num in range(len(home_cidrs))]
     assert_equals(stack.public_cidr, {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
-
-    assert_equals(stack.vpc.title, 'Vpc')
-    assert_equals(stack.vpc.CidrBlock, vpc_cidr)
-    assert_is(type(stack.vpc.Tags), Tags)
 
     assert_equals(stack.internet_gateway.title, 'Ig')
     assert_is(type(stack.internet_gateway.Tags), Tags)
@@ -191,10 +184,6 @@ def test_highly_available_nat_stack():
     assert_equals(stack.vpc_cidr, vpc_cidr)
     [assert_equals(stack.home_cidrs[num], home_cidrs[num]) for num in range(len(home_cidrs))]
     assert_equals(stack.public_cidr, {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
-
-    assert_equals(stack.vpc.title, 'Vpc')
-    assert_equals(stack.vpc.CidrBlock, vpc_cidr)
-    assert_is(type(stack.vpc.Tags), Tags)
 
     assert_equals(stack.internet_gateway.title, 'Ig')
     assert_is(type(stack.internet_gateway.Tags), Tags)
@@ -371,7 +360,7 @@ def create_stack():
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None
                                ),
-                               'dependencies': ['app2', 'db1'],
+                               'dependencies': ['app2:5432', 'db1:80'],
                                }],
         autoscaling_units=[{'unit_title': 'app1',
                             'elb_config': ElbConfig(
@@ -397,7 +386,7 @@ def create_stack():
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None
                             ),
-                            'dependencies': ['app2', 'db1'],
+                            'dependencies': ['app2:80', 'db1:5432'],
                             },
                            {'unit_title': 'app2',
                             'elb_config': ElbConfig(
@@ -441,19 +430,20 @@ def create_stack():
                          }
                         ],
         cf_distribution_units=[{'unit_title': 'cfdist1',
-                                'cf_origins_config': [CFOriginsConfig(
-                                    domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-                                    origin_id='S3-amazonia-elb-bucket',
-                                    origin_path='',
-                                    custom_headers={
-                                        'Origin':'http://www.domain.com',
-                                        'Accept':'True'
-                                    },
-                                    origin_policy={
-                                        'is_s3': True,
-                                        'origin_access_identity': 'originaccessid1'
-                                    }
-                                ),
+                                'cf_origins_config': [
+                                    CFOriginsConfig(
+                                        domain_name='amazonia-elb-bucket.s3.amazonaws.com',
+                                        origin_id='S3-amazonia-elb-bucket',
+                                        origin_path='',
+                                        custom_headers={
+                                            'Origin': 'http://www.domain.com',
+                                            'Accept': 'True'
+                                        },
+                                        origin_policy={
+                                            'is_s3': True,
+                                            'origin_access_identity': 'originaccessid1'
+                                        }
+                                    ),
                                     CFOriginsConfig(
                                         domain_name='app1',
                                         origin_id='www-elb',
@@ -492,22 +482,23 @@ def create_stack():
                                     minimum_protocol_version='TLSv1',
                                     ssl_support_method='sni-only'
                                 ),
-                                'cf_cache_behavior_config': [CFCacheBehavior(
-                                    is_default=True,
-                                    path_pattern='/index.html',
-                                    allowed_methods=['GET', 'HEAD'],
-                                    cached_methods=['GET', 'HEAD'],
-                                    target_origin_id='S3-bucket-id',
-                                    forward_cookies='all',
-                                    forwarded_headers=['Accept', 'Set-Cookie'],
-                                    viewer_protocol_policy='allow-all',
-                                    min_ttl=0,
-                                    default_ttl=0,
-                                    max_ttl=0,
-                                    trusted_signers=['self'],
-                                    query_string='False'
-                                ),
-                                    CFCacheBehavior(
+                                'cf_cache_behavior_config': [
+                                    CFCacheBehaviorConfig(
+                                        is_default=True,
+                                        path_pattern='/index.html',
+                                        allowed_methods=['GET', 'HEAD'],
+                                        cached_methods=['GET', 'HEAD'],
+                                        target_origin_id='S3-bucket-id',
+                                        forward_cookies='all',
+                                        forwarded_headers=['Accept', 'Set-Cookie'],
+                                        viewer_protocol_policy='allow-all',
+                                        min_ttl=0,
+                                        default_ttl=0,
+                                        max_ttl=0,
+                                        trusted_signers=['self'],
+                                        query_string='False'
+                                    ),
+                                    CFCacheBehaviorConfig(
                                         is_default=False,
                                         path_pattern='/login.js',
                                         allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
@@ -535,24 +526,19 @@ def create_stack():
                                         templates={'application/json': ''},
                                         parameters={'somemapping': 'somefield'}
                                     ),
-                                    response_config=[ApiGatewayResponseConfig(
-                                        templates={'application/json': ''},
-                                        parameters={'somemapping': 'somefield'},
-                                        statuscode='200',
-                                        models={'application/json': 'Empty'},
-                                        selectionpattern=''
-                                    )]
-                                )
-                            ],
-                            'deployment_config': [
-                                ApiGatewayDeploymentConfig(
-                                    apiname='test',
-                                    stagename='TEST'
+                                    response_config=[
+                                        ApiGatewayResponseConfig(
+                                            templates={'application/json': ''},
+                                            parameters={'somemapping': 'somefield'},
+                                            statuscode='200',
+                                            models={'application/json': 'Empty'},
+                                            selectionpattern=''
+                                        )]
                                 )
                             ]
                             }],
         lambda_units=[{'unit_title': 'validYamlTestLambda',
-                       'dependencies': ['db1'],
+                       'dependencies': ['db1:5432'],
                        'lambda_config': LambdaConfig(
                            lambda_s3_bucket='bucket_name',
                            lambda_s3_key='key_name',

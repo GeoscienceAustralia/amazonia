@@ -9,7 +9,9 @@ availability_zones:
   - 'ap-southeast-2a'
   - 'ap-southeast-2b'
   - 'ap-southeast-2c'
-vpc_cidr: '10.0.0.0/16'
+vpc_cidr:
+  name: 'VPC'
+  cidr: '10.0.0.0/16'
 jump_image_id: 'ami-dc361ebf'
 jump_instance_type: 't2.micro'
 nat_image_id: 'ami-53371f30'

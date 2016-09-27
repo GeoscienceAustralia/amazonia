@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.block_devices import Bdm
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject
 from amazonia.classes.util import get_cf_friendly_name
 from troposphere import Base64, codedeploy, Ref, Join, Output
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
@@ -10,7 +10,7 @@ from troposphere.cloudwatch import MetricDimension, Alarm
 from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
 
 
-class Asg(SecurityEnabledObject):
+class Asg(LocalSecurityEnabledObject):
     def __init__(self, title, template, network_config, load_balancers, asg_config):
         """
         Creates an autoscaling group and codedeploy definition
@@ -20,10 +20,9 @@ class Asg(SecurityEnabledObject):
         :param asg_config: object containing asg related config
         :param load_balancers: list of load balancers to associate autoscaling group with
         """
-        super(Asg, self).__init__(vpc=network_config.vpc, title=title, template=template)
-
-        self.template = template
         self.title = title + 'Asg'
+        super(Asg, self).__init__(vpc=network_config.vpc, title=self.title, template=template)
+        self.template = template
         self.network_config = network_config
         self.trop_asg = None
         self.lc = None
@@ -55,19 +54,20 @@ class Asg(SecurityEnabledObject):
         :param network_config: object containing network related variables
         """
 
-        availability_zones = [subnet.AvailabilityZone for subnet in network_config.private_subnets]
+        availability_zones = network_config.availability_zones
         self.trop_asg = self.template.add_resource(AutoScalingGroup(
             title,
             MinSize=asg_config.minsize,
             MaxSize=asg_config.maxsize,
-            VPCZoneIdentifier=[Ref(subnet.title) for subnet in network_config.private_subnets],
+            VPCZoneIdentifier=network_config.private_subnets,
             AvailabilityZones=availability_zones,
             LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
             HealthCheckType=asg_config.health_check_type,
             Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)],
-            DependsOn=network_config.get_depends_on()
         ))
+        if network_config.get_depends_on():
+            self.trop_asg.DependsOn = network_config.get_depends_on()
 
         # Set cloud formation update policy to update
         self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
@@ -77,7 +77,7 @@ class Asg(SecurityEnabledObject):
         )
 
         self.trop_asg.NotificationConfigurations = [
-            NotificationConfigurations(TopicARN=Ref(network_config.sns_topic.trop_topic),
+            NotificationConfigurations(TopicARN=network_config.sns_topic,
                                        NotificationTypes=['autoscaling:EC2_INSTANCE_LAUNCH',
                                                           'autoscaling:EC2_INSTANCE_LAUNCH_ERROR',
                                                           'autoscaling:EC2_INSTANCE_TERMINATE',
@@ -117,7 +117,7 @@ class Asg(SecurityEnabledObject):
             InstanceMonitoring=False,
             InstanceType=asg_config.instance_type,
             KeyName=network_config.keypair,
-            SecurityGroups=[Ref(self.security_group.name)],
+            SecurityGroups=[self.security_group],
         ))
 
         if asg_config.iam_instance_profile_arn is not None:
@@ -171,7 +171,7 @@ class Asg(SecurityEnabledObject):
 
         self.cw_alarms.append(self.template.add_resource(Alarm(
             title=cf_name + 'Cwa',
-            AlarmActions=[Ref(scaling_policy), Ref(self.network_config.sns_topic.trop_topic.title)],
+            AlarmActions=[Ref(scaling_policy), self.network_config.sns_topic],
             AlarmDescription=scaling_policy_config.description,
             AlarmName=cf_name,
             ComparisonOperator=scaling_policy_config.comparison_operator,
@@ -185,7 +185,7 @@ class Asg(SecurityEnabledObject):
             Period=scaling_policy_config.period,
             Statistic='Average',
             Threshold=scaling_policy_config.threshold,
-            OKActions=[Ref(self.network_config.sns_topic.trop_topic.title)]
+            OKActions=[self.network_config.sns_topic]
         )))
 
     def create_cd_deploygroup(self, title, cd_service_role_arn):

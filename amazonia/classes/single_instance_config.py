@@ -2,8 +2,8 @@
 
 
 class SingleInstanceConfig(object):
-    def __init__(self, vpc, sns_topic, keypair, si_image_id, si_instance_type, subnet, instance_dependencies,
-                 iam_instance_profile_arn, public_hosted_zone_name, is_nat):
+    def __init__(self, vpc, sns_topic, keypair, si_image_id, si_instance_type, subnet, availability_zone,
+                 instance_dependencies, iam_instance_profile_arn, public_hosted_zone_name, is_nat):
         """
         Simple config class to contain networking related parameters
         :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
@@ -16,6 +16,7 @@ class SingleInstanceConfig(object):
         :param public_hosted_zone_name: A hosted zone name for setting up a Route 53 record set for Jump hosts
         :param instance_dependencies: a list of dependencies to wait for before creating the single instance.
         :param iam_instance_profile_arn: the ARN for an IAM profile that enables cloudwatch logging.
+        :param availability_zone: availabiity zone to create single instance in
         """
         self.vpc = vpc
         self.sns_topic = sns_topic
@@ -27,3 +28,4 @@ class SingleInstanceConfig(object):
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.public_hosted_zone_name = public_hosted_zone_name
         self.is_nat = is_nat
+        self.availability_zone = availability_zone

@@ -1,28 +1,26 @@
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
+from amazonia.classes.amz_api_gateway import ApiGatewayUnit
+from amazonia.classes.amz_lambda import LambdaUnit
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
 from amazonia.classes.api_gateway_config import ApiGatewayResponseConfig, ApiGatewayRequestConfig
-from amazonia.classes.api_gateway_unit import ApiGatewayUnit
 from amazonia.classes.lambda_config import LambdaConfig
-from amazonia.classes.lambda_unit import LambdaUnit
-from amazonia.classes.network_config import NetworkConfig
-from amazonia.classes.single_instance import SingleInstance
-from amazonia.classes.single_instance_config import SingleInstanceConfig
-from amazonia.classes.sns import SNS
+from network_setup import get_network_config
 from nose.tools import *
-from troposphere import Template, ec2, Ref, Join, Tags
+from troposphere import Ref, Join
 
 template = apiname = methodname = httpmethod = authorizationtype = request_template = request_parameters = \
-    response_template = response_parameters = response_models = selection_pattern = statuscode = lambda_title = None
+    response_template = response_parameters = response_models = selection_pattern = statuscode = lambda_title = \
+    network_config = None
 
 
 def setup_resources():
     """
     Initialise resources before each test
     """
-    global template, apiname, methodname, httpmethod, authorizationtype, request_template, lambda_title, \
-        request_parameters, response_template, response_parameters, response_models, selection_pattern, statuscode
+    global template, network_config, apiname, methodname, httpmethod, authorizationtype, request_template, \
+        lambda_title, request_parameters, response_template, response_parameters, response_models, selection_pattern, \
+        statuscode
 
-    template = None
-    template = Template()
+    network_config, template = get_network_config()
     apiname = 'test0'
     methodname = 'login0'
     httpmethod = 'POST'
@@ -90,8 +88,7 @@ def test_creation_of_api():
     api = create_api(method)
 
     assert_equals(api.title, apiname)
-    assert_equals(api.api.title, '{0}API'.format(apiname))
-    assert_equals(api.api.Name, apiname)
+    assert_equals(api.api.title, apiname)
 
 
 @with_setup(setup_resources)
@@ -107,10 +104,7 @@ def test_creation_of_method():
     response = create_response_config()
     method = create_method_config(request, [response])
     api = create_api(method)
-    lambda_unit = add_lambda('1')
-    api.add_unit_flow(lambda_unit)
-
-    print(lambda_title)
+    add_lambda('1')
 
     assert_equals(len(api.methods), 1)
     assert_equals(api.methods[0].title, '{0}Method'.format(methodname))
@@ -142,12 +136,11 @@ def test_creation_of_integration():
     response = create_response_config()
     method = create_method_config(request, [response])
     api = create_api(method)
-    lambda_unit = add_lambda('2')
-    api.add_unit_flow(lambda_unit)
+    add_lambda('2')
+
     integration = api.methods[0].Integration
 
     assert_equals(integration.title, '{0}Integration'.format(methodname))
-    assert_equals(integration.Credentials, '')
     assert_equals(integration.Type, 'AWS')
     assert_equals(integration.IntegrationHttpMethod, httpmethod)
     assert_equals(len(integration.IntegrationResponses), 1)
@@ -159,36 +152,6 @@ def test_creation_of_integration():
     assert_equals(integration_response.StatusCode, statuscode)
     assert_equals(integration_response.ResponseParameters, response_parameters)
     assert_equals(integration_response.ResponseTemplates, response_template)
-
-
-@with_setup(setup_resources)
-def test_creation_of_deployment():
-    """
-    Tests the creation of a demployment
-    """
-    global apiname, methodname, lambda_title
-
-    apiname = 'test3'
-    methodname = 'login3'
-    request = create_request_config()
-    response = create_response_config()
-    method = create_method_config(request, [response])
-    api = create_api(method)
-    deployment = ApiGatewayDeploymentConfig(
-        apiname=api.api.title,
-        stagename='Test'
-    )
-    api.add_deployment(deployment)
-
-    assert_equals(api.deployments[0].title, '{0}{1}Deployment'.format(apiname, deployment.stagename))
-    assert_equals(api.deployments[0].Description, '{0} Deployment created for APIGW {1}'.format(deployment.stagename,
-                                                                                                apiname))
-    assert_equals(type(api.deployments[0].RestApiId), Ref)
-    assert_equals(api.deployments[0].StageName, deployment.stagename)
-
-    assert_equals(type(api.endpoints[0]), Join)
-    assert_equals(len(api.endpoints), 1)
-    assert_equals(len(api.endpoints), len(api.deployments))
 
 
 @with_setup(setup_resources)
@@ -241,7 +204,7 @@ def create_api(method_config):
     :return: an Api gateway object
     """
 
-    return ApiGatewayUnit(apiname, template, [method_config], None, None)
+    return ApiGatewayUnit(apiname, template, [method_config], network_config)
 
 
 @with_setup(setup_resources)
@@ -251,65 +214,6 @@ def add_lambda(num):
     :param num: adds a num to the end of resource titles to avoid duplicates.
     :return: a LambdaUnit object
     """
-
-    vpc = template.add_resource(ec2.VPC('myVpc' + num,
-                                        CidrBlock='10.0.0.0/16'))
-    internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway' + num,
-                                                                 Tags=Tags(Name='MyInternetGateway')))
-
-    template.add_resource(ec2.VPCGatewayAttachment('MyVPCGatewayAttachment' + num,
-                                                   InternetGatewayId=Ref(internet_gateway),
-                                                   VpcId=Ref(vpc),
-                                                   DependsOn=internet_gateway.title))
-    private_subnets = [template.add_resource(ec2.Subnet('MyPrivSub1' + num,
-                                                        AvailabilityZone='ap-southeast-2a',
-                                                        VpcId=Ref(vpc),
-                                                        CidrBlock='10.0.1.0/24')),
-                       template.add_resource(ec2.Subnet('MyPrivSub2' + num,
-                                                        AvailabilityZone='ap-southeast-2b',
-                                                        VpcId=Ref(vpc),
-                                                        CidrBlock='10.0.2.0/24')),
-                       template.add_resource(ec2.Subnet('MyPrivSub3' + num,
-                                                        AvailabilityZone='ap-southeast-2c',
-                                                        VpcId=Ref(vpc),
-                                                        CidrBlock='10.0.3.0/24'))]
-    public_subnets = [ec2.Subnet('MySubnet2' + num,
-                                 AvailabilityZone='ap-southeast-2a',
-                                 VpcId=Ref(vpc),
-                                 CidrBlock='10.0.2.0/24')]
-    sns_topic = SNS(template)
-    single_instance_config = SingleInstanceConfig(
-        keypair='pipeline',
-        si_image_id='ami-53371f30',
-        si_instance_type='t2.nano',
-        vpc=vpc,
-        subnet=public_subnets[0],
-        instance_dependencies=vpc.title,
-        public_hosted_zone_name=None,
-        iam_instance_profile_arn=None,
-        is_nat=True,
-        sns_topic=sns_topic
-    )
-    nat = SingleInstance(title='Nat' + num,
-                         template=template,
-                         single_instance_config=single_instance_config
-                         )
-
-    network_config = NetworkConfig(
-        public_cidr=None,
-        vpc=vpc,
-        public_subnets=None,
-        private_subnets=private_subnets,
-        jump=None,
-        nat=nat,
-        public_hosted_zone_name=None,
-        private_hosted_zone=None,
-        cd_service_role_arn=None,
-        keypair=None,
-        nat_highly_available=False,
-        nat_gateways=None,
-        sns_topic=sns_topic
-    )
 
     lambda_config = LambdaConfig(
         lambda_s3_bucket='bucket_name',
@@ -325,9 +229,9 @@ def add_lambda(num):
     )
 
     return LambdaUnit(
-        unit_title=lambda_title,
+        unit_title=lambda_title + num,
         template=template,
         dependencies=None,
-        network_config=network_config,
+        stack_config=network_config,
         lambda_config=lambda_config
     )

@@ -18,4 +18,3 @@ def test_sns():
     assert_equals(sns_topic.trop_topic.title, 'SnsTopic')
     assert_is(type(sns_topic.trop_topic.DisplayName), Join)
 
-    assert_equals(len(template.outputs), 1)

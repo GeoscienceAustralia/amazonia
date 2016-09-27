@@ -444,9 +444,17 @@ availability_zones: # A list of strings, specifying each availability zone to us
     type: 'string'
     empty: False
 vpc_cidr: # A cidr block to delegate to your VPC.
-  type: 'string'
-  empty: False # Below regex matches a CIDR pattern eg: 10.0.0.0/16
-  regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+  type: 'dict'
+  empty: False
+  schema:
+    name:
+      type: 'string'
+      empty: False
+      regex: '^([a-zA-Z0-9]+$)' # matches an alphanumeric title
+    cidr:
+      type: 'string'
+      empty: False # Below regex matches a CIDR pattern eg: 10.0.0.0/16
+      regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
 public_cidr: # A dictionary containing the name and cidr block to be considered 'public' by your stack.
   type: 'dict'
   empty: False
@@ -626,19 +634,6 @@ method_config: &method_config # The config for an api method
       nullable: False
       schema: *response_config
 
-deployment_config: &deployment_config # The config for an api deployment
-  type: 'dict'
-  nullable: True
-  schema:
-    apiname: # The api unit_title to link this deployment to.
-      type: 'string'
-      empty: False
-      nullable: False
-    stagename: # the name of this stage (eg: PROD/TEST/DEV).
-      type: 'string'
-      empty: False
-      nullable: False
-
 api_gateway_units: # A list of api gateway definitions to create.
   type: 'list'
   nullable: True
@@ -655,8 +650,3 @@ api_gateway_units: # A list of api gateway definitions to create.
         empty: False
         nullable: False
         schema: *method_config # A list of method_config for this api
-      deployment_config:
-        type: 'list'
-        empty: False
-        nullable: False
-        schema: *deployment_config # A list of stage_config for this api

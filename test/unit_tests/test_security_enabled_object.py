@@ -1,44 +1,58 @@
 #!/usr/bin/python3
 
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
+from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject
 from nose.tools import *
 from troposphere import Template, ec2, Ref
 
+template = vpc = None
 
+
+def setup_resources():
+    """
+    Create generic testing data
+    """
+    global template
+    global vpc
+
+    template = Template()
+
+    vpc = Ref(template.add_resource(ec2.VPC('MyVPC',
+                                        CidrBlock='10.0.0.0/16',
+                                        EnableDnsSupport='true',
+                                        EnableDnsHostnames='true')))
+
+
+@with_setup(setup_resources)
 def test_security_enabled_object():
     """
     Test title, security group title, template
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
 
     assert_equals(myobj.title, 'Unit01Web')
-    assert_equals(myobj.security_group.title, 'Unit01WebSg')
+    assert_equals(myobj.trop_security_group.title, 'Unit01WebSg')
     assert_equals(myobj.template, template)
 
 
+@with_setup(setup_resources)
 def test_create_sg():
     """
     Test security group title, Group Description
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
 
-    assert_equals(myobj.security_group.title, 'Unit01WebSg')
-    assert_equals(myobj.security_group.GroupDescription, 'Security group')
-    assert_is(type(myobj.security_group.VpcId), Ref)
+    assert_equals(myobj.trop_security_group.title, 'Unit01WebSg')
+    assert_equals(myobj.trop_security_group.GroupDescription, 'Security group')
+    assert_is(type(myobj.trop_security_group.VpcId), Ref)
 
 
+@with_setup(setup_resources)
 def test_add_flow():
     """
     Test ingress and egress rules are correctly applied betwen two security groups
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
+    otherobj = LocalSecurityEnabledObject(title='Unit02Web', vpc=vpc, template=template)
 
     myobj.add_flow(otherobj, '80')
 
@@ -53,14 +67,13 @@ def test_add_flow():
     assert_equals(myobj.egress[0].ToPort, '80')
 
 
+@with_setup(setup_resources)
 def test_add_ingress():
     """
     Test ingress rules are correctly applied to security group
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
+    otherobj = LocalSecurityEnabledObject(title='Unit02Web', vpc=vpc, template=template)
 
     myobj.add_ingress(otherobj, '80')
 
@@ -76,14 +89,13 @@ def test_add_ingress():
     assert_equals(myobj.ingress[1].ToPort, '65535')
 
 
+@with_setup(setup_resources)
 def test_add_egress():
     """
     Test egress rules are correctly applied to security group
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
-    otherobj = SecurityEnabledObject(title='Unit02Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
+    otherobj = LocalSecurityEnabledObject(title='Unit02Web', vpc=vpc, template=template)
 
     myobj.add_egress(otherobj, '80')
 
@@ -99,13 +111,12 @@ def test_add_egress():
     assert_equals(myobj.egress[1].ToPort, '65535')
 
 
+@with_setup(setup_resources)
 def test_add_ip_ingress():
     """
     Test ingress rules are correctly applied to CIDRs, elbs, single instances (nat or jump)
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
 
     cidrs = [{'name': 'GA1', 'cidr': '123.123.132.123/24'},
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},
@@ -128,13 +139,12 @@ def test_add_ip_ingress():
     assert_equals(myobj.ingress[3].ToPort, '65535')
 
 
+@with_setup(setup_resources)
 def test_add_ip_egress():
     """
     Test egress rules are correctly applied to CIDRs, elbs, single instances (nat or jump)
     """
-    template = Template()
-    myvpc = ec2.VPC('myVpc', CidrBlock='10.0.0.0/16')
-    myobj = SecurityEnabledObject(title='Unit01Web', vpc=myvpc, template=template)
+    myobj = LocalSecurityEnabledObject(title='Unit01Web', vpc=vpc, template=template)
 
     cidrs = [{'name': 'GA1', 'cidr': '123.123.132.123/24'},
              {'name': 'GA2', 'cidr': '321.321.321.321/32'},

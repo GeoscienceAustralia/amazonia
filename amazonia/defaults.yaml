@@ -15,7 +15,9 @@ availability_zones:
   - 'ap-southeast-2a'
   - 'ap-southeast-2b'
   - 'ap-southeast-2c'
-vpc_cidr: '10.0.0.0/16'
+vpc_cidr:
+  name: 'VPC'
+  cidr: '10.0.0.0/16'
 public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
@@ -212,10 +214,6 @@ method_config:
   request_config: *request_config
   response_config:
     - *response_config
-
-deployment_config:
-  apiname: 'myApi'
-  stagename: 'TEST'
 
 api_gateway_units:
 

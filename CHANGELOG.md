@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.0] - 27/09/2016
+- Created tree/leaf pattern based upon cloudformation cross stack references
+- Added permissions for API gateway to invoke Lambda
+- Rewrote unit flow method so that cross stack and integral stack references follow a similar pattern
+- Due to changes to how network dependencies are set, port numbers need to be specified as part of the dependency
+- Due to unit/leaf naming conventions, some cloud formation references will break and stacks will need to be recreated
+- Updated stack schema, yaml and tests to reflect new internal amazonia architecture
+- Rewrote creation of tests to make it faster and easier to extend amazonia
+
 ## [1.3.14] - 23/09/2016
 - Update Cloudfront unit flow to refer to API Gateways and ELBs
 

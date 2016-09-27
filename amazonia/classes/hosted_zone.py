@@ -19,22 +19,6 @@ class HostedZone(object):
         self.domain = domain
         self.trop_hosted_zone = self.create_hosted_zone(self.domain, vpcs)
 
-    @staticmethod
-    def add_vpc(vpc):
-        """
-        Creates a troposphere HostedZoneVPC object from a troposphere vpc object.
-        AWS: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone-hostedzonevpcs.html
-        Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/route53.py
-        :param vpc: A troposphere VPC object
-        :return: A route53 HostedZoneVPC object to associate the hosted zone with.
-        """
-
-        return route53.HostedZoneVPCs(
-            '{0}hz'.format(vpc.title),
-            VPCId=Ref(vpc),
-            VPCRegion=Ref("AWS::Region")
-        )
-
     def create_hosted_zone(self, domain, vpcs):
         """
         Creates a route53 hosted zone object either public (vpcs=None) or private (vpcs=[vpc1,...])
@@ -61,6 +45,6 @@ class HostedZone(object):
         if vpcs:
             hz.VPCs = []
             for vpc in vpcs:
-                hz.VPCs.append(HostedZoneVPCs(VPCId=Ref(vpc), VPCRegion=Ref('AWS::Region')))
+                hz.VPCs.append(HostedZoneVPCs(VPCId=vpc, VPCRegion=Ref('AWS::Region')))
 
         return hz

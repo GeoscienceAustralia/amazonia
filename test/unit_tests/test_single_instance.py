@@ -20,7 +20,7 @@ def test_not_nat_single_instance():
         si_sdc = si.single.SourceDestCheck
         assert_equals(si_sdc, 'true')
         sio = si.template.outputs[title].Description
-        assert_in('PublicIp', sio)
+        assert_in('URL', sio)
         assert_equals(si.single.IamInstanceProfile, 'instance-profile')
 
 
@@ -38,7 +38,7 @@ def test_jump_with_hostedzone_creates_r53_record():
         assert_equals(si.eip_address.Domain, 'vpc')
         assert_equals(si.si_r53.HostedZoneName, 'my.hostedzone.')
 
-        sio = si.template.outputs[title + 'URL'].Value
+        sio = si.template.outputs[title].Value
         assert_equals(sio, si.si_r53.Name)
 
 
@@ -52,15 +52,9 @@ def test_nat_single_instance():
     si = create_si('nat', is_nat=True)
     si_sdc = si.single.SourceDestCheck
     assert_equals(si_sdc, 'false')
-    sio = si.template.outputs['nat'].Description
-    assert_in('PrivateIp', sio)
     assert_equals(si.single.IamInstanceProfile, 'instance-profile')
     assert_equals(si.sns_topic.trop_topic.title, title)
     assert_is(type(si.sns_topic.trop_topic.DisplayName), Join)
-    assert_equals(si.template.outputs[title].Description, 'SNS Topic')
-    assert_equals(si.sns_topic.trop_topic.Subscription[0].title, title + 'Subscription0')
-    assert_equals(si.sns_topic.trop_topic.Subscription[0].Endpoint, 'some@email.com')
-    assert_equals(si.sns_topic.trop_topic.Subscription[0].Protocol, 'email')
     assert_equals(si.sns_topic.alarms[0].title, title + 'Alarm0')
     assert_equals(si.sns_topic.alarms[0].AlarmDescription, 'Alarms when nat metric CPUUtilization reaches 60')
     assert_equals(type(si.sns_topic.alarms[0].AlarmActions[0]), type(Ref('abc')))
@@ -91,18 +85,18 @@ def create_si(title, is_nat=False):
                                               VpcId=vpc,
                                               CidrBlock='10.0.1.0/24'))
     sns_topic = SNS(template)
-    sns_topic.add_subscription('some@email.com', 'email')
     single_instance_config = SingleInstanceConfig(
         keypair='pipeline',
         si_image_id='ami-53371f30',
         si_instance_type='t2.nano',
         vpc=vpc,
-        subnet=subnet,
+        subnet=Ref(subnet),
         public_hosted_zone_name=public_hosted_zone_name,
         instance_dependencies=dependencies,
         is_nat=is_nat,
         iam_instance_profile_arn='my/instance-profile',
-        sns_topic=sns_topic
+        sns_topic=sns_topic,
+        availability_zone='ap-southeast-2a'
     )
     si = SingleInstance(title=title,
                         template=template,

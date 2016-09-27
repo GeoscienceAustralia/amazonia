@@ -106,6 +106,6 @@ def create_subnet(**kwargs):
                     route_table=kwargs['route_table'],
                     cidr=cidr,
                     is_public=kwargs['is_public'],
-                    vpc=vpc)
+                    vpc=Ref(vpc))
 
     return subnet

@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 #  pylint: disable=line-too-long
 
-from troposphere import Ref, Tags, Join, Output, GetAtt, ec2, route53, Base64
+from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject
+from troposphere import Ref, Tags, Join, Output, ec2, route53, Base64
 
-from amazonia.classes.security_enabled_object import SecurityEnabledObject
 
-
-class SingleInstance(SecurityEnabledObject):
+class SingleInstance(LocalSecurityEnabledObject):
     def __init__(self, title, template, single_instance_config):
         """
         AWS CloudFormation - http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html
@@ -19,7 +18,7 @@ class SingleInstance(SecurityEnabledObject):
 
         super(SingleInstance, self).__init__(vpc=single_instance_config.vpc, title=title, template=template)
         self.sns_topic = single_instance_config.sns_topic
-        region = single_instance_config.subnet.AvailabilityZone[:-1]
+        region = single_instance_config.availability_zone[:-1]
         userdata = """#cloud-config
 # Capture all cloud-config output into a more readable logfile
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
@@ -62,11 +61,11 @@ runcmd:
                 ImageId=single_instance_config.si_image_id,
                 InstanceType=single_instance_config.si_instance_type,
                 NetworkInterfaces=[ec2.NetworkInterfaceProperty(
-                    GroupSet=[Ref(self.security_group)],
+                    GroupSet=[self.security_group],
                     AssociatePublicIpAddress=True,
                     DeviceIndex='0',
                     DeleteOnTermination=True,
-                    SubnetId=Ref(single_instance_config.subnet),
+                    SubnetId=single_instance_config.subnet,
                 )],
                 # The below boolean determines whether source/destination checking is enabled on the
                 # instance. This needs to be false to enable NAT functionality from the instance, or
@@ -92,11 +91,6 @@ runcmd:
             self.single.IamInstanceProfile = single_instance_config.iam_instance_profile_arn.split('/')[1]
 
         if self.single.SourceDestCheck == 'true':
-            self.si_output(nat=False, subnet=single_instance_config.subnet)
-        else:
-            self.si_output(nat=True, subnet=single_instance_config.subnet)
-
-        if single_instance_config.public_hosted_zone_name:
             # Give the instance an Elastic IP Address
             self.eip_address = self.template.add_resource(ec2.EIP(
                 self.single.title + 'EIP',
@@ -104,53 +98,32 @@ runcmd:
                 Domain='vpc',
                 InstanceId=Ref(self.single)
             ))
+            if single_instance_config.public_hosted_zone_name:
+                # Create a Route53 Record Set for the instances Elastic IP address.
 
-            # Create a Route53 Record Set for the instances Elastic IP address.
+                self.si_r53 = self.template.add_resource(route53.RecordSetType(
+                    self.single.title + 'R53',
+                    HostedZoneName=single_instance_config.public_hosted_zone_name,
+                    Comment='DNS Record for {0}'.format(self.single.title),
+                    Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.',
+                                   single_instance_config.public_hosted_zone_name]),
+                    ResourceRecords=[Ref(self.eip_address)],
+                    Type='A',
+                    TTL='300',
+                    DependsOn=single_instance_config.instance_dependencies
+                ))
 
-            self.si_r53 = self.template.add_resource(route53.RecordSetType(
-                self.single.title + 'R53',
-                HostedZoneName=single_instance_config.public_hosted_zone_name,
-                Comment='DNS Record for {0}'.format(self.single.title),
-                Name=Join('', [Ref('AWS::StackName'), '-', self.single.title, '.',
-                               single_instance_config.public_hosted_zone_name]),
-                ResourceRecords=[Ref(self.eip_address)],
-                Type='A',
-                TTL='300',
-                DependsOn=single_instance_config.instance_dependencies
-            ))
+                # Create an output for the Record Set that has been created.
 
-            # Create an output for the Record Set that has been created.
+                self.template.add_output(Output(
+                    self.single.title,
+                    Description='URL of the jump host {0}'.format(self.single.title),
+                    Value=self.si_r53.Name
+                ))
 
-            self.template.add_output(Output(
-                self.single.title + 'URL',
-                Description='URL of the jump host {0}'.format(self.single.title),
-                Value=self.si_r53.Name
-            ))
-
-    def si_output(self, nat, subnet):
-        """
-        Function that add the IP output required for single instances depending if it is a NAT or JumpHost
-        :param nat: A NAT boolean is defined by the SourceDestCheck=False flag for extracting the ip
-        :param subnet: A subnet where the instance lives required for output.
-        :return: Troposphere Output object containing IP details
-        """
-
-        if nat is True:
-            net_interface = 'PrivateIp'
-        else:
-            net_interface = 'PublicIp'
-
-        self.template.add_output(
-            Output(
-                self.single.title,
-                Description='{0} address of {1} single instance'.format(net_interface, self.single.title),
-                Value=Join(' ', ['{0} {1} address'.format(self.single.title, net_interface),
-                                 GetAtt(self.single, net_interface),
-                                 'on subnet',
-                                 Ref(subnet)
-                                 ]
-                           )
-            ))
-
-        # TODO Sys Tests: Connect from jumphost to subpub1 instance, subpub2 instance, can't connect on port 80,8080,443
-        # TODO Sys Tests: Try connecting to host in another vpc
+            else:
+                self.template.add_output(Output(
+                    self.single.title,
+                    Description='Public IP of the jump host {0}'.format(self.single.title),
+                    Value=Ref(self.eip_address)
+                ))

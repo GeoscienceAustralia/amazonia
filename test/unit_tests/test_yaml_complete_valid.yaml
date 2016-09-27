@@ -7,7 +7,9 @@ availability_zones:
   - 'ap-southeast-2a'
   - 'ap-southeast-2b'
   - 'ap-southeast-2c'
-vpc_cidr: '10.0.0.0/16'
+vpc_cidr:
+  name: 'VPC'
+  cidr: '10.0.0.0/16'
 public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
@@ -398,10 +400,6 @@ api_gateway_units:
             statuscode: '403'
             models:
               application/json: 'Empty'
-    deployment_config:
-      -
-        apiname: 'test'
-        stagename: 'TEST'
 
 lambda_units:
  -

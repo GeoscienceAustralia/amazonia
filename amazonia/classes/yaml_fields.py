@@ -1,15 +1,12 @@
+from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
+from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
-from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
-from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_distribution_config import CFDistributionConfig, CFCacheBehaviorConfig, CFOriginsConfig
 from amazonia.classes.database_config import DatabaseConfig
-from amazonia.classes.elb_config import ElbConfig
-from amazonia.classes.elb_listeners_config import ElbListenersConfig
-from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
-from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig, ApiGatewayDeploymentConfig
-from amazonia.classes.api_gateway_config import ApiGatewayRequestConfig, ApiGatewayResponseConfig
+from amazonia.classes.elb_config import ElbConfig, ElbListenersConfig
 from amazonia.classes.lambda_config import LambdaConfig
+from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
 
 
 class ComplexObjectFieldMapping(object):
@@ -121,12 +118,6 @@ class YamlFields(object):
         'models'
     ]
 
-    # api_stage_config field list
-    api_deployment_config = [
-        'apiname',
-        'stagename'
-    ]
-
     # cloudfront origins config key list
     cf_origins_config_key_list = [
         'domain_name',
@@ -226,8 +217,7 @@ class YamlFields(object):
     # api parameter field list
     api_gateway_unit_key_list = [
         'unit_title',
-        'method_config',
-        'deployment_config'
+        'method_config'
     ]
 
     # lambda unit parameter field list
@@ -278,7 +268,7 @@ class YamlFields(object):
         'cf_distribution_units':
             ComplexObjectFieldMapping(dict, True, False, cf_distribution_unit_key_list),
         'cf_cache_behavior_config':
-            ComplexObjectFieldMapping(CFCacheBehavior, True, False, cf_cache_behavior_config_key_list),
+            ComplexObjectFieldMapping(CFCacheBehaviorConfig, True, False, cf_cache_behavior_config_key_list),
         'cf_distribution_config':
             ComplexObjectFieldMapping(CFDistributionConfig, False, True, cf_distribution_config_key_list),
         'cf_origins_config':
@@ -291,11 +281,8 @@ class YamlFields(object):
             ComplexObjectFieldMapping(ApiGatewayRequestConfig, False, True, api_request_config),
         'response_config':
             ComplexObjectFieldMapping(ApiGatewayResponseConfig, True, False, api_response_config),
-        'deployment_config':
-            ComplexObjectFieldMapping(ApiGatewayDeploymentConfig, True, False, api_deployment_config),
         'lambda_units':
             ComplexObjectFieldMapping(dict, True, False, lambda_unit_key_list),
         'lambda_config':
             ComplexObjectFieldMapping(LambdaConfig, False, True, lambda_config_key_list),
     }
-

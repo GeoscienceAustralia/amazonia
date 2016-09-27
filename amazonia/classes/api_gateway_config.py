@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-from troposphere import Ref
 
 
 class ApiGatewayMethodConfig(object):
@@ -36,13 +35,3 @@ class ApiGatewayResponseConfig(ApiGatewayRequestConfig):
         self.statuscode = statuscode
         self.models = models
         self.selectionpattern = selectionpattern
-
-
-class ApiGatewayDeploymentConfig(object):
-    def __init__(self, apiname, stagename):
-        """
-        This class is used to hold the configuration required for an Api Gateway Deployment.
-        """
-
-        self.restapiid = Ref(apiname + 'API')
-        self.stagename = stagename

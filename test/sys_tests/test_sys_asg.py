@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 
 import troposphere.elasticloadbalancing as elb
-from amazonia.classes.sns import SNS
 from amazonia.classes.asg import Asg
 from amazonia.classes.asg_config import AsgConfig
 from amazonia.classes.block_devices_config import BlockDevicesConfig
-from amazonia.classes.network_config import NetworkConfig
 from amazonia.classes.simple_scaling_policy_config import SimpleScalingPolicyConfig
-from troposphere import ec2, Ref, Template
+from network_setup import get_network_config
+from troposphere import Template
 
 
 def main():
@@ -22,20 +21,7 @@ packages:
 runcmd:
  - service httpd start
     """
-    template = Template()
-
-    vpc = template.add_resource(ec2.VPC('MyVPC',
-                                        CidrBlock='10.0.0.0/16'))
-    subnets = [template.add_resource(ec2.Subnet('MySubnet',
-                                                AvailabilityZone='ap-southeast-2a',
-                                                VpcId=Ref(vpc),
-                                                CidrBlock='10.0.1.0/24'))]
-
-    internet_gateway = template.add_resource(ec2.InternetGateway('MyInternetGateway'))
-    template.add_resource(ec2.VPCGatewayAttachment('MyInternetGatewayAttachment',
-                                                   VpcId=Ref(vpc),
-                                                   InternetGatewayId=Ref(internet_gateway)
-                                                   ))
+    network_config, template = get_network_config()
 
     load_balancer = template.add_resource(elb.LoadBalancer('MyELB',
                                                            CrossZone=True,
@@ -50,28 +36,7 @@ runcmd:
                                                                                    InstancePort='80',
                                                                                    InstanceProtocol='HTTP')],
                                                            Scheme='internet-facing',
-                                                           Subnets=[Ref(subnet) for subnet in subnets]))
-    sns_topic = SNS(template)
-
-    class Single(object):
-        def __init__(self):
-            self.single = ec2.Instance('title')
-
-    network_config = NetworkConfig(
-        vpc=vpc,
-        private_subnets=subnets,
-        public_subnets=None,
-        jump=None,
-        nat=Single(),
-        public_cidr=None,
-        public_hosted_zone_name=None,
-        private_hosted_zone=None,
-        keypair='pipeline',
-        cd_service_role_arn='arn:aws:iam::12345678987654321:role/CodeDeployServiceRole',
-        nat_highly_available=False,
-        nat_gateways=[],
-        sns_topic=sns_topic
-    )
+                                                           Subnets=network_config.public_subnets))
 
     block_devices_config = [BlockDevicesConfig(device_name='/dev/xvda',
                                                ebs_volume_size='15',

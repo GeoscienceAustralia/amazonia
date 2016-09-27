@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from troposphere import Output, Ref, Join, cloudwatch
+from troposphere import Ref, Join, cloudwatch
 from troposphere.sns import Topic, Subscription
 
 
@@ -9,9 +9,7 @@ class SNS(object):
         """
         AWS: http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sns-topic.html
         Troposphere: https://github.com/cloudtools/troposphere/blob/master/troposphere/sns.py
-        :param unit_title: Title of the sns unit
         :param template: The troposphere template to add the Elastic Loadbalancer to.
-        :param display_name: The SNS display name
         """
         title = 'SnsTopic'
 
@@ -19,13 +17,6 @@ class SNS(object):
         self.trop_topic = self.template.add_resource(Topic(title,
                                                            DisplayName=Join('', [Ref('AWS::StackName'),
                                                                                  'Notifications'])))
-
-        self.template.add_output(Output(
-            title,
-            Value=Ref(self.trop_topic),
-            Description='SNS Topic'
-        ))
-
         self.subscriptions = []
         self.alarms = []
 

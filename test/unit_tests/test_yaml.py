@@ -59,7 +59,7 @@ def test_basic_values():
     # Assert correct values
     assert_equals(stack_input['keypair'], 'INSERT_YOUR_KEYPAIR_HERE')
     assert_list_equal(stack_input['availability_zones'], ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])
-    assert_equals(stack_input['vpc_cidr'], '10.0.0.0/16')
+    assert_dict_equal(stack_input['vpc_cidr'], {'name': 'VPC', 'cidr': '10.0.0.0/16'})
     assert_dict_equal(stack_input['public_cidr'], {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
     assert_equals(stack_input['jump_image_id'], 'ami-dc361ebf')
     assert_equals(stack_input['jump_instance_type'], 't2.micro')
@@ -125,7 +125,7 @@ def test_complete_valid_values():
     assert_equals(stack_input['code_deploy_service_role'], 'arn:aws:iam::1234567890123:role/CodeDeployServiceRole')
     assert_equals(stack_input['keypair'], 'key')
     assert_list_equal(stack_input['availability_zones'], ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])
-    assert_equals(stack_input['vpc_cidr'], '10.0.0.0/16')
+    assert_dict_equal(stack_input['vpc_cidr'], {'name': 'VPC', 'cidr': '10.0.0.0/16'})
     assert_dict_equal(stack_input['public_cidr'], {'name': 'PublicIp', 'cidr': '0.0.0.0/0'})
     assert_equals(stack_input['jump_image_id'], 'ami-dc361ebf')
     assert_equals(stack_input['jump_instance_type'], 't2.micro')

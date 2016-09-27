@@ -90,7 +90,7 @@ def main():
 
     HostedZone(template=template, domain='mypublic.hz', vpcs=None)
 
-    HostedZone(template=template, domain='myprivate.hz', vpcs=[vpc])
+    HostedZone(template=template, domain='myprivate.hz', vpcs=[Ref(vpc)])
 
     print(template.to_json(indent=2, separators=(',', ': ')))
 

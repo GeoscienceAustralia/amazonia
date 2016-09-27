@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 
-from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
-from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_distribution_unit import CFDistributionUnit
-from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_distribution_config import CFDistributionConfig, CFCacheBehaviorConfig, CFOriginsConfig
+from amazonia.classes.amz_cf_distribution import CFDistributionLeaf
 from troposphere import Template
 
 
@@ -12,22 +10,22 @@ def main():
 
     origins = [
         CFOriginsConfig(
-            domain_name='amazonia-elb-bucket.s3.amazonaws.com',
-            origin_id='S3-amazonia-elb-bucket',
-            origin_path='/directory',
-            custom_headers={
-                'Origin': 'http://www.domain.com',
-                'Accept': 'True'
-            },
+            domain_name='app2',
+            origin_id='app2',
+            origin_path='',
+            custom_headers=[],
             origin_policy={
-                'is_s3': True,
-                'origin_access_identity': 'originaccessid1'
+                'is_s3': False,
+                'origin_protocol_policy': 'http-only',
+                'http_port': 80,
+                'https_port': 443,
+                'origin_ssl_protocols': ['TLSv1', 'TLSv1.1', 'TLSv1.2'],
             }
         ),
         CFOriginsConfig(
-            domain_name='amazonia-myStackap-LXYP1MFWT9UC-145363293.ap-southeast-2.elb.amazonaws.com',
-            origin_id='ELB-amazonia-myStackap-LXYP1MFWT9UC-145363293',
-            origin_path='',
+            domain_name='apigw1',
+            origin_id='apigw1',
+            origin_path='/amz_deploy',
             custom_headers=[],
             origin_policy={
                 'is_s3': False,
@@ -40,12 +38,12 @@ def main():
     ]
 
     cache_behavior = [
-        CFCacheBehavior(
+        CFCacheBehaviorConfig(
             is_default=True,
-            path_pattern='/index.html',
+            path_pattern='',
             allowed_methods=['GET', 'HEAD'],
             cached_methods=['GET', 'HEAD'],
-            target_origin_id='S3-bucket-id',
+            target_origin_id='app2',
             forward_cookies='all',
             forwarded_headers=[],
             viewer_protocol_policy='allow-all',
@@ -55,12 +53,12 @@ def main():
             trusted_signers=[],
             query_string=True
         ),
-        CFCacheBehavior(
+        CFCacheBehaviorConfig(
             is_default=False,
-            path_pattern='/login.js',
+            path_pattern='/login',
             allowed_methods=['GET', 'POST', 'HEAD', 'DELETE', 'OPTIONS', 'PATCH', 'PUT'],
             cached_methods=['GET', 'HEAD'],
-            target_origin_id='www-origin',
+            target_origin_id='apigw1',
             forward_cookies='all',
             forwarded_headers=['Accept',
                                'Accept-Charset',
@@ -75,26 +73,26 @@ def main():
             min_ttl=0,
             default_ttl=0,
             max_ttl=0,
-            trusted_signers=['self'],
+            trusted_signers=[],
             query_string=False
         ),
     ]
 
     distribution_config = CFDistributionConfig(
-        aliases=['www.test-stack.gadevs.ga', 'test-stack.gadevs.ga'],
+        aliases=[],
         comment='SysTestCFDistribution',
-        default_root_object='index.html',
+        default_root_object='',
         enabled=True,
         price_class='PriceClass_All',
-        error_page_path='index.html',
-        acm_cert_arn='arn:aws:acm:us-east-1:123456789012:certificate/12345678-abcd-efgh-1234-abcd12345678',
+        error_page_path='',
+        acm_cert_arn=None,
         minimum_protocol_version='TLSv1',
         ssl_support_method='sni-only'
     )
 
-    CFDistributionUnit(unit_title='cfdist',
+    CFDistributionLeaf(leaf_title='cfdist',
+                       tree_name='tree',
                        template=template,
-                       network_config=None,
                        cf_origins_config=origins,
                        cf_cache_behavior_config=cache_behavior,
                        cf_distribution_config=distribution_config)

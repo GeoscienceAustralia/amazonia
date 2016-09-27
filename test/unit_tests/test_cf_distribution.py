@@ -1,13 +1,10 @@
 #!/usr/bin/python3
 
-from amazonia.classes.cf_cache_behavior_config import CFCacheBehavior
-from amazonia.classes.cf_distribution_config import CFDistributionConfig
-from amazonia.classes.cf_distribution_unit import CloudfrontConfigError
-from amazonia.classes.cf_origins_config import CFOriginsConfig
+from amazonia.classes.cf_distribution_config import CFDistributionConfig, CFCacheBehaviorConfig, CFOriginsConfig
 from nose.tools import *
 
 
-def create_cf_distribution_config(aliases=('wwwelb.ap-southeast-2.elb.amazonaws.com'),
+def create_cf_distribution_config(aliases='wwwelb.ap-southeast-2.elb.amazonaws.com',
                                   comment='UnitTestCFDistConfig',
                                   default_root_object='index.html',
                                   enabled=True, price_class='PriceClass_All',
@@ -59,8 +56,8 @@ def create_s3_origin(domain_name='amazonia-elb-bucket.s3.amazonaws.com', origin_
         origin_id=origin_id,
         origin_path='',
         custom_headers={
-            'Origin':'http://www.domain.com',
-            'Accept':'True'
+            'Origin': 'http://www.domain.com',
+            'Accept': 'True'
         },
         origin_policy={
             'is_s3': is_s3,
@@ -134,7 +131,7 @@ def create_cache_behavior(is_default=False,
     :param query_string: indicates whether to forward query strings to the origin
     :return: Instance of CacheBehavior object
     """
-    cache_behavior = CFCacheBehavior(
+    cache_behavior = CFCacheBehaviorConfig(
         is_default=is_default,
         path_pattern=path_pattern,
         allowed_methods=allowed_methods,
@@ -223,7 +220,7 @@ def test_cf_cache_behavior():
     """
     Test to check CacheBehavior object inputs match the created outputs
     """
-    is_default=False
+    is_default = False
     path_pattern = '/index.html'
     allowed_methods = ('GET', 'POST')
     cached_methods = ('GET', 'POST'),

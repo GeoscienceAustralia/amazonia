@@ -14,16 +14,17 @@ def main():
                         CidrBlock='10.0.1.0/24')
     template = Template()
     single_instance_config = SingleInstanceConfig(
-        keypair='pipeline',
+        keypair='INSERT_YOUR_KEYPAIR_HERE',
         si_image_id='ami-dc361ebf',
         si_instance_type='t2.micro',
-        vpc=vpc,
-        subnet=subnet,
+        vpc=Ref(vpc),
+        subnet=Ref(subnet),
         instance_dependencies=vpc.title,
         public_hosted_zone_name=None,
         sns_topic=None,
         is_nat=False,
-        iam_instance_profile_arn=None
+        iam_instance_profile_arn=None,
+        availability_zone='ap-southeast-2a'
     )
     SingleInstance(title='jump',
                    template=template,
