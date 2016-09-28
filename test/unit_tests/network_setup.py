@@ -4,8 +4,8 @@ from troposphere import Ref
 
 
 def get_network_config():
-    network = Network('INSERT_YOUR_KEYPAIR_HERE',
-                      ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'],
+    network = Network(keypair='INSERT_YOUR_KEYPAIR_HERE',
+                      availability_zones=['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'],
                       vpc_cidr={'name': 'VPC', 'cidr': '10.0.0.0/16'},
                       home_cidrs=[{'name': 'Home', 'cidr': '0.0.0.0/0'}],
                       public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
@@ -19,7 +19,7 @@ def get_network_config():
                       owner_emails=[],
                       nat_highly_available=False)
 
-    service_role_arn = 'arn:aws:iam::123456789:role/CodeDeployServiceRole'
+    cd_service_role_arn = 'arn:aws:iam::123456789:role/CodeDeployServiceRole'
 
     return NetworkConfig(
         vpc=network.vpc,
@@ -32,7 +32,7 @@ def get_network_config():
         private_hosted_zone_id=Ref(network.private_hosted_zone.trop_hosted_zone),
         private_hosted_zone_domain=network.private_hosted_zone.domain,
         keypair=network.keypair,
-        cd_service_role_arn=service_role_arn,
+        cd_service_role_arn=cd_service_role_arn,
         nat_highly_available=network.nat_highly_available,
         nat_gateways=[],
         sns_topic=Ref(network.sns_topic.trop_topic),

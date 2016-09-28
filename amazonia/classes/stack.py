@@ -60,6 +60,7 @@ class Stack(Network):
         self.zd_autoscaling_units = zd_autoscaling_units if zd_autoscaling_units else []
         self.api_gateway_units = api_gateway_units if api_gateway_units else []
         self.lambda_units = lambda_units if lambda_units else []
+        self.units = {}
         self.network_config = None
 
         self.network_config = NetworkConfig(vpc=self.vpc,

@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.1] - 29/09/2016
+- Adding unit tests for tree and leaf config
+- Setting default rds size to t2.micro
+- Setting default instance size to t2.nano
+
 ## [1.3.14] - 27/09/2016
 - Created tree/leaf pattern based upon cloudformation cross stack references
 - Added permissions for API gateway to invoke Lambda

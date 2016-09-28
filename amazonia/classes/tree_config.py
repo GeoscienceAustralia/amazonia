@@ -29,8 +29,7 @@ class TreeConfig(object):
 
     def get_depends_on(self):
         """
-        Used to set "depends on" clauses in cloud formation, if the vpc has nat gateways, use the first nat gateway,
-         otherwise use the NAT instance
+        As a tree's network config is already created, the depends on clause for leave's does not need to be populated
         :return: title to use in depends on
         """
         return None

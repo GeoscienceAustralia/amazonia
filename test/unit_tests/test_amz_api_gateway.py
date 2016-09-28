@@ -1,3 +1,4 @@
+from amazonia.classes.amz_api_gateway import ApiGatewayLeaf
 from amazonia.classes.amz_api_gateway import ApiGatewayUnit
 from amazonia.classes.amz_lambda import LambdaUnit
 from amazonia.classes.api_gateway_config import ApiGatewayMethodConfig
@@ -9,7 +10,7 @@ from troposphere import Ref, Join
 
 template = apiname = methodname = httpmethod = authorizationtype = request_template = request_parameters = \
     response_template = response_parameters = response_models = selection_pattern = statuscode = lambda_title = \
-    network_config = None
+    network_config = tree_name = None
 
 
 def setup_resources():
@@ -18,8 +19,8 @@ def setup_resources():
     """
     global template, network_config, apiname, methodname, httpmethod, authorizationtype, request_template, \
         lambda_title, request_parameters, response_template, response_parameters, response_models, selection_pattern, \
-        statuscode
-
+        statuscode, tree_name
+    tree_name = 'testtree'
     network_config, template = get_network_config()
     apiname = 'test0'
     methodname = 'login0'
@@ -78,17 +79,32 @@ def test_method_config():
 
 
 @with_setup(setup_resources)
-def test_creation_of_api():
+def test_creation_of_api_leaf():
     """
-    Tests the creation of an api
+    Tests the creation of an api unit and api leaf
     """
     request = create_request_config()
     response = create_response_config()
     method = create_method_config(request, [response])
-    api = create_api(method)
+    api_leaf = create_api_leaf(method)
 
-    assert_equals(api.title, apiname)
-    assert_equals(api.api.title, apiname)
+    assert_equals(api_leaf.title, apiname)
+    assert_equals(api_leaf.api.title, apiname)
+    assert_equals(api_leaf.tree_name, tree_name)
+
+
+@with_setup(setup_resources)
+def test_creation_of_api_unit():
+    """
+    Tests the creation of an api unit and api leaf
+    """
+    request = create_request_config()
+    response = create_response_config()
+    method = create_method_config(request, [response])
+    api_unit = create_api_unit(method)
+
+    assert_equals(api_unit.title, apiname)
+    assert_equals(api_unit.api.title, apiname)
 
 
 @with_setup(setup_resources)
@@ -103,7 +119,7 @@ def test_creation_of_method():
     request = create_request_config()
     response = create_response_config()
     method = create_method_config(request, [response])
-    api = create_api(method)
+    api = create_api_unit(method)
     add_lambda('1')
 
     assert_equals(len(api.methods), 1)
@@ -135,7 +151,7 @@ def test_creation_of_integration():
     request = create_request_config()
     response = create_response_config()
     method = create_method_config(request, [response])
-    api = create_api(method)
+    api = create_api_unit(method)
     add_lambda('2')
 
     integration = api.methods[0].Integration
@@ -154,7 +170,6 @@ def test_creation_of_integration():
     assert_equals(integration_response.ResponseTemplates, response_template)
 
 
-@with_setup(setup_resources)
 def create_request_config():
     """
     Create a request config
@@ -165,7 +180,6 @@ def create_request_config():
                                    parameters=request_parameters)
 
 
-@with_setup(setup_resources)
 def create_response_config():
     """
     Create a response config
@@ -179,7 +193,6 @@ def create_response_config():
                                     models=response_models)
 
 
-@with_setup(setup_resources)
 def create_method_config(request, responses):
     """
     Creates a method config object, stitching together the request and reponses that are passed in
@@ -196,18 +209,19 @@ def create_method_config(request, responses):
                                   authorizationtype=authorizationtype)
 
 
-@with_setup(setup_resources)
-def create_api(method_config):
+def create_api_unit(method_config):
     """
     Creates an API object using a method_config object
     :param method_config: a method config
     :return: an Api gateway object
     """
-
     return ApiGatewayUnit(apiname, template, [method_config], network_config)
 
 
-@with_setup(setup_resources)
+def create_api_leaf(method_config):
+    return ApiGatewayLeaf(tree_name, apiname, template, [method_config])
+
+
 def add_lambda(num):
     """
     Creates a lambda function to use with the api gateway
