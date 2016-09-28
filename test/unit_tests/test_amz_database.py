@@ -1,17 +1,19 @@
-from amazonia.classes.amz_database import DatabaseUnit
+from amazonia.classes.amz_database import DatabaseUnit, DatabaseLeaf
 from amazonia.classes.database_config import DatabaseConfig
 from network_setup import get_network_config
 from nose.tools import *
 from troposphere import Join
 
-template = network_config = database_config = None
+template = network_config = database_config = tree_name = availability_zones = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
-    global template, network_config, database_config
+    global template, network_config, database_config, tree_name, availability_zones
 
     network_config, template = get_network_config()
+    availability_zones = ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c']
+    tree_name = 'testtree'
 
     database_config = DatabaseConfig(
         db_instance_type='db.t2.micro',
@@ -28,7 +30,34 @@ def setup_resources():
 
 
 @with_setup(setup_resources)
-def test_database():
+def test_database_leaf():
+    """ Tests correct structure of Database leaf.
+    """
+    global network_config, database_config, template
+    db = DatabaseLeaf(leaf_title='MyDb',
+                      tree_name=tree_name,
+                      template=template,
+                      database_config=database_config,
+                      availability_zones=availability_zones
+                      )
+
+    assert_equals(db.trop_db.DBInstanceClass, 'db.t2.micro')
+    assert_equals(db.trop_db.Engine, 'postgres')
+    assert_equals(db.trop_db.Port, '5432')
+    assert_equals(db.trop_db.DBName, 'MyDb')
+    assert_equals(len(template.outputs), 3)
+    assert_equals(len(template.parameters), 2)
+    assert_equals(db.trop_db.AllocatedStorage, 5)
+    assert_equals(db.trop_db.PreferredBackupWindow, '17:00-17:30'),
+    assert_equals(db.trop_db.BackupRetentionPeriod, '4'),
+    assert_equals(db.trop_db.PreferredMaintenanceWindow, 'Mon:01:00-Mon:01:30'),
+    assert_equals(db.trop_db.StorageType, 'gp2')
+    assert_equals(type(db.trop_db.DBInstanceIdentifier), Join)
+
+
+
+@with_setup(setup_resources)
+def test_database_unit():
     """ Tests correct structure of Database unit.
     """
     global network_config, database_config, template
