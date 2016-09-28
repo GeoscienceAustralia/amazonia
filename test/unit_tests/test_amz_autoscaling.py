@@ -6,20 +6,21 @@ from network_setup import get_network_config
 from nose.tools import *
 from troposphere import Ref
 
-template = network_config = elb_config = asg_config = tree_name = availability_zones = cd_service_role_arn = \
+template = network_config = elb_config = asg_config = keypair = tree_name = availability_zones = cd_service_role_arn = \
     public_cidr = public_hosted_zone_name = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
-    global template, network_config, elb_config, asg_config, tree_name, availability_zones, cd_service_role_arn, \
-        public_cidr, public_hosted_zone_name
+    global template, network_config, elb_config, asg_config, keypair, tree_name, availability_zones, \
+        cd_service_role_arn, public_cidr, public_hosted_zone_name
     tree_name = 'testtree'
     network_config, template = get_network_config()
     availability_zones = ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c']
     cd_service_role_arn = 'arn:aws:iam::123456789:role/CodeDeployServiceRole'
     public_cidr = {'name': 'PublicIp', 'cidr': '0.0.0.0/0'}
     public_hosted_zone_name = 'your.domain.'
+    keypair = 'INSERT_YOUR_KEYPAIR_HERE'
     block_devices_config = [BlockDevicesConfig(
         device_name='/dev/xvda',
         ebs_volume_size='15',
@@ -122,26 +123,12 @@ def test_leaf_association():
     assert_equals(len(leaf.elb.egress), 1)
 
 
-def create_autoscaling_leaf(title, dependencies=None):
-    """Helper function to create leaf
-    :param title: title of leaf
-    :param dependencies: optional list of dependencies
-    :return new autoscaling leaf
-    """
-    global template, asg_config, elb_config, tree_name
-    return AutoscalingLeaf(tree_name=tree_name, leaf_title=title, asg_config=asg_config, elb_config=elb_config,
-                           availability_zones=availability_zones, cd_service_role_arn=cd_service_role_arn,
-                           keypair='INSERT_YOUR_KEYPAIR_HERE', template=template, public_cidr=public_cidr,
-                           dependencies=dependencies, public_hosted_zone_name=public_hosted_zone_name)
-
-
 def create_autoscaling_unit(title, dependencies=None):
     """Helper function to create unit
     :param title: title of unit
     :param dependencies: optional list of dependencies
     :return new autoscaling unit
     """
-    global template, network_config, asg_config, elb_config
     return AutoscalingUnit(
         unit_title=title,
         stack_config=network_config,
@@ -150,3 +137,15 @@ def create_autoscaling_unit(title, dependencies=None):
         template=template,
         dependencies=dependencies
     )
+
+
+def create_autoscaling_leaf(title, dependencies=None):
+    """Helper function to create leaf
+    :param title: title of leaf
+    :param dependencies: optional list of dependencies
+    :return new autoscaling leaf
+    """
+    return AutoscalingLeaf(tree_name=tree_name, leaf_title=title, asg_config=asg_config, elb_config=elb_config,
+                           availability_zones=availability_zones, cd_service_role_arn=cd_service_role_arn,
+                           keypair=keypair, template=template, public_cidr=public_cidr,
+                           dependencies=dependencies, public_hosted_zone_name=public_hosted_zone_name)

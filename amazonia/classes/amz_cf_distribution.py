@@ -25,20 +25,21 @@ class CFDistribution(object):
         :param cf_cache_behavior_config: A list of CFCacheBehavior objects
         :param cf_distribution_config: A CFDistributionConfig object
         """
+        self.title = title
         self.origins = []
         self.cache_behaviors = []
         self.default_cache_behavior = cloudfront.DefaultCacheBehavior()
 
         # Populate origins
-        self.add_origins(title, cf_origins_config)
+        self.add_origins(self.title, cf_origins_config)
         # Populate cache_behaviors
-        self.add_cache_behaviors(title, cf_cache_behavior_config)
+        self.add_cache_behaviors(self.title, cf_cache_behavior_config)
 
         # Set distribution-wide parameters
         self.cf_dist = cloudfront.DistributionConfig(
-            title + 'CfDistConfig',
+            self.title + 'CfDistConfig',
             Aliases=cf_distribution_config.aliases,
-            Comment=title,
+            Comment=self.title,
             DefaultCacheBehavior=self.default_cache_behavior,
             CacheBehaviors=self.cache_behaviors,
             DefaultRootObject=cf_distribution_config.default_root_object,
