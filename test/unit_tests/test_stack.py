@@ -15,7 +15,7 @@ userdata = keypair = instance_type = code_deploy_service_role = vpc_cidr = publi
     minsize = maxsize = elb_health_check = nat_image_id = jump_image_id = unit_image_id = health_check_grace_period = \
     health_check_type = db_instance_type = db_engine = db_port = db_hdd_size = owner_emails = \
     db_backup_window = db_backup_retention = db_maintenance_window = db_storage_type = block_devices_config = \
-    elb_listeners_config = healthy_threshold = unhealthy_threshold = interval = timeout = None
+    elb_listeners_config = healthy_threshold = unhealthy_threshold = interval = timeout = sticky_app_cookies = None
 
 availability_zones = []
 home_cidrs = []
@@ -43,7 +43,7 @@ runcmd:
  - service httpd start
 """
     availability_zones = ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c']
-    keypair = 'pipeline'
+    keypair = 'INSERT_YOUR_KEYPAIR_HERE'
     nat_image_id = 'ami-53371f30'
     jump_image_id = 'ami-dc361ebf'
     unit_image_id = 'ami-dc361ebf'
@@ -145,38 +145,11 @@ def test_stack():
     assert_equals(len(stack.units), 7)
 
 
+@with_setup(setup_resources)
 def test_highly_available_nat_stack():
     """ Test for nat gateway configuration"""
-    global userdata, availability_zones, keypair, instance_type, code_deploy_service_role, vpc_cidr, \
-        public_cidr, instance_port, loadbalancer_port, instance_protocol, loadbalancer_protocol, minsize, maxsize, \
-        elb_health_check, home_cidrs, nat_image_id, jump_image_id, health_check_grace_period, health_check_type, \
-        unit_image_id, db_instance_type, db_engine, db_port, owner_emails, db_backup_window, \
-        db_backup_retention, db_maintenance_window, db_storage_type, block_devices_config, healthy_threshold, \
-        unhealthy_threshold, interval, timeout, sticky_app_cookies
 
-    stack = Stack(
-        code_deploy_service_role=code_deploy_service_role,
-        keypair=keypair,
-        availability_zones=availability_zones,
-        vpc_cidr=vpc_cidr,
-        public_cidr=public_cidr,
-        home_cidrs=home_cidrs,
-        jump_image_id=jump_image_id,
-        jump_instance_type=instance_type,
-        nat_image_id=nat_image_id,
-        nat_instance_type=instance_type,
-        public_hosted_zone_name=None,
-        private_hosted_zone_name='private.lan.',
-        iam_instance_profile_arn=None,
-        owner_emails=owner_emails,
-        nat_highly_available=True,
-        zd_autoscaling_units=[],
-        autoscaling_units=[],
-        database_units=[],
-        cf_distribution_units=[],
-        api_gateway_units=[],
-        lambda_units=[]
-    )
+    stack = create_stack(nat_highly_available=True)
 
     assert_equals(stack.code_deploy_service_role, code_deploy_service_role)
     assert_equals(stack.keypair, keypair)
@@ -213,7 +186,7 @@ def test_highly_available_nat_stack():
         private_subnet = stack.private_subnets[num]
         assert_equals(private_subnet.CidrBlock, ''.join(['10.0.', str(num + 100), '.0/24']))
 
-    assert_equals(len(stack.units), 0)
+    assert_equals(len(stack.units), 7)
 
 
 def test_duplicate_unit_names():
@@ -296,7 +269,7 @@ def test_duplicate_unit_names():
     })
 
 
-def create_stack():
+def create_stack(nat_highly_available=False):
     """
     Helper function to create a stack with default values
     :return new stack
@@ -323,7 +296,7 @@ def create_stack():
         private_hosted_zone_name='priavte.lan.',
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
-        nat_highly_available=False,
+        nat_highly_available=nat_highly_available,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,

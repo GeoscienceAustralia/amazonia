@@ -57,7 +57,6 @@ class Network(object):
 
         # initialize object references
         self.template = Template()
-        self.units = {}
         self.private_subnets = []
         self.public_subnets = []
         self.public_subnet_mapping = {}
