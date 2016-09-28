@@ -22,10 +22,10 @@ public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
 jump_image_id: 'ami-dc361ebf'
-jump_instance_type: 't2.micro'
+jump_instance_type: 't2.nano'
 nat_highly_available: false
 nat_image_id: 'ami-53371f30'
-nat_instance_type: 't2.micro'
+nat_instance_type: 't2.nano'
 home_cidrs:
   - name: 'office'
     cidr: '123.45.12.34/16'
@@ -112,7 +112,7 @@ simple_scaling_policy_config:
 # Asg default values
 asg_config: &asg_config
   image_id: 'ami-dc361ebf'
-  instance_type: 't2.micro'
+  instance_type: 't2.nano'
   iam_instance_profile_arn:
   minsize: '1'
   maxsize: '1'

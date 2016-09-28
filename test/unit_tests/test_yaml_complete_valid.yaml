@@ -14,9 +14,9 @@ public_cidr:
   name: 'PublicIp'
   cidr: '0.0.0.0/0'
 jump_image_id: 'ami-dc361ebf'
-jump_instance_type: 't2.micro'
+jump_instance_type: 't2.nano'
 nat_image_id: 'ami-53371f30'
-nat_instance_type: 't2.micro'
+nat_instance_type: 't2.nano'
 nat_highly_available: true
 home_cidrs:
   - name: 'office'
@@ -31,7 +31,7 @@ zd_autoscaling_units:
     unit_title: 'zdapp1'
     blue_asg_config:
       image_id: 'ami-dc361ebf'
-      instance_type: 't2.micro'
+      instance_type: 't2.nano'
       iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
       minsize: '1'
       maxsize: '1'
@@ -57,7 +57,7 @@ zd_autoscaling_units:
          - service httpd start
     green_asg_config:
       image_id: 'ami-dc361ebf'
-      instance_type: 't2.micro'
+      instance_type: 't2.nano'
       iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
       minsize: '1'
       maxsize: '1'
@@ -122,7 +122,7 @@ autoscaling_units:
     unit_title: 'app1'
     asg_config:
       image_id: 'ami-dc361ebf'
-      instance_type: 't2.micro'
+      instance_type: 't2.nano'
       iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
       minsize: '1'
       maxsize: '1'
@@ -163,7 +163,7 @@ autoscaling_units:
     unit_title: 'app2'
     asg_config:
       image_id: 'ami-dc361ebf'
-      instance_type: 't2.micro'
+      instance_type: 't2.nano'
       iam_instance_profile_arn: 'arn:aws:iam::1234567890124:role/InstanceProfile'
       minsize: '1'
       maxsize: '1'
@@ -238,7 +238,7 @@ database_units:
   -
     unit_title: 'db1'
     database_config:
-      db_instance_type: 'db.m1.small'
+      db_instance_type: 'db.t2.micro'
       db_engine: 'postgres'
       db_port: '5432'
       db_name: 'myDb'
