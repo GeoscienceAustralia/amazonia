@@ -44,6 +44,6 @@ class AsgConfig(object):
             detect_unencrypted_access_keys(self.userdata)
 
         # Validate that minsize is less than maxsize
-        if self.minsize > self.maxsize:
+        if int(self.minsize) > int(self.maxsize):
             raise InvalidAsgConfigError('Autoscaling unit minsize ({0}) cannot be '
                                         'larger than maxsize ({1})'.format(self.minsize, self.maxsize))
