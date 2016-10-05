@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.2] - 5/10/2016
+- Temporarily locked web front end to v1.3.13 due to troposphere 1.8.2 dependency not being in Pypi yet.
+
 ## [1.4.1] - 29/09/2016
 - Adding unit tests for tree and leaf config
 - Setting default rds size to t2.micro
