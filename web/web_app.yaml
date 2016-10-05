@@ -2,7 +2,7 @@
 # Web Front End: http://amazonia.gadevs.ga/amazonia/web/index.html
 # API: http://amazonia.gadevs.ga/yaml
 # (The API will only work for POST requests with correctly formatted YAML data)
-stack_hosted_zone_name: 'gadevs.ga.'
+public_hosted_zone_name: 'gadevs.ga.'
 autoscaling_units:
   -
     unit_title: 'api'
@@ -18,9 +18,10 @@ autoscaling_units:
          - python34-pip
         runcmd:
          - cd /var/www/html
-         - git clone https://github.com/GeoscienceAustralia/amazonia.git
+         - git clone --branch v1.3.13 https://github.com/GeoscienceAustralia/amazonia.git
          - cd amazonia
          - pip-3.4 install -e . --user
+         - sed -i 's/Yaml:<\/h2><br \/>/Yaml:<\/h2><br \/><small>Version currently locked to <a href="https:\/\/github.com\/GeoscienceAustralia\/amazonia\/tree\/v1.3.13">v1.3.13<\/a>/g' ./web/index.html
          - export FLASK_APP=/var/www/html/amazonia/web/api.py
          - echo "<VirtualHost *:80>" >> /etc/httpd/conf/httpd.conf
          - echo "    ProxyPass /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
@@ -31,11 +32,8 @@ autoscaling_units:
          - python3 -m flask run --host=0.0.0.0
     elb_config:
       elb_health_check: 'HTTP:80/amazonia/web/index.html'
-      instance_protocol:
-        - 'HTTP'
-      instance_port:
-        - '80'
-      loadbalancer_protocol:
-        - 'HTTP'
-      loadbalancer_port:
-        - '80'
+      elb_listeners_config:
+        - instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_protocol: 'HTTP'
+          loadbalancer_port: '80'
