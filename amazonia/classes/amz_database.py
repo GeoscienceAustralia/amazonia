@@ -2,7 +2,7 @@
 
 from amazonia.classes.leaf import Leaf
 from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject
-from troposphere import ImportValue
+from troposphere import ImportValue, Export
 from troposphere import Tags, Ref, rds, Join, Output, GetAtt, Parameter, route53
 
 
@@ -123,7 +123,7 @@ class DatabaseLeaf(Database, Leaf):
             'rdsSecurityGroup',
             Description='RDS Security group',
             Value=self.security_group,
-            Export={'Name': self.tree_name + '-' + self.leaf_title + '-SecurityGroup'}
+            Export=Export(self.tree_name + '-' + self.leaf_title + '-SecurityGroup')
         ))
 
 

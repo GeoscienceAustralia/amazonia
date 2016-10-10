@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from troposphere import Ref, Join, GetAtt, Output, ImportValue
+from troposphere import Ref, Join, GetAtt, Output, ImportValue, Export
 from troposphere.apigateway import Deployment
 from troposphere.apigateway import RestApi, Resource, MethodResponse, IntegrationResponse, Integration, Method
 from troposphere.awslambda import Permission
@@ -213,7 +213,7 @@ class ApiGatewayLeaf(ApiGateway):
                 Ref("AWS::Region"),
                 '.amazonaws.com']
                        ),
-            Export={'Name': self.tree_name + '-' + self.title + '-Endpoint'}
+            Export=Export(self.tree_name + '-' + self.title + '-Endpoint')
         ))
 
     def get_lambda_reference(self, lambda_name):

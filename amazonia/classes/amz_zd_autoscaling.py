@@ -5,7 +5,7 @@ from amazonia.classes.elb import Elb
 from amazonia.classes.leaf import Leaf
 from amazonia.classes.security_enabled_object import RemoteReferenceSecurityEnabledObject, \
     LocalReferenceSecurityEnabledObject
-from troposphere import Output, GetAtt, ImportValue
+from troposphere import Output, GetAtt, ImportValue, Export
 
 
 class ZdAutoscaling(object):
@@ -122,13 +122,13 @@ class ZdAutoscalingLeaf(ZdAutoscaling, Leaf):
             'elbEndpoint',
             Description='Endpoint of the {0} ELB'.format(self.title),
             Value=GetAtt(self.prod_elb.trop_elb, 'DNSName'),
-            Export={'Name': self.tree_name + '-' + leaf_title + '-Endpoint'}
+            Export=Export(self.tree_name + '-' + leaf_title + '-Endpoint')
         ))
         self.template.add_output(Output(
             'elbSecurityGroup',
             Description='ELB Security group',
             Value=self.prod_elb.security_group,
-            Export={'Name': self.tree_name + '-' + leaf_title + '-SecurityGroup'}
+            Export=Export(self.tree_name + '-' + leaf_title + '-SecurityGroup')
         ))
 
         for dependency in self.dependencies:

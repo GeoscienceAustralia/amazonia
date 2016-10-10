@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from amazonia.classes.network import Network
-from troposphere import Ref, Output
+from troposphere import Ref, Output, Export
 
 
 class Tree(Network):
@@ -43,35 +43,35 @@ class Tree(Network):
             'vpc',
             Description='VPC ID',
             Value=self.vpc,
-            Export={'Name': self.tree_name + '-VPC'}
+            Export=Export(self.tree_name + '-VPC')
         ))
 
         self.template.add_output(Output(
             'jump',
             Description='Jump box Security group',
             Value=self.jump.security_group,
-            Export={'Name': self.tree_name + '-Jump'}
+            Export=Export(self.tree_name + '-Jump')
         ))
 
         self.template.add_output(Output(
             'privateHostedZone',
             Description='Private Hosted Zone ID',
             Value=Ref(self.private_hosted_zone.trop_hosted_zone),
-            Export={'Name': self.tree_name + '-PrivateHostedZoneId'}
+            Export=Export(self.tree_name + '-PrivateHostedZoneId')
         ))
 
         self.template.add_output(Output(
             'privateHostedZoneDomain',
             Description='Private Hosted Zone Domain',
             Value=self.private_hosted_zone.domain,
-            Export={'Name': self.tree_name + '-PrivateHostedZoneDomain'}
+            Export=Export(self.tree_name + '-PrivateHostedZoneDomain')
         ))
 
         self.template.add_output(Output(
             'snsTopic',
             Description='Sns Topic',
             Value=Ref(self.sns_topic.trop_topic),
-            Export={'Name': self.tree_name + '-SnsTopic'}
+            Export=Export(self.tree_name + '-SnsTopic')
         ))
 
         for subnet in self.public_subnets:
@@ -80,7 +80,7 @@ class Tree(Network):
                 'publicSubnet' + az,
                 Description='Public Subnet ' + az,
                 Value=Ref(subnet),
-                Export={'Name': self.tree_name + '-PublicSubnet-' + az}
+                Export=Export(self.tree_name + '-PublicSubnet-' + az)
             ))
 
         for subnet in self.private_subnets:
@@ -89,5 +89,5 @@ class Tree(Network):
                 'privateSubnet' + az,
                 Description='Private Subnet ' + az,
                 Value=Ref(subnet),
-                Export={'Name': self.tree_name + '-PrivateSubnet-' + az}
+                Export=Export(self.tree_name + '-PrivateSubnet-' + az)
             ))

@@ -2,7 +2,7 @@
 from amazonia.classes.leaf import Leaf
 from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject, RemoteReferenceSecurityEnabledObject, \
     LocalReferenceSecurityEnabledObject
-from troposphere import Ref, GetAtt, Join, Output
+from troposphere import Ref, GetAtt, Join, Output, Export
 from troposphere.awslambda import Code, VPCConfig, Function, Permission
 from troposphere.events import Rule, Target
 
@@ -103,7 +103,7 @@ class LambdaLeaf(Lambda, Leaf):
             'lambdaArn',
             Description='Lambda function ARN',
             Value=GetAtt(self.trop_lambda_function, 'Arn'),
-            Export={'Name': self.tree_name + '-' + leaf_title + '-Arn'}
+            Export=Export(self.tree_name + '-' + leaf_title + '-Arn')
         ))
 
 
