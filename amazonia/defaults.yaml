@@ -36,6 +36,7 @@ iam_instance_profile_arn:
 zd_autoscaling_units:
 autoscaling_units:
 database_units:
+ec2_scheduled_shutdown:
 
 # Common unit default values
 unit_title: 'defaulttitle'

@@ -443,6 +443,10 @@ availability_zones: # A list of strings, specifying each availability zone to us
   schema:
     type: 'string'
     empty: False
+ec2_scheduled_shutdown: # Boolean to specify whether to schedule shutdown for ec2 instances outside work hours
+  type: 'boolean'
+  nullable: True
+
 vpc_cidr: # A cidr block to delegate to your VPC.
   type: 'dict'
   empty: False

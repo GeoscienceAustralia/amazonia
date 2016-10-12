@@ -54,6 +54,14 @@ runcmd:
  - ./awslogs-agent-setup.py -n -r """ + region + """ -c /etc/awslogs.cfg
 """
 
+        tags = Tags(Name=Join('', [Ref('AWS::StackName'), '-', title]))
+        if single_instance_config.ec2_scheduled_shutdown:
+            # 2000 UTC (previous day) = 0700 AEDT, 0800 UTC = 1900 AEDT
+            # therefore, it needs to run Sunday UTC to be Monday AEDT
+            #
+            # <start time>;<stop time>;utc;<active days>
+            tags += Tags(**{'scheduler:ec2-startstop': '1900;0900;utc;sun,mon,tue,wed,thu'})
+
         self.single = self.template.add_resource(
             ec2.Instance(
                 title,
@@ -72,7 +80,7 @@ runcmd:
                 # true otherwise. For more info check the below:
                 # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
                 SourceDestCheck=False if single_instance_config.is_nat else True,
-                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
+                Tags=tags,
                 DependsOn=single_instance_config.instance_dependencies,
                 UserData=Base64(userdata)
             ))

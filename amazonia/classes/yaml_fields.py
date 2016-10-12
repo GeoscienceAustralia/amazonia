@@ -180,7 +180,8 @@ class YamlFields(object):
         'lambda_units',
         'database_units',
         'iam_instance_profile_arn',
-        'owner_emails'
+        'owner_emails',
+        'ec2_scheduled_shutdown'
     ]
 
     # autoscaling unit parameter field list

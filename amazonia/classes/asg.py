@@ -5,10 +5,9 @@ from amazonia.classes.security_enabled_object import LocalSecurityEnabledObject
 from amazonia.classes.util import get_cf_friendly_name
 from troposphere import Base64, codedeploy, Ref, Join, Output
 from troposphere.autoscaling import AutoScalingGroup, LaunchConfiguration, Tag, NotificationConfigurations
-from troposphere.autoscaling import ScalingPolicy
+from troposphere.autoscaling import ScalingPolicy, ScheduledAction
 from troposphere.cloudwatch import MetricDimension, Alarm
 from troposphere.policies import UpdatePolicy, AutoScalingRollingUpdate
-
 
 class Asg(LocalSecurityEnabledObject):
     def __init__(self, title, template, network_config, load_balancers, asg_config):
@@ -93,6 +92,24 @@ class Asg(LocalSecurityEnabledObject):
             asg_config=asg_config,
             network_config=network_config
         ))
+
+        if hasattr(asg_config, 'ec2_scheduled_shutdown'):
+            # scheduled action for turning off instances (max=0)
+            self.template.add_resource(ScheduledAction(
+                title=title + 'SchedActOFF',
+                AutoScalingGroupName=Ref(self.trop_asg),
+                MaxSize=0,
+                MinSize=0,
+                Recurrence="0 08 * * *"
+            ))
+            # scheduled action for turning on instances (max=maxsize)
+            self.template.add_resource(ScheduledAction(
+                title=title + 'SchedActON',
+                AutoScalingGroupName=Ref(self.trop_asg),
+                MaxSize=asg_config.maxsize,
+                MinSize=asg_config.minsize,
+                Recurrence="0 20 * * 0,1,2,3,4"
+            ))
 
     def create_launch_config(self, title, asg_config, network_config):
         """
