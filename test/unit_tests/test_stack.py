@@ -209,6 +209,7 @@ def test_duplicate_unit_names():
         'iam_instance_profile_arn': None,
         'owner_emails': owner_emails,
         'nat_highly_available': False,
+        'ec2_scheduled_shutdown': False,
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -220,7 +221,8 @@ def test_duplicate_unit_names():
                                    userdata=userdata,
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
-                                   simple_scaling_policy_config=None
+                                   simple_scaling_policy_config=None,
+                                   ec2_scheduled_shutdown=None
                                ),
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -257,7 +259,8 @@ def test_duplicate_unit_names():
                                    userdata=userdata,
                                    iam_instance_profile_arn=None,
                                    block_devices_config=None,
-                                   simple_scaling_policy_config=None
+                                   simple_scaling_policy_config=None,
+                                   ec2_scheduled_shutdown=None
                                ),
                                'dependencies': [],
                                }],
@@ -297,6 +300,7 @@ def create_stack(nat_highly_available=False):
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_highly_available=nat_highly_available,
+        ec2_scheduled_shutdown=False,
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -319,7 +323,8 @@ def create_stack(nat_highly_available=False):
                                    userdata=userdata,
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
-                                   simple_scaling_policy_config=None
+                                   simple_scaling_policy_config=None,
+                                   ec2_scheduled_shutdown=None
                                ),
                                'green_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -331,7 +336,8 @@ def create_stack(nat_highly_available=False):
                                    userdata=userdata,
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
-                                   simple_scaling_policy_config=None
+                                   simple_scaling_policy_config=None,
+                                   ec2_scheduled_shutdown=None
                                ),
                                'dependencies': ['app2:5432', 'db1:80'],
                                }],
@@ -357,7 +363,8 @@ def create_stack(nat_highly_available=False):
                                 userdata=userdata,
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None
                             ),
                             'dependencies': ['app2:80', 'db1:5432'],
                             },
@@ -383,7 +390,8 @@ def create_stack(nat_highly_available=False):
                                 userdata=userdata,
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None
                             ),
                             'dependencies': []
                             }],

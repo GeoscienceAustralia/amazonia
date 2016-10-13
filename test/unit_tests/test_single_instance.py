@@ -69,11 +69,24 @@ def test_nat_single_instance():
     assert_equals(si.sns_topic.alarms[0].Dimensions[0].Name, 'InstanceId')
 
 
-def create_si(title, is_nat=False):
+def test_ec2_scheduler_tags_created():
+    """Test whether EC2 scheduler tags are added to single instance"""
+    title_with_schedule = 'siSchedule'
+    si_schedule = create_si(title_with_schedule, ec2_schedule=True)
+    assert_in('1900;0900;utc;sun,mon,tue,wed,thu', [x['Value'] for x in si_schedule.single.properties['Tags'].tags])
+
+    # ensure tags aren't added for instances that aren't scheduled
+    title = 'si'
+    si = create_si(title)
+    assert_not_in('1900;0900;utc;sun,mon,tue,wed,thu', [x['Value'] for x in si.single.properties['Tags'].tags])
+
+
+def create_si(title, is_nat=False, ec2_schedule=None):
     """
     Helper function to create Single instance Troposhpere object to interate through.
     :param title: name of instance
     :param is_nat: is the instance a nat
+    :param ec2_schedule: optional flag to set scheduler tag on instance
     :return: Troposphere object for single instance, security group and output
     """
     vpc = 'vpc-12345'
@@ -96,7 +109,8 @@ def create_si(title, is_nat=False):
         is_nat=is_nat,
         iam_instance_profile_arn='my/instance-profile',
         sns_topic=sns_topic,
-        availability_zone='ap-southeast-2a'
+        availability_zone='ap-southeast-2a',
+        ec2_scheduled_shutdown=ec2_schedule
     )
     si = SingleInstance(title=title,
                         template=template,

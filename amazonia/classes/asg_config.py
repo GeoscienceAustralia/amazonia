@@ -14,7 +14,8 @@ class InvalidAsgConfigError(Exception):
 class AsgConfig(object):
     def __init__(self, health_check_grace_period,
                  health_check_type, minsize, maxsize, image_id, instance_type, userdata,
-                 iam_instance_profile_arn, block_devices_config, simple_scaling_policy_config):
+                 iam_instance_profile_arn, block_devices_config, simple_scaling_policy_config,
+                 ec2_scheduled_shutdown):
         """
         Simple config class to contain autoscaling group related parameters
         :param minsize: minimum size of autoscaling group
@@ -27,6 +28,7 @@ class AsgConfig(object):
         :param health_check_type: The type of health check. currently 'ELB' or 'EC2' are the only valid types.
         :param block_devices_config: List containing block device mappings
         :param simple_scaling_policy_config: List containing scaling policies
+        :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
         """
         self.health_check_grace_period = health_check_grace_period
         self.health_check_type = health_check_type
@@ -38,6 +40,7 @@ class AsgConfig(object):
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.block_devices_config = block_devices_config
         self.simple_scaling_policy_config = simple_scaling_policy_config
+        self.ec2_scheduled_shutdown = ec2_scheduled_shutdown
 
         # check for insecure variables
         if self.userdata is not None:

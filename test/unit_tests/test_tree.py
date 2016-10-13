@@ -3,7 +3,8 @@ from amazonia.classes.util import get_cf_friendly_name
 from nose.tools import *
 from troposphere import Tags, Ref
 
-keypair = instance_type = vpc_cidr = public_cidr = nat_image_id = jump_image_id = owner_emails = None
+keypair = instance_type = vpc_cidr = public_cidr = nat_image_id = jump_image_id = owner_emails = \
+    ec2_scheduled_shutdown = None
 availability_zones = []
 home_cidrs = []
 
@@ -126,4 +127,5 @@ def create_tree(nat_highly_available=False):
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_highly_available=nat_highly_available,
+        ec2_scheduled_shutdown=ec2_scheduled_shutdown
     )

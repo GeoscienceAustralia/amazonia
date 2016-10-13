@@ -16,7 +16,7 @@ class Stack(Network):
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, public_hosted_zone_name,
                  private_hosted_zone_name, iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
-                 nat_highly_available):
+                 nat_highly_available, ec2_scheduled_shutdown):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -47,12 +47,14 @@ class Stack(Network):
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
         :param nat_highly_available: True/False for whether or not to use a series of NAT gateways or a single NAT
+        :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
         """
 
         super(Stack, self).__init__(
             keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
             jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name,
-            private_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_highly_available)
+            private_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_highly_available,
+            ec2_scheduled_shutdown)
         self.code_deploy_service_role = code_deploy_service_role
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []
@@ -62,6 +64,9 @@ class Stack(Network):
         self.lambda_units = lambda_units if lambda_units else []
         self.units = {}
         self.network_config = None
+
+        for autoscaling_unit in self.autoscaling_units:
+            autoscaling_unit['ec2_scheduled_shutdown'] = ec2_scheduled_shutdown
 
         self.network_config = NetworkConfig(vpc=self.vpc,
                                             public_subnets=[Ref(subnet) for subnet in self.public_subnets],

@@ -80,7 +80,8 @@ runcmd:
         maxsize=1,
         minsize=1,
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=simple_scaling_policy_config
+        simple_scaling_policy_config=simple_scaling_policy_config,
+        ec2_scheduled_shutdown=None
     )
 
     load_balancer = elb.LoadBalancer('testElb',

@@ -9,7 +9,7 @@ from troposphere import Output, GetAtt, ImportValue, Export
 
 
 class Autoscaling(object):
-    def __init__(self, title, template, network_config, elb_config, asg_config, dependencies):
+    def __init__(self, title, template, network_config, elb_config, asg_config, dependencies, ec2_scheduled_shutdown):
         """
         Create Amazonia Autoscaling resources, an ELB, an autosclaing group and other associated resources
         :param title: title of the amazonia obect and associated resources to be used in cloud formation
@@ -18,6 +18,7 @@ class Autoscaling(object):
         :param elb_config: config related to Elastic Load Balancer
         :param asg_config: config related to AutoScaling Group
         :param dependencies: List of resources to create network flow to
+        :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
         """
         self.title = title
         self.template = template
@@ -25,12 +26,15 @@ class Autoscaling(object):
         self.instance_ports = [listener.instance_port for listener in elb_config.elb_listeners_config]
         self.dependencies = dependencies if dependencies else []
 
+        asg_config.ec2_scheduled_shutdown = ec2_scheduled_shutdown
+
         self.elb = Elb(
             title=title,
             template=self.template,
             network_config=network_config,
             elb_config=elb_config
         )
+
         self.asg = Asg(
             title=title,
             template=self.template,
@@ -75,7 +79,7 @@ class AutoscalingLeaf(Autoscaling, Leaf):
         self.tree_config.private_hosted_zone_id = ImportValue(self.tree_name + '-PrivateHostedZoneId')
         self.tree_config.private_hosted_zone_domain = ImportValue(self.tree_name + '-PrivateHostedZoneDomain')
         super(AutoscalingLeaf, self).__init__(leaf_title, template, self.tree_config, elb_config, asg_config,
-                                              dependencies)
+                                              dependencies, asg_config.ec2_scheduled_shutdown)
 
         self.template.add_output(Output(
             'elbSecurityGroup',
@@ -101,7 +105,8 @@ class AutoscalingLeaf(Autoscaling, Leaf):
 
 
 class AutoscalingUnit(Autoscaling):
-    def __init__(self, unit_title, template, dependencies, stack_config, elb_config, asg_config):
+    def __init__(self, unit_title, template, dependencies, stack_config, elb_config, asg_config,
+                 ec2_scheduled_shutdown):
         """
         Create an integrated Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',
@@ -111,9 +116,10 @@ class AutoscalingUnit(Autoscaling):
         :param stack_config: object containing stack network configuration
         :param elb_config: config related to Elastic Load Balancer
         :param asg_config: config related to AutoScaling Group
+        :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
         """
         super(AutoscalingUnit, self).__init__(unit_title, template, stack_config, elb_config, asg_config,
-                                              dependencies)
+                                              dependencies, ec2_scheduled_shutdown)
         for dependency in self.dependencies:
             portless_dependency_name = dependency.split(':')[0]
             dependency_port = dependency.split(':')[1]

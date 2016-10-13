@@ -36,6 +36,7 @@ iam_instance_profile_arn:
 zd_autoscaling_units:
 autoscaling_units:
 database_units:
+ec2_scheduled_shutdown:
 
 # Common unit default values
 unit_title: 'defaulttitle'
@@ -120,6 +121,7 @@ asg_config: &asg_config
   health_check_type: 'ELB'
   block_devices_config:
   simple_scaling_policy_config:
+  ec2_scheduled_shutdown:
   userdata: |
     #cloud-config
     repo_update: true

@@ -7,7 +7,7 @@ from nose.tools import *
 from troposphere import Ref
 
 template = elb_config = network_config = common_asg_config = block_devices_config = tree_name = availability_zones = \
-    cd_service_role_arn = public_cidr = public_hosted_zone_name = keypair = None
+    cd_service_role_arn = public_cidr = public_hosted_zone_name = keypair = ec2_scheduled_shutdown = None
 
 
 def setup_resources():
@@ -70,7 +70,8 @@ runcmd:
         userdata=userdata,
         iam_instance_profile_arn=None,
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=None
+        simple_scaling_policy_config=None,
+        ec2_scheduled_shutdown=ec2_scheduled_shutdown
     )
 
 

@@ -7,7 +7,7 @@ from troposphere import Ref, Output, Export
 class Tree(Network):
     def __init__(self, tree_name, keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
                  jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name, private_hosted_zone_name,
-                 iam_instance_profile_arn, owner_emails, nat_highly_available):
+                 iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -31,13 +31,14 @@ class Tree(Network):
         :param iam_instance_profile_arn: the ARN for an IAM instance profile that enables cloudtrail access for logging
         :param owner_emails: a list of emails for owners of this stack. Used for alerting.
         :param nat_highly_available: True/False for whether or not to use a series of NAT gateways or a single NAT
+        :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
         """
         self.tree_name = tree_name
 
         super(Tree, self).__init__(keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
                                    jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name,
                                    private_hosted_zone_name,
-                                   iam_instance_profile_arn, owner_emails, nat_highly_available)
+                                   iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown)
 
         self.template.add_output(Output(
             'vpc',

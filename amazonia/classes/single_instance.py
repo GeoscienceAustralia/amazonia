@@ -54,6 +54,20 @@ runcmd:
  - ./awslogs-agent-setup.py -n -r """ + region + """ -c /etc/awslogs.cfg
 """
 
+        tags = Tags(Name=Join('', [Ref('AWS::StackName'), '-', title]))
+        if single_instance_config.ec2_scheduled_shutdown:
+            # Add tag to instance, so it gets picked up by EC2 Scheduler (a CF stack that needs to be running):
+            # http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html
+            #
+            # EC2 scheduler tag format: "<start time>;<stop time>;utc;<active days>"
+            #
+            # The times are in UTC, so need to account for this:
+            # 1900 UTC (previous day) = 0600 AEDT, 0900 UTC = 2000 AEDT,
+            # therefore, it needs to run Sunday UTC to be Monday AEDT.
+            #
+            # A work day is defined as: 6am-9pm. (An additional hour is added before & after for daylight savings)
+            tags += Tags(**{'scheduler:ec2-startstop': '1900;0900;utc;sun,mon,tue,wed,thu'})
+
         self.single = self.template.add_resource(
             ec2.Instance(
                 title,
@@ -72,7 +86,7 @@ runcmd:
                 # true otherwise. For more info check the below:
                 # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html#cfn-ec2-instance-sourcedestcheck
                 SourceDestCheck=False if single_instance_config.is_nat else True,
-                Tags=Tags(Name=Join('', [Ref('AWS::StackName'), '-', title])),
+                Tags=tags,
                 DependsOn=single_instance_config.instance_dependencies,
                 UserData=Base64(userdata)
             ))
