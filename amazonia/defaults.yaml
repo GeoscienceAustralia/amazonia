@@ -121,6 +121,7 @@ asg_config: &asg_config
   health_check_type: 'ELB'
   block_devices_config:
   simple_scaling_policy_config:
+  ec2_scheduled_shutdown:
   userdata: |
     #cloud-config
     repo_update: true

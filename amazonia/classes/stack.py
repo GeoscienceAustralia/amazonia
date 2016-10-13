@@ -65,9 +65,8 @@ class Stack(Network):
         self.units = {}
         self.network_config = None
 
-        if ec2_scheduled_shutdown:
-            for autoscaling_unit in self.autoscaling_units:
-                autoscaling_unit['ec2_scheduled_shutdown'] = True
+        for autoscaling_unit in self.autoscaling_units:
+            autoscaling_unit['ec2_scheduled_shutdown'] = ec2_scheduled_shutdown
 
         self.network_config = NetworkConfig(vpc=self.vpc,
                                             public_subnets=[Ref(subnet) for subnet in self.public_subnets],

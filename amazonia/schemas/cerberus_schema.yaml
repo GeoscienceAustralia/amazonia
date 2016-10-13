@@ -168,6 +168,9 @@ asg_config: &asg_config
       type: 'list'
       nullable: True
       schema: *simple_scaling_policy_config # any scaling policies based upon cpu usage
+    ec2_scheduled_shutdown:
+      type: 'boolean'
+      nullable: True
 
 blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
 green_asg_config: *asg_config #nested dictionary containing blue asg specific configuration

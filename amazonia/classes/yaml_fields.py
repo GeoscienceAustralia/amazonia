@@ -57,7 +57,8 @@ class YamlFields(object):
                            'userdata',
                            'iam_instance_profile_arn',
                            'block_devices_config',
-                           'simple_scaling_policy_config'
+                           'simple_scaling_policy_config',
+                           'ec2_scheduled_shutdown'
                            ]
 
     # simple_scaling_policy field list

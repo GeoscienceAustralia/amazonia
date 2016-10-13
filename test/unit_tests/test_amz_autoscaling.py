@@ -7,13 +7,13 @@ from nose.tools import *
 from troposphere import Ref
 
 template = network_config = elb_config = asg_config = keypair = tree_name = availability_zones = cd_service_role_arn = \
-    public_cidr = public_hosted_zone_name = None
+    public_cidr = public_hosted_zone_name = ec2_scheduled_shutdown = None
 
 
 def setup_resources():
     """ Setup global variables between tests"""
     global template, network_config, elb_config, asg_config, keypair, tree_name, availability_zones, \
-        cd_service_role_arn, public_cidr, public_hosted_zone_name
+        cd_service_role_arn, public_cidr, public_hosted_zone_name, ec2_scheduled_shutdown
     tree_name = 'testtree'
     network_config, template = get_network_config()
     availability_zones = ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c']
@@ -49,7 +49,8 @@ runcmd:
         maxsize=1,
         minsize=1,
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=None
+        simple_scaling_policy_config=None,
+        ec2_scheduled_shutdown=ec2_scheduled_shutdown
     )
 
     elb_listeners_config = [
@@ -123,10 +124,29 @@ def test_leaf_association():
     assert_equals(len(leaf.elb.egress), 1)
 
 
-def create_autoscaling_unit(title, dependencies=None):
+@with_setup(setup_resources)
+def test_ec2_shutdown_scheduled_actions_created():
+    """Test Scheduled Actions are created for autoscaling group"""
+    # ensure scheduled actions aren't created by default
+    title = 'app'
+    unit_without_schedule = create_autoscaling_unit(title)
+    assert_not_in(title + 'AsgSchedActON', unit_without_schedule.asg.template.resources)
+    assert_not_in(title + 'AsgSchedActOFF', unit_without_schedule.asg.template.resources)
+
+    # ensure scheduled actions are created when ec2_scheduled_shutdown flag enabled
+    title_with_schedule = 'appScheduled'
+    unit_with_schedule = create_autoscaling_unit(title_with_schedule, ec2_schedule=True)
+
+    # scheduled actions created
+    assert_in(title_with_schedule + 'AsgSchedActON', unit_with_schedule.asg.template.resources)
+    assert_in(title_with_schedule + 'AsgSchedActOFF', unit_with_schedule.asg.template.resources)
+
+
+def create_autoscaling_unit(title, dependencies=None, ec2_schedule=None):
     """Helper function to create unit
     :param title: title of unit
     :param dependencies: optional list of dependencies
+    :param ec2_schedule: optional flag to add ec2 scheduling tag to instance
     :return new autoscaling unit
     """
     return AutoscalingUnit(
@@ -135,7 +155,8 @@ def create_autoscaling_unit(title, dependencies=None):
         asg_config=asg_config,
         elb_config=elb_config,
         template=template,
-        dependencies=dependencies
+        dependencies=dependencies,
+        ec2_scheduled_shutdown=ec2_schedule
     )
 
 

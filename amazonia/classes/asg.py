@@ -93,14 +93,17 @@ class Asg(LocalSecurityEnabledObject):
             network_config=network_config
         ))
 
-        if hasattr(asg_config, 'ec2_scheduled_shutdown'):
+        # scale down auto scaling group outside work hours with Scheduled Actions
+        if asg_config.ec2_scheduled_shutdown:
+            # Recurrence tag uses Cron syntax: https://en.wikipedia.org/wiki/Cron
+
             # scheduled action for turning off instances (max=0)
             self.template.add_resource(ScheduledAction(
                 title=title + 'SchedActOFF',
                 AutoScalingGroupName=Ref(self.trop_asg),
                 MaxSize=0,
                 MinSize=0,
-                Recurrence="0 08 * * *"
+                Recurrence="0 09 * * *"  # 0900 UTC = 2000 AEDT
             ))
             # scheduled action for turning on instances (max=maxsize)
             self.template.add_resource(ScheduledAction(
@@ -108,7 +111,7 @@ class Asg(LocalSecurityEnabledObject):
                 AutoScalingGroupName=Ref(self.trop_asg),
                 MaxSize=asg_config.maxsize,
                 MinSize=asg_config.minsize,
-                Recurrence="0 20 * * 0,1,2,3,4"
+                Recurrence="0 19 * * 0,1,2,3,4"  # 1900 UTC (previous day) = 0600 AEDT
             ))
 
     def create_launch_config(self, title, asg_config, network_config):

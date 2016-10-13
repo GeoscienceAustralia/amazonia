@@ -26,15 +26,14 @@ class Autoscaling(object):
         self.instance_ports = [listener.instance_port for listener in elb_config.elb_listeners_config]
         self.dependencies = dependencies if dependencies else []
 
+        asg_config.ec2_scheduled_shutdown = ec2_scheduled_shutdown
+
         self.elb = Elb(
             title=title,
             template=self.template,
             network_config=network_config,
             elb_config=elb_config
         )
-
-        if ec2_scheduled_shutdown:
-            asg_config.ec2_scheduled_shutdown = True
 
         self.asg = Asg(
             title=title,
@@ -80,7 +79,7 @@ class AutoscalingLeaf(Autoscaling, Leaf):
         self.tree_config.private_hosted_zone_id = ImportValue(self.tree_name + '-PrivateHostedZoneId')
         self.tree_config.private_hosted_zone_domain = ImportValue(self.tree_name + '-PrivateHostedZoneDomain')
         super(AutoscalingLeaf, self).__init__(leaf_title, template, self.tree_config, elb_config, asg_config,
-                                              dependencies)
+                                              dependencies, asg_config.ec2_scheduled_shutdown)
 
         self.template.add_output(Output(
             'elbSecurityGroup',
@@ -107,7 +106,7 @@ class AutoscalingLeaf(Autoscaling, Leaf):
 
 class AutoscalingUnit(Autoscaling):
     def __init__(self, unit_title, template, dependencies, stack_config, elb_config, asg_config,
-                 ec2_scheduled_shutdown=False):
+                 ec2_scheduled_shutdown):
         """
         Create an integrated Amazonia unit, with associated Amazonia ELB and ASG
         :param unit_title: Title of the autoscaling application  prefixedx with Stack name e.g 'MyStackWebApp1',

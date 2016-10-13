@@ -56,10 +56,16 @@ runcmd:
 
         tags = Tags(Name=Join('', [Ref('AWS::StackName'), '-', title]))
         if single_instance_config.ec2_scheduled_shutdown:
-            # 2000 UTC (previous day) = 0700 AEDT, 0800 UTC = 1900 AEDT
-            # therefore, it needs to run Sunday UTC to be Monday AEDT
+            # Add tag to instance, so it gets picked up by EC2 Scheduler (a CF stack that needs to be running):
+            # http://docs.aws.amazon.com/solutions/latest/ec2-scheduler/deployment.html
             #
-            # <start time>;<stop time>;utc;<active days>
+            # EC2 scheduler tag format: "<start time>;<stop time>;utc;<active days>"
+            #
+            # The times are in UTC, so need to account for this:
+            # 1900 UTC (previous day) = 0600 AEDT, 0900 UTC = 2000 AEDT,
+            # therefore, it needs to run Sunday UTC to be Monday AEDT.
+            #
+            # A work day is defined as: 6am-9pm. (An additional hour is added before & after for daylight savings)
             tags += Tags(**{'scheduler:ec2-startstop': '1900;0900;utc;sun,mon,tue,wed,thu'})
 
         self.single = self.template.add_resource(
