@@ -18,10 +18,9 @@ autoscaling_units:
          - python34-pip
         runcmd:
          - cd /var/www/html
-         - git clone --branch v1.3.13 https://github.com/GeoscienceAustralia/amazonia.git
+         - git clone https://github.com/GeoscienceAustralia/amazonia.git
          - cd amazonia
          - pip-3.4 install -e . --user
-         - sed -i 's/Yaml:<\/h2><br \/>/Yaml:<\/h2><br \/><small>Version currently locked to <a href="https:\/\/github.com\/GeoscienceAustralia\/amazonia\/tree\/v1.3.13">v1.3.13<\/a>/g' ./web/index.html
          - export FLASK_APP=/var/www/html/amazonia/web/api.py
          - echo "<VirtualHost *:80>" >> /etc/httpd/conf/httpd.conf
          - echo "    ProxyPass /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
