@@ -125,7 +125,7 @@ def test_asg():
                            'autoscaling:EC2_INSTANCE_TERMINATE', 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'])
         assert_equals(asg.lc.title, title + 'Asg' + 'Lc')
         assert_equals(asg.lc.ImageId, 'ami-dc361ebf')
-        assert_equals(asg.lc.InstanceType, 't2.micro')
+        assert_equals(asg.lc.InstanceType, 't2.microFAIL')
         assert_equals(asg.lc.KeyName, 'INSERT_YOUR_KEYPAIR_HERE')
         assert_equals(
             asg.lc.IamInstanceProfile,
