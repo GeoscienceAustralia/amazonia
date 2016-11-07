@@ -8,5 +8,5 @@ python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
-install: pip install -e . --user --upgrade
+install: pip install -e . --upgrade
 script: nosetests -vv --with-xunit test/unit_tests/*.py
