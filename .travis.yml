@@ -7,4 +7,10 @@ python:
   - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
 install: pip install -e . --upgrade
-script: nosetests -vv --with-xunit test/unit_tests/*.py
+script:
+  - nosetests -vv --with-xunit test/unit_tests/*.py
+  - nosetests --with-xunit --with-coverage --cover-erase --cover-package=amazonia/classes --cover-xml test/unit_tests
+  - sonar-runner -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=$SONAR_HOST
+
+secure: "B9RDX/UTCsA3PDD0hnodhjDkVbmoaJMIQmpLa52DoKkQaz2TS0cX6u7PVEEPRTLgzZ5QQhZYYWi7HOkYcDoM820yck/rrYE+qc5Yaf1iGL4OEpb3uvLYXmNq0xu6R0XFZwuCEpczsrZvvD8YeooZL0hV2jSoByjk6q6IouTPDKJp2obDnyyacDGDq+UAca3l0ITXAOr9INCZeoNBGvmbEp+fZcR0qH/csQKHjO45ca49FRwJwG+Kt66Y7YzNu1KbRhBYidlZ5wFUIplE0meiOqoeWe9JY+JmZQxT8ABgxXBkWlOreKHOhk/1DkPenUz9fR4UP0vORATh5CQ6IxO+WnoJzlkB2jonAw6UzMk6VKtfY432hTuEwSXS5AiAbai7Ooq+kgDQbrsD2qzjGEJaGajS4bZiHGl5ARndOKo34gbAdUxbJwpq5BjqZy3ZjU8C9M6kHACXcXEqR63uRjMwhzbWHeS44ok/8cxYYvsdcbFfAc4mlbLDyyrzGCDP+wZ5vGbntT56Cf7BrcA4I3X6zJvhDc3zhY+daJeKWfafeMg1Ip3BKnUfp83hQllqR7F2q+ipulBAFQPNiKycHQ2RS3mTdDJH/Af2vj0yysfODbLCPnCJKieiDyiSCTLmqT23kwQz3+Ot8P1+dfEMN/OiuLKn/q+bSaAgHGdaFpNKo/A="
+secure: "Az86RgbRz5FW+eOOcz3i2SBvSKZg4zsi2SnT43Kx98vToOof4pzfzm1aMWMa1FvWwCf4hCXI/OxhSkUG8VXpfSnD/oGAKeqIQTck7IOtGKXMBKCI/5KqW174EeS7cwTB++rTDfrSfQCvw964S2c0Y+YBT0etOBCJLTm32bU5vHsvbNkjJLa7fMh6ujg9heml18Tmhtb+rAM2euy7y6h8voJ/fLKbi8dYteGuJyQzoB8IDJd2JBdCy7VLxzwFnKNqFLTQjrrRLUMjkhiND3GkonLgU6AWUeNwe0Ajq6ja5LXVNDvNZ6bUVHU8fJlkfA2lz2rnIY752P7Q+RcHzIO1jMckEFCF5GCB0m48A2clQUGnQqBJLrjnt+U1fBUlh1hWhc89E/k1Ec2MsTda7qdxUXvkFfIQfimeQVxIy5DVyEBGHdH2/TS+w3lqa07djQ9Ht5BZyoOP59d6dbPFh6NjGU3yQPvhLORxge/YWnufup/WUMGOiOpQqGru03BTGGPLItCz7jjrDKsa1VGRkXhOHS8fSlY27zOAiZvymqY79Z+jKXqEHlfgA+M/Gg9laAz9Dso33ZlQzB+1GETFAQOL0gN4B3ZwQTejaEfeLhAp66nJBGYL6krchOvmwRer0UFuD1bycykhcLWwbaUmwaTOT+ktkPJrdtHavuWocFGmMeM="
