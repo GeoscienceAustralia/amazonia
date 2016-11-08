@@ -6,6 +6,10 @@ python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
+before_install:
+  - echo 'deb http://downloads.sourceforge.net/project/sonar-pkg/deb binary/' | sudo tee --append /etc/apt/sources.list
+  - sudo apt-get update
+  - sudo apt-get install sonar
 install: pip install -e . --upgrade
 script:
   - nosetests -vv --with-xunit test/unit_tests/*.py
