@@ -9,7 +9,7 @@ python:
 before_install:
   - echo 'deb http://downloads.sourceforge.net/project/sonar-pkg/deb binary/' | sudo tee --append /etc/apt/sources.list
   - sudo apt-get update
-  - sudo apt-get install sonar
+  - sudo apt-get install sonar-runner -y --force-yes
 install: pip install -e . --upgrade
 script:
   - nosetests -vv --with-xunit test/unit_tests/*.py
