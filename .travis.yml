@@ -1,24 +1,20 @@
 language: python
 python:
-#  - "3.2"
-#  - "3.3"
-#  - "3.4"
-  - "3.5"
-#  - "3.5-dev" # 3.5 development branch
-#  - "3.6-dev" # 3.6 development branch
+- '3.5'
 before_install:
-  - curl http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/2.4/sonar-runner-dist-2.4.zip -o /tmp/sonar-runner-dist-2.4.zip
-  - sudo mkdir /opt/sonar-runner
-  - sudo unzip /tmp/sonar-runner-dist-2.4.zip -d /opt/sonar-runner
-  - sudo chmod 755 -R /opt/sonar-runner
-  - export PATH=$PATH:/opt/sonar-runner/sonar-runner-2.4/bin
+- curl http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/2.4/sonar-runner-dist-2.4.zip
+  -o /tmp/sonar-runner-dist-2.4.zip
+- sudo mkdir /opt/sonar-runner
+- sudo unzip /tmp/sonar-runner-dist-2.4.zip -d /opt/sonar-runner
+- sudo chmod 755 -R /opt/sonar-runner
+- export PATH=$PATH:/opt/sonar-runner/sonar-runner-2.4/bin
 install: pip install -e . --upgrade
 script:
-  - nosetests -vv --with-xunit test/unit_tests/*.py
-  - nosetests --with-xunit --with-coverage --cover-erase --cover-package=amazonia/classes --cover-xml test/unit_tests
-  - sonar-runner -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=$SONAR_HOST
-
+- nosetests -vv --with-xunit test/unit_tests/*.py
+- nosetests --with-xunit --with-coverage --cover-erase --cover-package=amazonia/classes
+  --cover-xml test/unit_tests
+- sonar-runner -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=$SONAR_HOST
 env:
   global:
-    secure: "B9RDX/UTCsA3PDD0hnodhjDkVbmoaJMIQmpLa52DoKkQaz2TS0cX6u7PVEEPRTLgzZ5QQhZYYWi7HOkYcDoM820yck/rrYE+qc5Yaf1iGL4OEpb3uvLYXmNq0xu6R0XFZwuCEpczsrZvvD8YeooZL0hV2jSoByjk6q6IouTPDKJp2obDnyyacDGDq+UAca3l0ITXAOr9INCZeoNBGvmbEp+fZcR0qH/csQKHjO45ca49FRwJwG+Kt66Y7YzNu1KbRhBYidlZ5wFUIplE0meiOqoeWe9JY+JmZQxT8ABgxXBkWlOreKHOhk/1DkPenUz9fR4UP0vORATh5CQ6IxO+WnoJzlkB2jonAw6UzMk6VKtfY432hTuEwSXS5AiAbai7Ooq+kgDQbrsD2qzjGEJaGajS4bZiHGl5ARndOKo34gbAdUxbJwpq5BjqZy3ZjU8C9M6kHACXcXEqR63uRjMwhzbWHeS44ok/8cxYYvsdcbFfAc4mlbLDyyrzGCDP+wZ5vGbntT56Cf7BrcA4I3X6zJvhDc3zhY+daJeKWfafeMg1Ip3BKnUfp83hQllqR7F2q+ipulBAFQPNiKycHQ2RS3mTdDJH/Af2vj0yysfODbLCPnCJKieiDyiSCTLmqT23kwQz3+Ot8P1+dfEMN/OiuLKn/q+bSaAgHGdaFpNKo/A="
-    secure: "Az86RgbRz5FW+eOOcz3i2SBvSKZg4zsi2SnT43Kx98vToOof4pzfzm1aMWMa1FvWwCf4hCXI/OxhSkUG8VXpfSnD/oGAKeqIQTck7IOtGKXMBKCI/5KqW174EeS7cwTB++rTDfrSfQCvw964S2c0Y+YBT0etOBCJLTm32bU5vHsvbNkjJLa7fMh6ujg9heml18Tmhtb+rAM2euy7y6h8voJ/fLKbi8dYteGuJyQzoB8IDJd2JBdCy7VLxzwFnKNqFLTQjrrRLUMjkhiND3GkonLgU6AWUeNwe0Ajq6ja5LXVNDvNZ6bUVHU8fJlkfA2lz2rnIY752P7Q+RcHzIO1jMckEFCF5GCB0m48A2clQUGnQqBJLrjnt+U1fBUlh1hWhc89E/k1Ec2MsTda7qdxUXvkFfIQfimeQVxIy5DVyEBGHdH2/TS+w3lqa07djQ9Ht5BZyoOP59d6dbPFh6NjGU3yQPvhLORxge/YWnufup/WUMGOiOpQqGru03BTGGPLItCz7jjrDKsa1VGRkXhOHS8fSlY27zOAiZvymqY79Z+jKXqEHlfgA+M/Gg9laAz9Dso33ZlQzB+1GETFAQOL0gN4B3ZwQTejaEfeLhAp66nJBGYL6krchOvmwRer0UFuD1bycykhcLWwbaUmwaTOT+ktkPJrdtHavuWocFGmMeM="
+  - secure: JIXoiFE2F9/TqkfKqMy29rwCHKV5JbfyIvejdVV7hFbt8EgupWfWL5cCyf7MNOABKjk88IxmybGQsgbUV4uCsTZPr0/L/PGe8mH4ImYLjWUe1Xn9RMJSdiYAfLLYj2mYRNaJuxxADn9gnJi5XXYQpbPU25TbvO5Z4Ti3klj6HjCrxXYox+TDB1NMlgnUeK9AzoCig98nfTniuhylOi3Qn/E5YiRFPMbZYudoDBscDFelNRqtDrmeQeVqq8p3c1Gzcsd6GchCSaB8tQoHuZw10LAfNhbRdGNKB9yuDLFB0lYw6JN3LyCD34en9hPwWheuCIUg5ZIO90z9oOS1zZicvPSM+5Om2SWl3MyhO+tyNYRkZYOTt6To55YSY3qx6HYf9d+6cPJQgeJUhmhMulA5fhssvdrbKZ/Zr4eQMtRRGegRuMCYTHW/tk58DPzF/Iq1FFcdjaHXDOWPOEq71ZT+pVbZKQHEWz8w2XCH/lqUf8OYF+7764f+7fgXfDu527F1tNb2wxp7JAu6SvsPQCRoLVOJyxDphfAoIL7g8oslkJHGk1KiIReWzi4X4X5rTjJxNTalPT0XkGbZthBlwStpoU39SELifsTGLcRSelB6O1N/WeVLR2utRMPnulyYHHyecgxIQsqcqXTTseiqFRYvRHHXxpU0VPiPl71S7sKuaUE=
+  - secure: AwJY30ZSb/9LY9sFOi0xIfRxzd+GBtxXnhxAwuRfEYcvTW/3y2EjL5N27gr7f70c+5p1O+tWUK3NxxxwHquVOuA2lt2hTTbX27X8bG7oGDoKMGGmPTZBwg+oDm23YO+kucABAsfOUPDYLm50H01blRm2xmNPcBRz//0sOqYR7SZyk0Lq7V031+VVeMcYnSdzRo3RZ9rk01QzzATgm2m6pq/UxDKCSbUp0Zc55ppLQshFdVFKE+IiJmIaXAL+AsUt41oWKifXY6fDVrlxLTd4em4ajq1Wneii8EMY+qq+ve+WhaOQFzqU3RjNU4SPzKdKiP9cQR5jgmM75APUQK4PlWe+gbCSDkbxdfMyDBBhdnRonDc4xzAoYkU6prmeREqg9uvhAH7u/zEQbmGRuuDIX/mgUWcaA8IIiqeVb15zYHCwQhz99sa9jz0vGLhzRhW8Bg1qttg9EQqscbK1Sser9YZWO/u8Pm/bIFQ2OBu6kYrhgoi5SGceIh9AwIcR88U1B7SX0wSQRXMlm5wyLBY2WbGA4ti9Lst9DAAECM7YgaHhUaEQX6cYXpG6Lm7jqEJANLXUX2ga7jdXogl4hqsnOH3tzeuk0fSTKUvaUWRG5Fsq4DULusgwq3hQIN1M0+il1o33TxSVQNVc1QcQWwnsAjxxVzR6gMU/JjVhQq5eGHA=
