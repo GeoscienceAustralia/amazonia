@@ -2,6 +2,8 @@ language: python
 python:
 - '3.5'
 before_install:
+- sudo apt-get update
+- sudo apt-get install -y pylint
 - curl http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/2.4/sonar-runner-dist-2.4.zip
   -o /tmp/sonar-runner-dist-2.4.zip
 - sudo mkdir /opt/sonar-runner
