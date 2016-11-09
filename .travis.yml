@@ -4,8 +4,8 @@ python:
 - '3.5'
 
 before_install:
-chmod +x .travis/setup.sh
-.travis/setup.sh
+- chmod +x .travis/setup.sh
+- .travis/setup.sh
 
 install: pip install -e . --upgrade
 
