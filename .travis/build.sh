@@ -3,6 +3,7 @@
 if [[ $TRAVIS_BRANCH == 'master' ]]
 then
   # Run system tests
+  echo 'Running systems tests'
 else
   # Run unit tests
   nosetests -vv --with-xunit test/unit_tests/*.py
