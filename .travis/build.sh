@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [[ $TRAVIS_BRANCH == 'master' ]]
+then
   # Run system tests
   echo 'Running systems tests'
 else
