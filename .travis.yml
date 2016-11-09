@@ -1,21 +1,20 @@
 language: python
+
 python:
 - '3.5'
+
 before_install:
-- sudo apt-get update
-- sudo apt-get install -y pylint
-- curl http://repo1.maven.org/maven2/org/codehaus/sonar/runner/sonar-runner-dist/2.4/sonar-runner-dist-2.4.zip
-  -o /tmp/sonar-runner-dist-2.4.zip
-- sudo mkdir /opt/sonar-runner
-- sudo unzip /tmp/sonar-runner-dist-2.4.zip -d /opt/sonar-runner
-- sudo chmod 755 -R /opt/sonar-runner
-- export PATH=$PATH:/opt/sonar-runner/sonar-runner-2.4/bin
+chmod +x .travis/setup.sh
+.travis/setup.sh
+
 install: pip install -e . --upgrade
+
 script:
 - nosetests -vv --with-xunit test/unit_tests/*.py
 - nosetests --with-xunit --with-coverage --cover-erase --cover-package=amazonia/classes
   --cover-xml test/unit_tests
 - sonar-runner -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=$SONAR_HOST
+
 env:
   global:
   - secure: JIXoiFE2F9/TqkfKqMy29rwCHKV5JbfyIvejdVV7hFbt8EgupWfWL5cCyf7MNOABKjk88IxmybGQsgbUV4uCsTZPr0/L/PGe8mH4ImYLjWUe1Xn9RMJSdiYAfLLYj2mYRNaJuxxADn9gnJi5XXYQpbPU25TbvO5Z4Ti3klj6HjCrxXYox+TDB1NMlgnUeK9AzoCig98nfTniuhylOi3Qn/E5YiRFPMbZYudoDBscDFelNRqtDrmeQeVqq8p3c1Gzcsd6GchCSaB8tQoHuZw10LAfNhbRdGNKB9yuDLFB0lYw6JN3LyCD34en9hPwWheuCIUg5ZIO90z9oOS1zZicvPSM+5Om2SWl3MyhO+tyNYRkZYOTt6To55YSY3qx6HYf9d+6cPJQgeJUhmhMulA5fhssvdrbKZ/Zr4eQMtRRGegRuMCYTHW/tk58DPzF/Iq1FFcdjaHXDOWPOEq71ZT+pVbZKQHEWz8w2XCH/lqUf8OYF+7764f+7fgXfDu527F1tNb2wxp7JAu6SvsPQCRoLVOJyxDphfAoIL7g8oslkJHGk1KiIReWzi4X4X5rTjJxNTalPT0XkGbZthBlwStpoU39SELifsTGLcRSelB6O1N/WeVLR2utRMPnulyYHHyecgxIQsqcqXTTseiqFRYvRHHXxpU0VPiPl71S7sKuaUE=
