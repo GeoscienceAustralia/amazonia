@@ -8,12 +8,12 @@ then
     -d amazonia/defaults.yaml \
     -s amazonia/schema.yaml \
     -t testSysStack.template \
-    -st testSysStack &
+    -st testSysStack
   python3 ./test/sys_tests/test_sys_stack_create.py \
     -y amazonia/application.yaml \
     -d ../${bamboo.infra}/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
     -t testSysStackGA.template \
-    -st testSysStackGA &
+    -st testSysStackGA
 else
   # Run unit tests
 #  nosetests -vv --with-xunit test/unit_tests/*.py
@@ -24,10 +24,10 @@ else
     -d amazonia/defaults.yaml \
     -s amazonia/schema.yaml \
     -t testSysStack.template \
-    -st testSysStack &
+    -st testSysStack
   python3 test/sys_tests/test_sys_stack_create.py \
     -y amazonia/application.yaml \
     -d dodo/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
     -t testSysStackGA.template \
-    -st testSysStackGA &
+    -st testSysStackGA
 fi
