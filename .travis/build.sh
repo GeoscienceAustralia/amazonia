@@ -3,7 +3,17 @@
 if [[ $TRAVIS_BRANCH == 'master' ]]
 then
   # Run system tests
-  echo 'Running systems tests'
+  python3 test/sys_tests/test_sys_stack_create.py \
+    -y amazonia/application.yaml \
+    -d amazonia/defaults.yaml \
+    -s amazonia/schema.yaml \
+    -t testSysStack.template \
+    -st testSysStack &
+  python3 ./test/sys_tests/test_sys_stack_create.py \
+    -y amazonia/application.yaml \
+    -d ../${bamboo.infra}/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
+    -t testSysStackGA.template \
+    -st testSysStackGA &
 else
   # Run unit tests
 #  nosetests -vv --with-xunit test/unit_tests/*.py
@@ -14,5 +24,10 @@ else
     -d amazonia/defaults.yaml \
     -s amazonia/schema.yaml \
     -t testSysStack.template \
-    -st testSysStack
+    -st testSysStack &
+  python3 test/sys_tests/test_sys_stack_create.py \
+    -y amazonia/application.yaml \
+    -d dodo/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
+    -t testSysStackGA.template \
+    -st testSysStackGA &
 fi
