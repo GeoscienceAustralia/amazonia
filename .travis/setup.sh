@@ -7,4 +7,4 @@ sudo mkdir /opt/sonar-runner
 sudo unzip /tmp/sonar-runner-dist-2.4.zip -d /opt/sonar-runner
 sudo chmod 755 -R /opt/sonar-runner
 export PATH=$PATH:/opt/sonar-runner/sonar-runner-2.4/bin
-git clone $INFRA_REPO
+git clone -b integration $INFRA_REPO
