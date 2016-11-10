@@ -11,11 +11,11 @@ then
     -st testSysStack &
   python3 ./test/sys_tests/test_sys_stack_create.py \
     -y amazonia/application.yaml \
-    -d ../${bamboo.infra}/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
+    -d dodo/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml \
     -t testSysStackGA.template \
     -st testSysStackGA &
   python3 ./test/sys_tests/test_sys_stack_create.py \
-    -y ../${bamboo.infra}/configuration_code/scripts/amazonia/amazonia/amazonia_verbose_example.yaml \
+    -y dodo/configuration_code/scripts/amazonia/amazonia/amazonia_verbose_example.yaml \
     -d amazonia/defaults.yaml \
     -t testSysStackVerbose.template \
     -st testSysStackVerbose \
@@ -37,7 +37,7 @@ else
     -t testSysStackGA.template \
     -st testSysStackGA &
   python3 ./test/sys_tests/test_sys_stack_create.py \
-    -y ../${bamboo.infra}/configuration_code/scripts/amazonia/amazonia/amazonia_verbose_example.yaml \
+    -y dodo/configuration_code/scripts/amazonia/amazonia/amazonia_verbose_example.yaml \
     -d amazonia/defaults.yaml \
     -t testSysStackVerbose.template \
     -st testSysStackVerbose \
