@@ -3,3 +3,4 @@ testfile2
 testfile3
 testfile4
 testfile5
+testfile6
