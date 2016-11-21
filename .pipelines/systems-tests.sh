@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pip3 install -e . --upgrade
-git clone -b integration $INFRA_REPO
+git clone -b integration https://$GIT_USERNAME:$GIT_PASSWORD@$INFRA_REPO
 
 #python3 dodo/test/sys_tests/test_sys_stack_create.py -y amazonia/application.yaml -d dodo/configuration_code/scripts/amazonia/amazonia/amazonia_ga_defaults.yaml -t testSysStackGA.template -st testSysStackGA &
 #python3 dodo/test/sys_tests/test_sys_stack_create.py -y amazonia/application.yaml -d amazonia/defaults.yaml -s amazonia/schema.yaml -t testSysStack.template -st testSysStack &
