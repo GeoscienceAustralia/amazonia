@@ -12,4 +12,3 @@ pipelines:
           script:
             - for file in .pipelines/*.sh; do chmod +x $file; done
             - .pipelines/master.sh
-
