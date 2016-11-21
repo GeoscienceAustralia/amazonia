@@ -1,0 +1,15 @@
+image: geoscienceaustralia/autobots-pipeline
+pipelines:
+  default:
+    - step:
+        script:
+          - for file in .pipelines/*.sh; do chmod +x $file; done
+          - .pipelines/setup.sh
+          - .pipelines/unit-tests.sh
+  branches:
+    master:
+      - step:
+          script:
+            - for file in .pipelines/*.sh; do chmod +x $file; done
+            - .pipelines/master.sh
+
