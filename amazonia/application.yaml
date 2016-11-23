@@ -1,4 +1,4 @@
-amz_version: 1.4.15
+amz_version: 1.4.16
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 autoscaling_units:
   -
