@@ -2,12 +2,15 @@
 # Runs on any push to master
 
 # Test whether this commit is only a bumpversion
-cmpstr="Bump version: "
+bumpstr="Bump version: "
+# Test whether this commit is a merge caused by bumpversion
+intstr="Merge branch 'integration'"
+
 # Retrieve the most recent commit from the git log
 log=`git log --oneline -n 1 | awk '{$1=""; print $0}'`
 echo $log
 
-if [[ $log == $cmpstr* ]]
+if [[ $log == $bumpstr* ]] || [[ $log == $intstr* ]]
 then
   echo 'Bumpversion - not running systems tests'
 else
