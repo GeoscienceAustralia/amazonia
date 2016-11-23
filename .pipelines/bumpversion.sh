@@ -12,6 +12,7 @@ git config --global user.name $GIT_NAME
 git config --global push.default simple
 
 echo $GITHUB_SSH_KEY > ~/.ssh/id_rsa
+chmod 400 ~/.ssh/id_rsa
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_rsa
 
@@ -32,5 +33,5 @@ bumpversion $BUMPVERSION_TYPE --list --verbose --tag && echo "!! BUMPVERSION"
 git push origin --all && echo "!! GIT PUSH --ALL"
 git push origin --tags && echo "!! GIT PUSH --TAGS"
 
-git remote add github 
+git remote add github git@github.com:geoscienceaustralia/amazonia.git
 git push github
