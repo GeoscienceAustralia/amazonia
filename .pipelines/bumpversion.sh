@@ -11,11 +11,6 @@ git config --global user.email $GIT_EMAIL
 git config --global user.name $GIT_NAME
 git config --global push.default simple
 
-echo $GITHUB_SSH_KEY > ~/.ssh/id_rsa
-chmod 400 ~/.ssh/id_rsa
-eval "$(ssh-agent -s)"
-echo > ssh-add ~/.ssh/id_rsa
-
 # Clone Repo
 git clone https://$GIT_USERNAME:$GIT_PASSWORD@$AMAZONIA_REPO amazonia-repo && echo "!! GIT CLONE"
 cd amazonia-repo
@@ -33,5 +28,5 @@ bumpversion $BUMPVERSION_TYPE --list --verbose --tag && echo "!! BUMPVERSION"
 git push origin --all && echo "!! GIT PUSH --ALL"
 git push origin --tags && echo "!! GIT PUSH --TAGS"
 
-git remote add github git@github.com:geoscienceaustralia/amazonia.git
-git push github
+git remote add github https://$GITHUB_USERNAME:$GITHUB_PASSWORD@GITHUB_AMAZONIA_REPO
+git push github --all && echo "Pushing to github..."
