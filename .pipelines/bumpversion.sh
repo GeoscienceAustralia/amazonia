@@ -14,7 +14,7 @@ git config --global push.default simple
 echo $GITHUB_SSH_KEY > ~/.ssh/id_rsa
 chmod 400 ~/.ssh/id_rsa
 eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
+echo > ssh-add ~/.ssh/id_rsa
 
 # Clone Repo
 git clone https://$GIT_USERNAME:$GIT_PASSWORD@$AMAZONIA_REPO amazonia-repo && echo "!! GIT CLONE"
