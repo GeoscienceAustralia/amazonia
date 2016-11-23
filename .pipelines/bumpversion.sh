@@ -28,5 +28,5 @@ bumpversion $BUMPVERSION_TYPE --list --verbose --tag && echo "!! BUMPVERSION"
 git push origin --all && echo "!! GIT PUSH --ALL"
 git push origin --tags && echo "!! GIT PUSH --TAGS"
 
-git remote add github https://$GITHUB_USERNAME:$GITHUB_PASSWORD@GITHUB_AMAZONIA_REPO
+git remote add github https://$GITHUB_USERNAME:$GITHUB_PASSWORD@$GITHUB_AMAZONIA_REPO
 git push github --all && echo "Pushing to github..."
