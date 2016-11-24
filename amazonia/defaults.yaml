@@ -8,7 +8,7 @@
 #   Multi line strings: can be used by establishing a literal block '|'
 
 # Stack values
-amz_version: 1.4.46
+amz_version: 1.4.47
 keypair: 'INSERT_YOUR_KEYPAIR_HERE'
 code_deploy_service_role:
 availability_zones:
