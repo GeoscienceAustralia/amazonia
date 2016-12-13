@@ -24,7 +24,8 @@ def main():
         sns_topic=None,
         is_nat=False,
         iam_instance_profile_arn=None,
-        availability_zone='ap-southeast-2a'
+        availability_zone='ap-southeast-2a',
+        ec2_scheduled_shutdown=None
     )
     SingleInstance(title='jump',
                    template=template,

@@ -56,13 +56,15 @@ def main():
         image_id='ami-dc361ebf',
         instance_type='t2.nano',
         minsize=1,
-        maxsize=1,
+        maxsize=2,
         userdata='',
         health_check_grace_period=300,
         health_check_type='ELB',
         iam_instance_profile_arn='arn:aws:iam::12345678987654321:role/InstanceProfileRole',
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=None
+        simple_scaling_policy_config=None,
+        ec2_scheduled_shutdown=None,
+        pausetime='10'
     )
 
     Asg(title='simple',

@@ -92,7 +92,7 @@ def test_basic_values():
     assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].loadbalancer_port, '80')
     assert_equal(autoscaling_unit_input['elb_config'].elb_listeners_config[0].instance_port, '80')
     assert_equals(autoscaling_unit_input['asg_config'].minsize, '1')
-    assert_equals(autoscaling_unit_input['asg_config'].maxsize, '1')
+    assert_equals(autoscaling_unit_input['asg_config'].maxsize, '2')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_grace_period, '300')
     assert_equals(autoscaling_unit_input['asg_config'].health_check_type, 'ELB')
     assert_equals(autoscaling_unit_input['dependencies'], None)
