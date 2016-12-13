@@ -61,7 +61,7 @@ runcmd:
 
     asg_config = AsgConfig(
         minsize=1,
-        maxsize=1,
+        maxsize=2,
         health_check_grace_period=300,
         health_check_type='ELB',
         image_id='ami-dc361ebf',
@@ -69,7 +69,9 @@ runcmd:
         userdata=userdata,
         iam_instance_profile_arn=None,
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=None
+        simple_scaling_policy_config=None,
+        ec2_scheduled_shutdown=None,
+        pausetime='10'
     )
 
     AutoscalingUnit(
@@ -78,7 +80,8 @@ runcmd:
         dependencies=['app2:80'],
         stack_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_config
+        asg_config=asg_config,
+        ec2_scheduled_shutdown=None
     )
 
     AutoscalingUnit(
@@ -87,7 +90,8 @@ runcmd:
         template=template,
         elb_config=elb_config,
         asg_config=asg_config,
-        dependencies=None
+        dependencies=None,
+        ec2_scheduled_shutdown=None
     )
     print(template.to_json(indent=2, separators=(',', ': ')))
 

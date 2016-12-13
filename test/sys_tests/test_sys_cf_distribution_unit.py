@@ -61,7 +61,7 @@ def main():
 
     asg_config = AsgConfig(
         minsize=1,
-        maxsize=1,
+        maxsize=2,
         health_check_grace_period=300,
         health_check_type='ELB',
         image_id='ami-dc361ebf',
@@ -69,7 +69,9 @@ def main():
         userdata=userdata,
         iam_instance_profile_arn=None,
         block_devices_config=block_devices_config,
-        simple_scaling_policy_config=None
+        simple_scaling_policy_config=None,
+        ec2_scheduled_shutdown=None,
+        pausetime='10'
     )
 
     app_name = 'app1'
@@ -80,7 +82,8 @@ def main():
         dependencies=[],
         stack_config=network_config,
         elb_config=elb_config,
-        asg_config=asg_config
+        asg_config=asg_config,
+        ec2_scheduled_shutdown=None
     )
 
     apiname = 'apigw1'

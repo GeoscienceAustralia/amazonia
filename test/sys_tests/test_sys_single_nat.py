@@ -26,7 +26,8 @@ def main():
         public_hosted_zone_name=None,
         iam_instance_profile_arn=None,
         sns_topic=sns_topic,
-        availability_zone='ap-southeast-2a'
+        availability_zone='ap-southeast-2a',
+        ec2_scheduled_shutdown=None
     )
     SingleInstance(title='nat1',
                    template=template,

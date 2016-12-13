@@ -94,7 +94,7 @@ runcmd:
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
-                 maxsize=1,
+                 maxsize=2,
                  health_check_grace_period=300,
                  health_check_type='ELB',
                  image_id=app_image_id,
@@ -102,11 +102,13 @@ runcmd:
                  iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
-                 simple_scaling_policy_config=None
+                 simple_scaling_policy_config=None,
+                 ec2_scheduled_shutdown=None,
+                 pausetime='10'
              ),
              'green_asg_config': AsgConfig(
                  minsize=1,
-                 maxsize=1,
+                 maxsize=2,
                  health_check_grace_period=300,
                  health_check_type='ELB',
                  image_id=app_image_id,
@@ -114,14 +116,16 @@ runcmd:
                  iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
                  userdata=userdata1,
                  block_devices_config=block_devices_config,
-                 simple_scaling_policy_config=None
+                 simple_scaling_policy_config=None,
+                 ec2_scheduled_shutdown=None,
+                 pausetime='10'
              ),
              'dependencies': ['app2:80', 'db1:5432']}
         ],
         autoscaling_units=[{'unit_title': 'app1',
                             'asg_config': AsgConfig(
                                 minsize=1,
-                                maxsize=1,
+                                maxsize=2,
                                 health_check_grace_period=300,
                                 health_check_type='ELB',
                                 image_id=app_image_id,
@@ -129,7 +133,9 @@ runcmd:
                                 iam_instance_profile_arn='arn:aws:iam::123456789:iam-instance-profile',
                                 userdata=userdata1,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None,
+                                pausetime='10'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,
@@ -146,7 +152,7 @@ runcmd:
                            {'unit_title': 'app2',
                             'asg_config': AsgConfig(
                                 minsize=1,
-                                maxsize=1,
+                                maxsize=2,
                                 health_check_grace_period=300,
                                 health_check_type='ELB',
                                 image_id=app_image_id,
@@ -154,7 +160,9 @@ runcmd:
                                 iam_instance_profile_arn=None,
                                 userdata=userdata2,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None,
+                                pausetime='10'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,
@@ -185,7 +193,8 @@ runcmd:
                          }],
         cf_distribution_units=[],
         api_gateway_units=[],
-        lambda_units=[]
+        lambda_units=[],
+        ec2_scheduled_shutdown=None
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 

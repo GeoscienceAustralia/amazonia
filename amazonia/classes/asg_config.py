@@ -15,7 +15,7 @@ class AsgConfig(object):
     def __init__(self, health_check_grace_period,
                  health_check_type, minsize, maxsize, image_id, instance_type, userdata,
                  iam_instance_profile_arn, block_devices_config, simple_scaling_policy_config,
-                 ec2_scheduled_shutdown):
+                 ec2_scheduled_shutdown, pausetime):
         """
         Simple config class to contain autoscaling group related parameters
         :param minsize: minimum size of autoscaling group
@@ -29,6 +29,7 @@ class AsgConfig(object):
         :param block_devices_config: List containing block device mappings
         :param simple_scaling_policy_config: List containing scaling policies
         :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
+        :param pausetime: number of minutes as an int. Time between building an instance and taking down the old one
         """
         self.health_check_grace_period = health_check_grace_period
         self.health_check_type = health_check_type
@@ -41,12 +42,13 @@ class AsgConfig(object):
         self.block_devices_config = block_devices_config
         self.simple_scaling_policy_config = simple_scaling_policy_config
         self.ec2_scheduled_shutdown = ec2_scheduled_shutdown
+        self.pausetime = pausetime
 
         # check for insecure variables
         if self.userdata is not None:
             detect_unencrypted_access_keys(self.userdata)
 
         # Validate that minsize is less than maxsize
-        if self.minsize > self.maxsize:
+        if int(self.minsize) > int(self.maxsize):
             raise InvalidAsgConfigError('Autoscaling unit minsize ({0}) cannot be '
                                         'larger than maxsize ({1})'.format(self.minsize, self.maxsize))
