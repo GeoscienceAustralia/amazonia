@@ -222,7 +222,8 @@ def test_duplicate_unit_names():
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
-                                   ec2_scheduled_shutdown=None
+                                   ec2_scheduled_shutdown=None,
+                                   pausetime='10'
                                ),
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -260,7 +261,8 @@ def test_duplicate_unit_names():
                                    iam_instance_profile_arn=None,
                                    block_devices_config=None,
                                    simple_scaling_policy_config=None,
-                                   ec2_scheduled_shutdown=None
+                                   ec2_scheduled_shutdown=None,
+                                   pausetime='10'
                                ),
                                'dependencies': [],
                                }],
@@ -324,7 +326,8 @@ def create_stack(nat_highly_available=False):
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
-                                   ec2_scheduled_shutdown=None
+                                   ec2_scheduled_shutdown=None,
+                                   pausetime='10'
                                ),
                                'green_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -337,7 +340,8 @@ def create_stack(nat_highly_available=False):
                                    iam_instance_profile_arn=None,
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
-                                   ec2_scheduled_shutdown=None
+                                   ec2_scheduled_shutdown=None,
+                                   pausetime='10'
                                ),
                                'dependencies': ['app2:5432', 'db1:80'],
                                }],
@@ -364,7 +368,8 @@ def create_stack(nat_highly_available=False):
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
-                                ec2_scheduled_shutdown=None
+                                ec2_scheduled_shutdown=None,
+                                pausetime='10'
                             ),
                             'dependencies': ['app2:80', 'db1:5432'],
                             },
@@ -391,7 +396,8 @@ def create_stack(nat_highly_available=False):
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
-                                ec2_scheduled_shutdown=None
+                                ec2_scheduled_shutdown=None,
+                                pausetime='10'
                             ),
                             'dependencies': []
                             }],

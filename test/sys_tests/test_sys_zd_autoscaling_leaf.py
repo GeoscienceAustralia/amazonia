@@ -77,7 +77,10 @@ runcmd:
                                 userdata=userdata,
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None)
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None,
+                                pausetime='10'
+                                )
     green_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                  health_check_type=health_check_type,
                                  minsize=0,
@@ -87,7 +90,10 @@ runcmd:
                                  userdata=userdata,
                                  iam_instance_profile_arn=None,
                                  block_devices_config=block_devices_config,
-                                 simple_scaling_policy_config=None)
+                                 simple_scaling_policy_config=None,
+                                 ec2_scheduled_shutdown=None,
+                                 pausetime='10'
+                                 )
 
     ZdAutoscalingLeaf(
         leaf_title='zdapp1',

@@ -71,7 +71,8 @@ class Asg(LocalSecurityEnabledObject):
         # Set cloud formation update policy to update
         self.trop_asg.resource['UpdatePolicy'] = UpdatePolicy(
             AutoScalingRollingUpdate=AutoScalingRollingUpdate(
-                MinInstancesInService=0
+                MinInstancesInService=asg_config.minsize,
+                PauseTime='PT{0}M'.format(asg_config.pausetime)
             )
         )
 

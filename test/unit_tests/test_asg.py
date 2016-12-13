@@ -77,11 +77,12 @@ runcmd:
         'arn:aws:iam::123456789:instance-profile/iam-instance-profile',
         image_id='ami-dc361ebf',
         instance_type='t2.micro',
-        maxsize=1,
+        maxsize=2,
         minsize=1,
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=simple_scaling_policy_config,
-        ec2_scheduled_shutdown=None
+        ec2_scheduled_shutdown=None,
+        pausetime='10'
     )
 
     load_balancer = elb.LoadBalancer('testElb',
@@ -111,7 +112,8 @@ def test_asg():
         asg = create_asg(title)
         assert_equals(asg.trop_asg.title, title + 'Asg')
         assert_equals(asg.trop_asg.MinSize, 1)
-        assert_equals(asg.trop_asg.MaxSize, 1)
+        assert_equals(asg.trop_asg.MaxSize, 2)
+        assert_equals(asg.trop_asg.resource['UpdatePolicy'].AutoScalingRollingUpdate.PauseTime, 'PT10M')
         [assert_is(type(subnet_id), Ref) for subnet_id in asg.trop_asg.VPCZoneIdentifier]
         assert_is(type(asg.trop_asg.LaunchConfigurationName), Ref)
         assert_equals(asg.trop_asg.AvailabilityZones, ['ap-southeast-2a', 'ap-southeast-2b', 'ap-southeast-2c'])

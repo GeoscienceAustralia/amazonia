@@ -58,7 +58,8 @@ class YamlFields(object):
                            'iam_instance_profile_arn',
                            'block_devices_config',
                            'simple_scaling_policy_config',
-                           'ec2_scheduled_shutdown'
+                           'ec2_scheduled_shutdown',
+                           'pausetime'
                            ]
 
     # simple_scaling_policy field list

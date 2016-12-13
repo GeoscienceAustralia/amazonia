@@ -171,6 +171,10 @@ asg_config: &asg_config
     ec2_scheduled_shutdown:
       type: 'boolean'
       nullable: True
+    pausetime:
+      type: 'string'
+      nullable: True
+      empty: False
 
 blue_asg_config: *asg_config #nested dictionary containing blue asg specific configuration
 green_asg_config: *asg_config #nested dictionary containing blue asg specific configuration

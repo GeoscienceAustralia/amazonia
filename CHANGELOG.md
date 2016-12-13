@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.47] - 13/12/2016
+- Removed version locking for web front end.
+- Added Pausetime as a configurable variable in asg_config.
+- Updated MinInstancesInService to use the asg_config's minsize.
+- Numerous corrections to system tests.
+
 ## [1.4.2] - 5/10/2016
 - Temporarily locked web front end to v1.3.13 due to troposphere 1.8.2 dependency not being in Pypi yet.
 
