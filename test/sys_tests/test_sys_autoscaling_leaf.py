@@ -70,7 +70,8 @@ runcmd:
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None,
         ec2_scheduled_shutdown=None,
-        pausetime='10'
+        pausetime='10',
+        owner='autobots'
     )
 
     AutoscalingLeaf(

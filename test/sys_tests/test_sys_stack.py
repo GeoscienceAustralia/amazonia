@@ -104,7 +104,8 @@ runcmd:
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None,
                  ec2_scheduled_shutdown=None,
-                 pausetime='10'
+                 pausetime='10',
+                 owner='autobots'
              ),
              'green_asg_config': AsgConfig(
                  minsize=1,
@@ -118,7 +119,8 @@ runcmd:
                  block_devices_config=block_devices_config,
                  simple_scaling_policy_config=None,
                  ec2_scheduled_shutdown=None,
-                 pausetime='10'
+                 pausetime='10',
+                 owner='autobots'
              ),
              'dependencies': ['app2:80', 'db1:5432']}
         ],
@@ -135,7 +137,8 @@ runcmd:
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                owner='autobots'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,
@@ -162,7 +165,8 @@ runcmd:
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                owner='autobots'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,

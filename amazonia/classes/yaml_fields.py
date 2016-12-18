@@ -59,7 +59,8 @@ class YamlFields(object):
                            'block_devices_config',
                            'simple_scaling_policy_config',
                            'ec2_scheduled_shutdown',
-                           'pausetime'
+                           'pausetime',
+                           'owner'
                            ]
 
     # simple_scaling_policy field list

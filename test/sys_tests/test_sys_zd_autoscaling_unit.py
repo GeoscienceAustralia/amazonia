@@ -27,7 +27,7 @@ runcmd:
     interval = 300
     timeout = 30
     minsize = 1
-    maxsize = 1
+    maxsize = 2
     health_check_grace_period = 300
     health_check_type = 'ELB'
 
@@ -77,7 +77,10 @@ runcmd:
                                 userdata=userdata,
                                 iam_instance_profile_arn=None,
                                 block_devices_config=block_devices_config,
-                                simple_scaling_policy_config=None)
+                                simple_scaling_policy_config=None,
+                                ec2_scheduled_shutdown=None,
+                                pausetime=10,
+                                owner='autobots')
     green_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                  health_check_type=health_check_type,
                                  minsize=minsize,
@@ -87,7 +90,10 @@ runcmd:
                                  userdata=userdata,
                                  iam_instance_profile_arn=None,
                                  block_devices_config=block_devices_config,
-                                 simple_scaling_policy_config=None)
+                                 simple_scaling_policy_config=None,
+                                 ec2_scheduled_shutdown=None,
+                                 pausetime=10,
+                                 owner='autobots')
     ZdAutoscalingUnit(
         unit_title='app1',
         template=template,

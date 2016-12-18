@@ -223,7 +223,8 @@ def test_duplicate_unit_names():
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='autobots'
                                ),
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -262,7 +263,8 @@ def test_duplicate_unit_names():
                                    block_devices_config=None,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='autobots'
                                ),
                                'dependencies': [],
                                }],
@@ -327,7 +329,8 @@ def create_stack(nat_highly_available=False):
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='autobots'
                                ),
                                'green_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -341,7 +344,8 @@ def create_stack(nat_highly_available=False):
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='autobots'
                                ),
                                'dependencies': ['app2:5432', 'db1:80'],
                                }],
@@ -369,7 +373,8 @@ def create_stack(nat_highly_available=False):
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                   owner='autobots'
                             ),
                             'dependencies': ['app2:80', 'db1:5432'],
                             },
@@ -397,7 +402,8 @@ def create_stack(nat_highly_available=False):
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                owner='autobots'
                             ),
                             'dependencies': []
                             }],

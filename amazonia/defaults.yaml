@@ -31,6 +31,7 @@ home_cidrs:
     cidr: '123.45.12.34/16'
 public_hosted_zone_name:
 private_hosted_zone_name: 'private.lan.'
+owner: 'geoscience-australia'
 owner_emails:
 iam_instance_profile_arn:
 zd_autoscaling_units:

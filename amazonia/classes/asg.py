@@ -63,7 +63,9 @@ class Asg(LocalSecurityEnabledObject):
             LoadBalancerNames=[Ref(load_balancer) for load_balancer in load_balancers],
             HealthCheckGracePeriod=asg_config.health_check_grace_period,
             HealthCheckType=asg_config.health_check_type,
-            Tags=[Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True)],
+            Tags=[
+                Tag('Name', Join('', [Ref('AWS::StackName'), '-', title]), True),
+                Tag('owner', asg_config.owner, True)],
         ))
         if network_config.get_depends_on():
             self.trop_asg.DependsOn = network_config.get_depends_on()
