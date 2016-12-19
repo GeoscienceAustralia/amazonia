@@ -210,6 +210,7 @@ def test_duplicate_unit_names():
         'owner_emails': owner_emails,
         'nat_highly_available': False,
         'ec2_scheduled_shutdown': False,
+        'owner': 'autobots',
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -223,7 +224,8 @@ def test_duplicate_unit_names():
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -234,7 +236,8 @@ def test_duplicate_unit_names():
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout
+                                   timeout=timeout,
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'dependencies': [],
                                },
@@ -248,7 +251,8 @@ def test_duplicate_unit_names():
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout
+                                   timeout=timeout,
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -262,7 +266,8 @@ def test_duplicate_unit_names():
                                    block_devices_config=None,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'dependencies': [],
                                }],
@@ -303,6 +308,7 @@ def create_stack(nat_highly_available=False):
         owner_emails=owner_emails,
         nat_highly_available=nat_highly_available,
         ec2_scheduled_shutdown=False,
+        owner='ga.autobots@gmail.com',
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,
@@ -313,7 +319,8 @@ def create_stack(nat_highly_available=False):
                                    healthy_threshold=healthy_threshold,
                                    unhealthy_threshold=unhealthy_threshold,
                                    interval=interval,
-                                   timeout=timeout
+                                   timeout=timeout,
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'blue_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -327,7 +334,8 @@ def create_stack(nat_highly_available=False):
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'green_asg_config': AsgConfig(
                                    minsize=minsize,
@@ -341,7 +349,8 @@ def create_stack(nat_highly_available=False):
                                    block_devices_config=block_devices_config,
                                    simple_scaling_policy_config=None,
                                    ec2_scheduled_shutdown=None,
-                                   pausetime='10'
+                                   pausetime='10',
+                                   owner='ga.autobots@gmail.com'
                                ),
                                'dependencies': ['app2:5432', 'db1:80'],
                                }],
@@ -355,7 +364,8 @@ def create_stack(nat_highly_available=False):
                                 healthy_threshold=healthy_threshold,
                                 unhealthy_threshold=unhealthy_threshold,
                                 interval=interval,
-                                timeout=timeout
+                                timeout=timeout,
+                                owner='ga.autobots@gmail.com'
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,
@@ -369,7 +379,8 @@ def create_stack(nat_highly_available=False):
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                   owner='ga.autobots@gmail.com'
                             ),
                             'dependencies': ['app2:80', 'db1:5432'],
                             },
@@ -383,7 +394,8 @@ def create_stack(nat_highly_available=False):
                                 healthy_threshold=healthy_threshold,
                                 unhealthy_threshold=unhealthy_threshold,
                                 interval=interval,
-                                timeout=timeout
+                                timeout=timeout,
+                                owner='ga.autobots@gmail.com'
                             ),
                             'asg_config': AsgConfig(
                                 minsize=minsize,
@@ -397,7 +409,8 @@ def create_stack(nat_highly_available=False):
                                 block_devices_config=block_devices_config,
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
-                                pausetime='10'
+                                pausetime='10',
+                                owner='ga.autobots@gmail.com'
                             ),
                             'dependencies': []
                             }],
@@ -412,7 +425,8 @@ def create_stack(nat_highly_available=False):
                              db_backup_window=db_backup_window,
                              db_backup_retention=db_backup_retention,
                              db_maintenance_window=db_maintenance_window,
-                             db_storage_type=db_storage_type
+                             db_storage_type=db_storage_type,
+                             owner='ga.autobots@gmail.com'
                          )
                          }
                         ],

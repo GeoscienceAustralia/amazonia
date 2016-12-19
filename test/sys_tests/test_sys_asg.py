@@ -90,7 +90,8 @@ runcmd:
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=simple_scaling_policy_config,
         ec2_scheduled_shutdown=None,
-        pausetime='10'
+        pausetime='10',
+        owner='ga.autobots@gmail.com'
     )
 
     Asg(title='simple',

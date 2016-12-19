@@ -13,7 +13,7 @@ from troposphere.ec2 import EIP, NatGateway
 class Network(object):
     def __init__(self, keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
                  jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name, private_hosted_zone_name,
-                 iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown):
+                 iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown, owner):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -56,6 +56,7 @@ class Network(object):
         self.nat_highly_available = nat_highly_available
         self.iam_instance_profile_arn = iam_instance_profile_arn
         self.ec2_scheduled_shutdown = ec2_scheduled_shutdown
+        self.owner = owner
 
         # initialize object references
         self.template = Template()
@@ -146,7 +147,8 @@ class Network(object):
             is_nat=False,
             sns_topic=self.sns_topic,
             availability_zone=availability_zones[0],
-            ec2_scheduled_shutdown=self.ec2_scheduled_shutdown
+            ec2_scheduled_shutdown=self.ec2_scheduled_shutdown,
+            owner=self.owner
         )
 
         # Add Jumpbox and NAT and associated security group ingress and egress rules
@@ -194,7 +196,8 @@ class Network(object):
                 public_hosted_zone_name=None,
                 sns_topic=self.sns_topic,
                 availability_zone=availability_zones[0],
-                ec2_scheduled_shutdown=self.ec2_scheduled_shutdown
+                ec2_scheduled_shutdown=self.ec2_scheduled_shutdown,
+                owner=self.owner
             )
 
             self.nat = SingleInstance(

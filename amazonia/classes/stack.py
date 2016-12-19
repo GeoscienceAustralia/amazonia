@@ -16,7 +16,7 @@ class Stack(Network):
                  public_cidr, jump_image_id, jump_instance_type, nat_image_id, nat_instance_type, zd_autoscaling_units,
                  autoscaling_units, database_units, cf_distribution_units, public_hosted_zone_name,
                  private_hosted_zone_name, iam_instance_profile_arn, owner_emails, api_gateway_units, lambda_units,
-                 nat_highly_available, ec2_scheduled_shutdown):
+                 nat_highly_available, ec2_scheduled_shutdown, owner):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -54,7 +54,7 @@ class Stack(Network):
             keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
             jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name,
             private_hosted_zone_name, iam_instance_profile_arn, owner_emails, nat_highly_available,
-            ec2_scheduled_shutdown)
+            ec2_scheduled_shutdown, owner)
         self.code_deploy_service_role = code_deploy_service_role
         self.autoscaling_units = autoscaling_units if autoscaling_units else []
         self.database_units = database_units if database_units else []

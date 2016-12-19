@@ -4,7 +4,7 @@
 class ElbConfig(object):
     def __init__(self, elb_listeners_config, elb_health_check,
                  public_unit, elb_log_bucket, ssl_certificate_id, healthy_threshold, unhealthy_threshold,
-                 interval, timeout):
+                 interval, timeout, owner):
         """
         Simple config class to contain elb related parameters
         :param elb_listeners_config: List of ELB listener configs
@@ -26,6 +26,7 @@ class ElbConfig(object):
         self.unhealthy_threshold = unhealthy_threshold
         self.interval = interval
         self.timeout = timeout
+        self.owner = owner
 
 
 class ElbListenersConfig(object):

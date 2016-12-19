@@ -59,7 +59,8 @@ runcmd:
                            healthy_threshold=10,
                            unhealthy_threshold=2,
                            interval=300,
-                           timeout=30)
+                           timeout=30,
+                           owner='ga.autobots@gmail.com')
     common_asg_config = AsgConfig(
         minsize=1,
         maxsize=1,
@@ -72,7 +73,8 @@ runcmd:
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None,
         ec2_scheduled_shutdown=ec2_scheduled_shutdown,
-        pausetime='10'
+        pausetime='10',
+        owner='ga.autobots@gmail.com'
     )
 
 

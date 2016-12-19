@@ -67,7 +67,7 @@ runcmd:
             #
             # A work day is defined as: 6am-9pm. (An additional hour is added before & after for daylight savings)
             tags += Tags(**{'scheduler:ec2-startstop': '1900;0900;utc;sun,mon,tue,wed,thu'})
-
+        tags += Tags(Owner=single_instance_config.owner)
         self.single = self.template.add_resource(
             ec2.Instance(
                 title,

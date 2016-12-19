@@ -48,6 +48,7 @@ def main():
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
+        owner='ga.autobots@gmail.com',
         elb_listeners_config=elb_listeners_config
     )
 
@@ -71,7 +72,8 @@ def main():
         block_devices_config=block_devices_config,
         simple_scaling_policy_config=None,
         ec2_scheduled_shutdown=None,
-        pausetime='10'
+        pausetime='10',
+        owner='ga.autobots@gmail.com'
     )
 
     app_name = 'app1'

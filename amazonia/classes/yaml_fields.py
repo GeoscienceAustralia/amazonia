@@ -36,7 +36,8 @@ class YamlFields(object):
                            'healthy_threshold',
                            'unhealthy_threshold',
                            'interval',
-                           'timeout'
+                           'timeout',
+                           'owner'
                            ]
 
     # elb_listeners_config field list
@@ -59,7 +60,8 @@ class YamlFields(object):
                            'block_devices_config',
                            'simple_scaling_policy_config',
                            'ec2_scheduled_shutdown',
-                           'pausetime'
+                           'pausetime',
+                           'owner'
                            ]
 
     # simple_scaling_policy field list
@@ -157,7 +159,8 @@ class YamlFields(object):
         'db_backup_window',
         'db_backup_retention',
         'db_maintenance_window',
-        'db_storage_type'
+        'db_storage_type',
+        'owner'
     ]
 
     # stack parameter field list
@@ -183,7 +186,8 @@ class YamlFields(object):
         'database_units',
         'iam_instance_profile_arn',
         'owner_emails',
-        'ec2_scheduled_shutdown'
+        'ec2_scheduled_shutdown',
+        'owner'
     ]
 
     # autoscaling unit parameter field list
