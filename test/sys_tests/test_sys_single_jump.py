@@ -26,7 +26,7 @@ def main():
         iam_instance_profile_arn=None,
         availability_zone='ap-southeast-2a',
         ec2_scheduled_shutdown=None,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     SingleInstance(title='jump',
                    template=template,

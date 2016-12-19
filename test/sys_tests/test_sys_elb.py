@@ -35,7 +35,7 @@ def main():
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     elb_config2 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -47,7 +47,7 @@ def main():
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     elb_config3 = ElbConfig(
         elb_listeners_config=elb_listeners_config,
@@ -59,7 +59,7 @@ def main():
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     Elb(title='MyUnit1',

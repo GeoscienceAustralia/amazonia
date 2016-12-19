@@ -111,7 +111,7 @@ def create_si(title, is_nat=False, ec2_schedule=None):
         sns_topic=sns_topic,
         availability_zone='ap-southeast-2a',
         ec2_scheduled_shutdown=ec2_schedule,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     si = SingleInstance(title=title,
                         template=template,

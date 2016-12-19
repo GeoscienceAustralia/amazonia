@@ -19,7 +19,7 @@ def get_network_config():
                       owner_emails=[],
                       nat_highly_available=False,
                       ec2_scheduled_shutdown=None,
-                      owner='autobots')
+                      owner='ga.autobots@gmail.com')
 
     cd_service_role_arn = 'arn:aws:iam::123456789:role/CodeDeployServiceRole'
 

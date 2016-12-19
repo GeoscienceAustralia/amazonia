@@ -514,9 +514,11 @@ private_hosted_zone_name: # A string containing the name of the Route 53 hosted 
   type: 'string'
   nullable: True
   empty: False
-owner: # A string applied to the owner tag of created objects
+owner: # The owners email address, this will be applied as a tag to the objects
   type: 'string'
+  nullable: False
   empty: False
+  regex: '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 owner_emails:  # A list of email addresses to specify ownership of this stack and also send alerts to if
   type: 'list' # alerts have been set up.
   nullable: True

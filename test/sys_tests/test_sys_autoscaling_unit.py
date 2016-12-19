@@ -48,7 +48,7 @@ runcmd:
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
-        owner='autobots',
+        owner='ga.autobots@gmail.com',
         elb_listeners_config=elb_listeners_config
     )
 
@@ -73,7 +73,7 @@ runcmd:
         simple_scaling_policy_config=None,
         ec2_scheduled_shutdown=None,
         pausetime='10',
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     AutoscalingUnit(

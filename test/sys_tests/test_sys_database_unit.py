@@ -18,7 +18,7 @@ def main():
         db_backup_retention='4',
         db_maintenance_window='Mon:01:00-Mon:01:30',
         db_storage_type='gp2',
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     # Test RDS

@@ -49,7 +49,7 @@ def create_elb(instance_port='80', loadbalancer_port='80', loadbalancer_protocol
         unhealthy_threshold=unhealthy_threshold,
         interval=interval,
         timeout=timeout,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     elb = Elb(title='elb',

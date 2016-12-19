@@ -65,7 +65,7 @@ def main():
         simple_scaling_policy_config=None,
         ec2_scheduled_shutdown=None,
         pausetime='10',
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     Asg(title='simple',

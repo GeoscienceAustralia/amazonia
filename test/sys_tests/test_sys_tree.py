@@ -25,7 +25,7 @@ def main():
         public_hosted_zone_name='your.domain.',
         private_hosted_zone_name='private.lan.',
         ec2_scheduled_shutdown=None,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 

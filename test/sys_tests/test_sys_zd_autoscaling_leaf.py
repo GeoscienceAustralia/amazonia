@@ -67,7 +67,7 @@ runcmd:
                            unhealthy_threshold=unhealthy_threshold,
                            interval=interval,
                            timeout=timeout,
-                           owner='autobots'
+                           owner='ga.autobots@gmail.com'
                            )
     blue_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                 health_check_type=health_check_type,
@@ -81,7 +81,7 @@ runcmd:
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
                                 pausetime='10',
-                                owner='autobots'
+                                owner='ga.autobots@gmail.com'
                                 )
     green_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                  health_check_type=health_check_type,
@@ -95,7 +95,7 @@ runcmd:
                                  simple_scaling_policy_config=None,
                                  ec2_scheduled_shutdown=None,
                                  pausetime='10',
-                                 owner='autobots'
+                                 owner='ga.autobots@gmail.com'
                                  )
 
     ZdAutoscalingLeaf(

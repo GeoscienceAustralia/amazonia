@@ -19,7 +19,7 @@ def main():
         db_backup_retention=None,
         db_maintenance_window=None,
         db_storage_type='gp2',
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     DatabaseLeaf(leaf_title='MyDb',

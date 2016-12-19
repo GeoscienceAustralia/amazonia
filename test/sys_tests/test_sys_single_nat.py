@@ -28,7 +28,7 @@ def main():
         sns_topic=sns_topic,
         availability_zone='ap-southeast-2a',
         ec2_scheduled_shutdown=None,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     SingleInstance(title='nat1',
                    template=template,

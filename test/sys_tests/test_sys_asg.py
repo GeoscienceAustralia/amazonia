@@ -91,7 +91,7 @@ runcmd:
         simple_scaling_policy_config=simple_scaling_policy_config,
         ec2_scheduled_shutdown=None,
         pausetime='10',
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
 
     Asg(title='simple',

@@ -91,7 +91,7 @@ runcmd:
                  unhealthy_threshold=2,
                  interval=300,
                  timeout=30,
-                 owner='autobots'
+                 owner='ga.autobots@gmail.com'
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
@@ -106,7 +106,7 @@ runcmd:
                  simple_scaling_policy_config=None,
                  ec2_scheduled_shutdown=None,
                  pausetime='10',
-                 owner='autobots'
+                 owner='ga.autobots@gmail.com'
              ),
              'green_asg_config': AsgConfig(
                  minsize=1,
@@ -121,7 +121,7 @@ runcmd:
                  simple_scaling_policy_config=None,
                  ec2_scheduled_shutdown=None,
                  pausetime='10',
-                 owner='autobots'
+                 owner='ga.autobots@gmail.com'
              ),
              'dependencies': ['app2:80', 'db1:5432']}
         ],
@@ -139,7 +139,7 @@ runcmd:
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
                                 pausetime='10',
-                                owner='autobots'
+                                owner='ga.autobots@gmail.com'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,
@@ -151,7 +151,7 @@ runcmd:
                                 unhealthy_threshold=2,
                                 interval=300,
                                 timeout=30,
-                                owner='autobots'
+                                owner='ga.autobots@gmail.com'
                             ),
                             'dependencies': ['app2:80', 'db1:5432']},
                            {'unit_title': 'app2',
@@ -168,7 +168,7 @@ runcmd:
                                 simple_scaling_policy_config=None,
                                 ec2_scheduled_shutdown=None,
                                 pausetime='10',
-                                owner='autobots'
+                                owner='ga.autobots@gmail.com'
                             ),
                             'elb_config': ElbConfig(
                                 elb_listeners_config=elb_listeners_config,
@@ -180,7 +180,7 @@ runcmd:
                                 unhealthy_threshold=2,
                                 interval=300,
                                 timeout=30,
-                                owner='autobots'
+                                owner='ga.autobots@gmail.com'
                             ),
                             'dependencies': []}
                            ],
@@ -196,14 +196,14 @@ runcmd:
                              db_backup_retention=None,
                              db_maintenance_window=None,
                              db_storage_type=None,
-                             owner='autobots'
+                             owner='ga.autobots@gmail.com'
                          )
                          }],
         cf_distribution_units=[],
         api_gateway_units=[],
         lambda_units=[],
         ec2_scheduled_shutdown=None,
-        owner='autobots'
+        owner='ga.autobots@gmail.com'
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 
