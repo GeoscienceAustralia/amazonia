@@ -36,7 +36,8 @@ class YamlFields(object):
                            'healthy_threshold',
                            'unhealthy_threshold',
                            'interval',
-                           'timeout'
+                           'timeout',
+                           'owner'
                            ]
 
     # elb_listeners_config field list

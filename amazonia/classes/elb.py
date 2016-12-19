@@ -23,6 +23,9 @@ class Elb(LocalSecurityEnabledObject):
         super(Elb, self).__init__(vpc=network_config.vpc, title=title, template=template)
         elb_listeners = elb_config.elb_listeners_config
         subnets = network_config.public_subnets if elb_config.public_unit is True else network_config.private_subnets
+        # Create Tags
+        tags = Tags(Name=self.title)
+        tags += Tags(owner=elb_config.owner)
 
         # Create ELB
         self.trop_elb = self.template.add_resource(
@@ -42,7 +45,7 @@ class Elb(LocalSecurityEnabledObject):
                              Scheme='internet-facing' if elb_config.public_unit is True else 'internal',
                              SecurityGroups=[self.security_group],
                              Subnets=subnets,
-                             Tags=Tags(Name=self.title)))
+                             Tags=tags))
         if network_config.get_depends_on():
             self.trop_elb.DependsOn = network_config.get_depends_on()
 

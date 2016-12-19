@@ -90,7 +90,8 @@ runcmd:
                  healthy_threshold=10,
                  unhealthy_threshold=2,
                  interval=300,
-                 timeout=30
+                 timeout=30,
+                 owner='autobots'
              ),
              'blue_asg_config': AsgConfig(
                  minsize=1,
@@ -149,7 +150,8 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30
+                                timeout=30,
+                                owner='autobots'
                             ),
                             'dependencies': ['app2:80', 'db1:5432']},
                            {'unit_title': 'app2',
@@ -177,7 +179,8 @@ runcmd:
                                 healthy_threshold=10,
                                 unhealthy_threshold=2,
                                 interval=300,
-                                timeout=30
+                                timeout=30,
+                                owner='autobots'
                             ),
                             'dependencies': []}
                            ],

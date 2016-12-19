@@ -66,7 +66,8 @@ runcmd:
                            healthy_threshold=healthy_threshold,
                            unhealthy_threshold=unhealthy_threshold,
                            interval=interval,
-                           timeout=timeout
+                           timeout=timeout,
+                           owner='autobots'
                            )
     blue_asg_config = AsgConfig(health_check_grace_period=health_check_grace_period,
                                 health_check_type=health_check_type,

@@ -47,6 +47,7 @@ runcmd:
         unhealthy_threshold=2,
         interval=300,
         timeout=30,
+        owner='autobots',
         elb_listeners_config=elb_listeners_config
     )
 
