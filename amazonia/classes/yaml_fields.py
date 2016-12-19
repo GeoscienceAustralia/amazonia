@@ -158,7 +158,8 @@ class YamlFields(object):
         'db_backup_window',
         'db_backup_retention',
         'db_maintenance_window',
-        'db_storage_type'
+        'db_storage_type',
+        'owner'
     ]
 
     # stack parameter field list

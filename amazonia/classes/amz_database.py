@@ -22,11 +22,14 @@ class Database(LocalSecurityEnabledObject):
         self.db_subnet_group_title = title + 'Dsg'
         self.port = database_config.db_port
         self.rds_r53 = None
+        # Add Tags
+        tags = Tags(Name=self.db_subnet_group_title)
+        tags += Tags(owner=database_config.owner)
         self.trop_db_subnet_group = template.add_resource(
             rds.DBSubnetGroup(self.db_subnet_group_title,
                               DBSubnetGroupDescription=self.db_subnet_group_title,
                               SubnetIds=network_config.private_subnets,
-                              Tags=Tags(Name=self.db_subnet_group_title)))
+                              Tags=tags))
         rds_params = {
             'AllocatedStorage': database_config.db_hdd_size,
             'AllowMajorVersionUpgrade': True,

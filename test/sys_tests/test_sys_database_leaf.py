@@ -18,7 +18,8 @@ def main():
         db_backup_window=None,
         db_backup_retention=None,
         db_maintenance_window=None,
-        db_storage_type='gp2'
+        db_storage_type='gp2',
+        owner='autobots'
     )
 
     DatabaseLeaf(leaf_title='MyDb',

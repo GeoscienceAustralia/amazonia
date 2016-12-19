@@ -420,7 +420,8 @@ def create_stack(nat_highly_available=False):
                              db_backup_window=db_backup_window,
                              db_backup_retention=db_backup_retention,
                              db_maintenance_window=db_maintenance_window,
-                             db_storage_type=db_storage_type
+                             db_storage_type=db_storage_type,
+                             owner='autobots'
                          )
                          }
                         ],
