@@ -27,7 +27,8 @@ def main():
         iam_instance_profile_arn=None,
         sns_topic=sns_topic,
         availability_zone='ap-southeast-2a',
-        ec2_scheduled_shutdown=None
+        ec2_scheduled_shutdown=None,
+        owner='ga.autobots@gmail.com'
     )
     SingleInstance(title='nat1',
                    template=template,

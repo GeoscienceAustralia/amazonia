@@ -7,7 +7,7 @@ from troposphere import Ref, Output, Export
 class Tree(Network):
     def __init__(self, tree_name, keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
                  jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name, private_hosted_zone_name,
-                 iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown):
+                 iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown, owner):
         """
         Create a vpc, nat, jumphost, internet gateway, public/private route tables, public/private subnets
          and collection of Amazonia units
@@ -38,7 +38,7 @@ class Tree(Network):
         super(Tree, self).__init__(keypair, availability_zones, vpc_cidr, home_cidrs, public_cidr, jump_image_id,
                                    jump_instance_type, nat_image_id, nat_instance_type, public_hosted_zone_name,
                                    private_hosted_zone_name,
-                                   iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown)
+                                   iam_instance_profile_arn, owner_emails, nat_highly_available, ec2_scheduled_shutdown, owner)
 
         self.template.add_output(Output(
             'vpc',

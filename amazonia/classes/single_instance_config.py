@@ -4,7 +4,7 @@
 class SingleInstanceConfig(object):
     def __init__(self, vpc, sns_topic, keypair, si_image_id, si_instance_type, subnet, availability_zone,
                  instance_dependencies, iam_instance_profile_arn, public_hosted_zone_name, is_nat,
-                 ec2_scheduled_shutdown):
+                 ec2_scheduled_shutdown, owner):
         """
         Simple config class to contain networking related parameters
         :param vpc: Troposphere vpc object, required for SecurityEnabledObject class
@@ -19,6 +19,7 @@ class SingleInstanceConfig(object):
         :param iam_instance_profile_arn: the ARN for an IAM profile that enables cloudwatch logging.
         :param availability_zone: availabiity zone to create single instance in
         :param ec2_scheduled_shutdown: True/False for whether to schedule shutdown for EC2 instances outside work hours
+        :param owner: String value of owner tag
         """
         self.vpc = vpc
         self.sns_topic = sns_topic
@@ -32,3 +33,4 @@ class SingleInstanceConfig(object):
         self.is_nat = is_nat
         self.availability_zone = availability_zone
         self.ec2_scheduled_shutdown = ec2_scheduled_shutdown
+        self.owner = owner
