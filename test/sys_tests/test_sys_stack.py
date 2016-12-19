@@ -198,7 +198,8 @@ runcmd:
         cf_distribution_units=[],
         api_gateway_units=[],
         lambda_units=[],
-        ec2_scheduled_shutdown=None
+        ec2_scheduled_shutdown=None,
+        owner='autobots'
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 

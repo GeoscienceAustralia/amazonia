@@ -110,7 +110,8 @@ def create_si(title, is_nat=False, ec2_schedule=None):
         iam_instance_profile_arn='my/instance-profile',
         sns_topic=sns_topic,
         availability_zone='ap-southeast-2a',
-        ec2_scheduled_shutdown=ec2_schedule
+        ec2_scheduled_shutdown=ec2_schedule,
+        owner='autobots'
     )
     si = SingleInstance(title=title,
                         template=template,

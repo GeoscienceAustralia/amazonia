@@ -24,7 +24,8 @@ def main():
         public_cidr={'name': 'PublicIp', 'cidr': '0.0.0.0/0'},
         public_hosted_zone_name='your.domain.',
         private_hosted_zone_name='private.lan.',
-        ec2_scheduled_shutdown=None
+        ec2_scheduled_shutdown=None,
+        owner='autobots'
     )
     print(stack.template.to_json(indent=2, separators=(',', ': ')))
 

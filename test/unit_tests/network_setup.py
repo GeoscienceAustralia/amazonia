@@ -18,7 +18,8 @@ def get_network_config():
                       iam_instance_profile_arn='arn:aws:iam::123456789:instance-profile/iam-instance-profile',
                       owner_emails=[],
                       nat_highly_available=False,
-                      ec2_scheduled_shutdown=None)
+                      ec2_scheduled_shutdown=None,
+                      owner='autobots')
 
     cd_service_role_arn = 'arn:aws:iam::123456789:role/CodeDeployServiceRole'
 

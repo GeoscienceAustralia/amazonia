@@ -210,6 +210,7 @@ def test_duplicate_unit_names():
         'owner_emails': owner_emails,
         'nat_highly_available': False,
         'ec2_scheduled_shutdown': False,
+        'owner': 'autobots',
         'autoscaling_units': [{'unit_title': 'app1',
                                'asg_config': AsgConfig(
                                    minsize=minsize,
@@ -305,6 +306,7 @@ def create_stack(nat_highly_available=False):
         owner_emails=owner_emails,
         nat_highly_available=nat_highly_available,
         ec2_scheduled_shutdown=False,
+        owner='autobots',
         zd_autoscaling_units=[{'unit_title': 'zdapp1',
                                'elb_config': ElbConfig(
                                    elb_listeners_config=elb_listeners_config,

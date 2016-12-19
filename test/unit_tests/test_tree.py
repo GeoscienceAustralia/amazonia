@@ -127,5 +127,6 @@ def create_tree(nat_highly_available=False):
         iam_instance_profile_arn=None,
         owner_emails=owner_emails,
         nat_highly_available=nat_highly_available,
-        ec2_scheduled_shutdown=ec2_scheduled_shutdown
+        ec2_scheduled_shutdown=ec2_scheduled_shutdown,
+        owner='autobots'
     )

@@ -27,7 +27,7 @@ runcmd:
     interval = 300
     timeout = 30
     minsize = 1
-    maxsize = 1
+    maxsize = 2
     health_check_grace_period = 300
     health_check_type = 'ELB'
 
