@@ -1,11 +1,9 @@
-# This yaml is used to generate the API and web front end service for amazonia.
-# Web Front End: http://amazonia.gadevs.ga/amazonia/web/index.html
-# API: http://amazonia.gadevs.ga/yaml
-# (The API will only work for POST requests with correctly formatted YAML data)
-public_hosted_zone_name: 'gadevs.ga.'
+#
+# Creates a 2 tier stack with a load balanced, autoscaling web application
+#
 autoscaling_units:
   -
-    unit_title: 'api'
+    unit_title: 'web'
     asg_config:
       image_id: 'ami-dc361ebf'
       userdata: |
@@ -17,10 +15,6 @@ autoscaling_units:
         runcmd:
          - cd /var/www/html
          - echo "Hello World !!" > ./index.html
-         - echo "<VirtualHost *:80>" >> /etc/httpd/conf/httpd.conf
-         - echo "    ProxyPass /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
-         - echo "    ProxyPassReverse /yaml http://localhost:5000/yaml" >> /etc/httpd/conf/httpd.conf
-         - echo "</VirtualHost>" >> /etc/httpd/conf/httpd.conf
          - service httpd reload
          - service httpd start
     elb_config:
