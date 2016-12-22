@@ -15,7 +15,7 @@ This section details the steps required to install Amazonia for local developmen
 1. Using Git download Amazonia from the BitBucket [repo](https://bitbucket.org/geoscienceaustralia/amazonia.git)
     **git clone https://bitbucket.org/geoscienceaustralia/amazonia.git**
 2. From the **amazonia** root folder run the install
-    **pip install -e**
+    **pip install -e .**
 3. You are now ready to use Amazonia !!
 
 ## Usage
