@@ -1,43 +1,36 @@
+## Amazonia
+
+Amazonia facilitates creation of application and infrastructure stacks in the AWS cloud in a reproducible and consistent way. It does this by accepting your **defaults** and **application** files, validating them for errors and producing and cloud formation template. As the name implies the **defaults** file states all the environmental settings. It is highly recommended to spend some time to review and customise this to your environment. This will speed up development by freeing you up to focus your efforts on application stacks.
+
+## Quick Start
+
+Amazonia can be accessed via two methods the first being an experimental web [front-end](http://amazonia.gadevs.ga/amazonia/web/index.html). Requiring no setup time it allows you to quickly become familiar with Amazonia and is also handy if you are developing on a restricted workstation. Just create and enter an **application** YAML in your browser [here](http://amazonia.gadevs.ga/amazonia/web/index.html) and see the resultant cloud formation template (this is naturally run against the supplied **defaults**).
+
+The second method is more geared towards a development environment and requires some minor setup which is described in the next section.
+
+## Installation
+
+This section details the steps required to install Amazonia for local development. It assumes your Linux development workstation has Python3, PIP and Git client configured and working.
+
+1. Using Git download Amazonia from the BitBucket [repo](https://bitbucket.org/geoscienceaustralia/amazonia.git)
+    **git clone https://bitbucket.org/geoscienceaustralia/amazonia.git**
+2. From the **amazonia** root folder run the install
+    **pip install -e .**
+3. You are now ready to use Amazonia !!
+
 ## Usage
 
-To install library locally for the current user, from the amazonia root directory use:
+Amazonia is driven by the **amz.py** Python script which takes two input files. As previously mentioned these are the defaults and application files. If either of these are not supplied on the commandline Amazonia will source from **amazonia/application.yaml** and **amazonia/defaults.yaml** instead.
 
-`make install`
-
-Alternatively, you can use:
-
-`pip3 install -e . --user`
-
-Note: this will install all of the dependencies for the project. The dependencies list can be found in the setup.py file in the 'Install Requires:' section.
-
-To generate cloud formation using amazonia, you need to provide two yaml documents. One containing any application specific details and another for the environmental defaults.
-
-Amazonia will read the two yaml documets and give priority to the application specific yaml, meaning that the defaults can be overridden in the application specific yaml if required. Because of this, it is best to set as many defaults as possible to ensure the best functionality out of this library.
-
-See the yaml files in the amazonia folder for a guide showing all possible yaml variables and the expected types of contents. Schema is used to validate the combined application and defaults yaml before execution.
-
-If no custom yaml files are provided, amazonia will read from amazonia/application.yaml and amazonia/defaults.yaml.
-
-Once you have both of your yaml documents, you can run amazonia using the below command
-
-`python3 amazonia/amz.py -y APPLICATION_YAML_LOCATION -d ENVIRONMENTAL_DEFAULT_YAML_LOCATION`
-
-## experimental front end
-
-We have created an experimental front end which allows a user to build an application yaml file in their web browser and see the result Amazonia would generate using the basic defaults.yaml for now.
-
-The site can be found [here](http://amazonia.gadevs.ga/amazonia/web/index.html)
-
-#### amz.py options
-
+**Commandline:** `python amazonia/amz.py -y {application}.yaml -d {defaults}.yaml`
 
     usage: amz.py [-h] [-y YAML] [-d DEFAULT] [-s SCHEMA] [-t TEMPLATE] [-o]
-    
+
     optional arguments:
       -h, --help            show this help message and exit
-      -y YAML, --yaml       Path to the applications amazonia yaml file
+      -y YAML, --yaml       Path to the **application**s amazonia yaml file
       -d DEFAULT, --default
-                            Path to the environmental defaults yaml file
+                            Path to the environmental **defaults** yaml file
       -s SCHEMA, --schema
                             Path to the schema to validate the provided yaml
                             values against
@@ -46,35 +39,22 @@ The site can be found [here](http://amazonia.gadevs.ga/amazonia/web/index.html)
       -o, --out             Output template to stdout rather than a file.
 
 
+## Examples
+
+You will find two examples in the examples **amazonia\examples** folder:
+
+**2TierWeb**
+
+This is a simple **Hello World !!** web application. It has been configured to auto-scale with Elastic Load Balancer for load distribution.
+
+**3TierWebRDS**
+
+This demostrates a 3 tier stack consisting of a **web** front-end, an **api** middle tier and **database** backend.
+
 ## Contributions
 
-For any contributions, please feel free to fork, or branch this repo from the integration branch.
-All Pull requests should also be aimed at the integration branch. 
+For any contributions, please feel free to fork, or branch this repo from the integration branch. All Pull requests should also be aimed at the integration branch.
 This is because the integration branch is where our tests run before we merge to master so this is super helpful to us :)
-
-##Examples
-
-#### Quick Start
-
-Follow these steps to create a working stack using Amazonia:
-
-1. Clone the master branch of this repo.
-2. Change the KeyPair yaml variable in the amazonia/application.yaml file. This needs to be the name of an existing key pair in your AWS space. See YAML key tips at the bottom of this readme for more info.
-3. Change directory to the amazonia folder and run amz.py with no arguments: `Python3 amz.py`
-4. Create a stack using the stack.template file that is generated.
-
-This will create the following resources:
-
-- 1 x Internet Gateway
-- 1 x VPC Gateway Attachment
-- 1 x Jump Box (for ssh access into your environment)
-- 1 x NAT (Internet access from your app server will pass through this)
-- 1 x Autoscaling group (min/max 1 instance. This will be your app server)
-- 1 x Launch configuration for the above autoscaling group.
-- 6 x subnets (3 public, 3 private)
-- 1 x Load Balancer
-- 4 x security groups (1 for load balancer, 1 for Autoscaling group, 1 for NAT, 1 for Jump box)
-- Route tables, routing and security group rules for all of the above.
 
 ## YAML key tips
 
