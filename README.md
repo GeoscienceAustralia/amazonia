@@ -43,9 +43,9 @@ Amazonia is driven by the **amz.py** Python script which takes two input files. 
 
 You will find two examples in the examples **amazonia\examples** folder:
 
-**web**
+**2TierWeb**
 
-This is a simple web application using the light weight **FLASK** web server. It has been configured to auto-scale with Elastic Load Balancer for load distribution.
+This is a simple **Hello World !!** web application. It has been configured to auto-scale with Elastic Load Balancer for load distribution.
 
 **3TierWebRDS**
 
