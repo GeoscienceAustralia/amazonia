@@ -1,0 +1,26 @@
+#
+# Creates a 2 tier stack with a load balanced, autoscaling web application
+#
+autoscaling_units:
+  -
+    unit_title: 'web'
+    asg_config:
+      image_id: 'ami-dc361ebf'
+      userdata: |
+        #cloud-config
+        repo_update: true
+        repo_upgrade: all
+        packages:
+         - httpd
+        runcmd:
+         - cd /var/www/html
+         - echo "Hello World !!" > ./index.html
+         - service httpd reload
+         - service httpd start
+    elb_config:
+      elb_health_check: 'HTTP:80/index.html'
+      elb_listeners_config:
+        - instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_protocol: 'HTTP'
+          loadbalancer_port: '80'

@@ -1,0 +1,71 @@
+#
+# Create a 3 tier stack with Web, API, and RDS with autoscaling units
+#
+
+autoscaling_units:
+  -
+    unit_title: 'webserver'
+    asg_config:
+      image_id: 'ami-dc361ebf'
+      userdata: |
+        #cloud-config
+        repo_update: true
+        repo_upgrade: all
+        packages:
+         - httpd
+        write_files:
+         - content: |
+            <html>
+            <body>
+            <h1>Welcome to the Home Page !</h1>
+            </body>
+            </html>
+           path: /var/www/html/index.html
+           permissions: '0644'
+           owner: root:root
+        runcmd:
+         - service httpd start
+    elb_config:
+      elb_health_check: 'HTTP:80/index.html'
+      elb_listeners_config:
+        - instance_protocol: 'HTTP'
+          instance_port: '80'
+          loadbalancer_protocol: 'HTTP'
+          loadbalancer_port: '80'
+  -
+    unit_title: 'apiserver'
+    asg_config:
+      image_id: 'ami-dc361ebf'
+      userdata: |
+        #cloud-config
+        repo_update: true
+        repo_upgrade: all
+        packages:
+         - git
+         - python34-pip
+        runcmd:
+         - git clone {your API}
+         - pip install {your API}
+         - python3 -m flask run --host=0.0.0.0
+    elb_config:
+      elb_health_check: 'HTTP:5000/api/get/user'
+      elb_listeners_config:
+        - instance_protocol: 'HTTP'
+          instance_port: '5000'
+          loadbalancer_protocol: 'HTTP'
+          loadbalancer_port: '5000'
+
+database_units:
+  -
+    unit_title: 'dbdbase'
+    database_config:
+      db_instance_type: 'db.t2.micro'
+      db_engine: 'postgres'
+      db_port: '5432'
+      db_name: 'myDb'
+      db_hdd_size: 5
+      db_snapshot_id:
+      db_backup_window: '17:00-17:30'
+      db_backup_retention: '4'
+      db_maintenance_window: 'Mon:01:00-Mon:01:30'
+      db_storage_type: 'gp2'
