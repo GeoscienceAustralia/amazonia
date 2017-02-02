@@ -53,7 +53,7 @@ This demostrates a 3 tier stack consisting of a **web** front-end, an **api** mi
 
 ## Contributions
 
-For any contributions, please feel free to fork, or branch this repo from the integration branch. All Pull requests should also be aimed at the integration branch.
+For any contributions, please feel free to fork, or branch this repo from the integration branch. All pull requests should also be aimed at the integration branch.
 This is because the integration branch is where our tests run before we merge to master so this is super helpful to us :)
 
 ## YAML key tips
