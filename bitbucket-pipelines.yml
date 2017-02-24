@@ -1,4 +1,4 @@
-image: geoscienceaustralia/autobots-pipeline
+image: geoscienceaustralia/autobots-amazonia
 pipelines:
   default:
     - step:
