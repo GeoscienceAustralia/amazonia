@@ -159,7 +159,7 @@ class Network(object):
         )
 
         [self.jump.add_ingress(sender=home_cidr, port='22') for home_cidr in self.home_cidrs]
-        self.jump.add_egress(receiver=self.public_cidr, port='-1')
+        self.jump.add_egress(receiver={'name': 'PublicIp', 'cidr': '0.0.0.0/0'}, port='-1')
 
         if self.nat_highly_available:
             for public_subnet in self.public_subnets:
